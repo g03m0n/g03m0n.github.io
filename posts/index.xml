@@ -3,7 +3,7 @@
         <title>All Posts - Lil Tu</title>
         <link>https://g03m0n.github.io/posts/</link>
         <description>All Posts | Lil Tu</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 02 Dec 2023 19:45:38 &#43;0700</lastBuildDate><atom:link href="https://g03m0n.github.io/posts/" rel="self" type="application/rss+xml" /><item>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 02 Dec 2023 20:11:41 &#43;0700</lastBuildDate><atom:link href="https://g03m0n.github.io/posts/" rel="self" type="application/rss+xml" /><item>
     <title>Theme Documentation - Basics</title>
     <link>https://g03m0n.github.io/posts/theme-documentation-basics/</link>
     <pubDate>Fri, 06 Mar 2020 21:29:01 &#43;0800</pubDate>
@@ -51,6 +51,14 @@
     <guid>https://g03m0n.github.io/posts/theme-documentation-bilibili-shortcode/</guid>
     <description><![CDATA[<a href="https://github.com/Fastbyte01/KeepIt/releases/tag/v0.2.0" rel="noopener noreffer" target="_blank"></a>
 <p>The <code>bilibili</code> shortcode embeds a responsive video player for bilibili videos.</p>]]></description>
+</item>
+<item>
+    <title>Lil Tu</title>
+    <link>https://g03m0n.github.io/posts/lil-tu/lil-tu/</link>
+    <pubDate>Sat, 02 Dec 2023 20:11:41 &#43;0700</pubDate>
+    <author>Author</author>
+    <guid>https://g03m0n.github.io/posts/lil-tu/lil-tu/</guid>
+    <description><![CDATA[Hello]]></description>
 </item>
 <item>
     <title>Pham Anh Tu</title>
