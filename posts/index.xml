@@ -1,8 +1,8 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
-        <title>All Posts - My New Hugo Site</title>
+        <title>All Posts - Lil Tu</title>
         <link>https://g03m0n.github.io/posts/</link>
-        <description>All Posts | My New Hugo Site</description>
+        <description>All Posts | Lil Tu</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 06 Mar 2020 21:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/posts/" rel="self" type="application/rss+xml" /><item>
     <title>Theme Documentation - Basics</title>
     <link>https://g03m0n.github.io/posts/theme-documentation-basics/</link>

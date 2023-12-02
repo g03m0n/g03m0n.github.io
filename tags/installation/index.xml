@@ -1,8 +1,8 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
-        <title>installation - Tag - My New Hugo Site</title>
+        <title>installation - Tag - Lil Tu</title>
         <link>https://g03m0n.github.io/tags/installation/</link>
-        <description>installation - Tag - My New Hugo Site</description>
+        <description>installation - Tag - Lil Tu</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 06 Mar 2020 21:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/installation/" rel="self" type="application/rss+xml" /><item>
     <title>Theme Documentation - Basics</title>
     <link>https://g03m0n.github.io/posts/theme-documentation-basics/</link>
