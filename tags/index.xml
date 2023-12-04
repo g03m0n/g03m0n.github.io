@@ -1,30 +1,22 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
-        <title>Tags - Tag - Lil Tu</title>
+        <title>Tags - Tag - g03m0n</title>
         <link>https://g03m0n.github.io/tags/</link>
-        <description>Tags - Tag - Lil Tu</description>
+        <description>Tags - Tag - g03m0n</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 06 Mar 2020 21:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/" rel="self" type="application/rss+xml" /><item>
-    <title>configuration</title>
-    <link>https://g03m0n.github.io/tags/configuration/</link>
+    <title>安装</title>
+    <link>https://g03m0n.github.io/tags/installation/_index.zh-cn/</link>
     <pubDate>Fri, 06 Mar 2020 21:29:01 &#43;0800</pubDate>
     <author>Author</author>
-    <guid>https://g03m0n.github.io/tags/configuration/</guid>
+    <guid>https://g03m0n.github.io/tags/installation/_index.zh-cn/</guid>
     <description><![CDATA[]]></description>
 </item>
 <item>
-    <title>installation</title>
-    <link>https://g03m0n.github.io/tags/installation/</link>
+    <title>配置</title>
+    <link>https://g03m0n.github.io/tags/configuration/_index.zh-cn/</link>
     <pubDate>Fri, 06 Mar 2020 21:29:01 &#43;0800</pubDate>
     <author>Author</author>
-    <guid>https://g03m0n.github.io/tags/installation/</guid>
-    <description><![CDATA[]]></description>
-</item>
-<item>
-    <title>content</title>
-    <link>https://g03m0n.github.io/tags/content/</link>
-    <pubDate>Thu, 05 Mar 2020 15:58:26 &#43;0800</pubDate>
-    <author>Author</author>
-    <guid>https://g03m0n.github.io/tags/content/</guid>
+    <guid>https://g03m0n.github.io/tags/configuration/_index.zh-cn/</guid>
     <description><![CDATA[]]></description>
 </item>
 <item>
@@ -33,6 +25,14 @@
     <pubDate>Thu, 05 Mar 2020 15:58:26 &#43;0800</pubDate>
     <author>Author</author>
     <guid>https://g03m0n.github.io/tags/markdown/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>内容</title>
+    <link>https://g03m0n.github.io/tags/content/_index.zh-cn/</link>
+    <pubDate>Thu, 05 Mar 2020 15:58:26 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://g03m0n.github.io/tags/content/_index.zh-cn/</guid>
     <description><![CDATA[]]></description>
 </item>
 <item>
