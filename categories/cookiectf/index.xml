@@ -1,0 +1,19 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>CookieCTF - Category - g03m0n</title>
+        <link>https://g03m0n.github.io/categories/cookiectf/</link>
+        <description>CookieCTF - Category - g03m0n</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 06 Mar 2020 21:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/categories/cookiectf/" rel="self" type="application/rss+xml" /><item>
+    <title>CookieCTF - Baby Crawler</title>
+    <link>https://g03m0n.github.io/posts/cookiectf-baby-crawler/cookiectf-baby-crawl/</link>
+    <pubDate>Fri, 06 Mar 2020 21:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cookiectf-baby-crawler/cookiectf-baby-crawl/</guid>
+    <description><![CDATA[Link challenge tại đâyĐây là giao diện chính của challenge:
+Ở challenge này, khi ấn vào nút CRAWL trang web sẽ hiển thị một đường link Cached File
+Khi click vào đường link ta sẽ thấy html của trang web
+Quay trở lại giao diện chính, kiểm tra source code thì phát hiện 1 endpoint ?debug
+Kiểm tra thì thấy được đoạn code chạy ở server-side. Chú ý vào đoạn code này:]]></description>
+</item>
+</channel>
+</rss>
