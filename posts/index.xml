@@ -3,7 +3,7 @@
         <title>All Posts - g03m0n</title>
         <link>https://g03m0n.github.io/posts/</link>
         <description>All Posts | g03m0n</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 03 Dec 2023 03:10:23 &#43;0700</lastBuildDate><atom:link href="https://g03m0n.github.io/posts/" rel="self" type="application/rss+xml" /><item>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 06 Mar 2020 21:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/posts/" rel="self" type="application/rss+xml" /><item>
     <title>CookieCTF - Baby Crawler</title>
     <link>https://g03m0n.github.io/posts/cookiectf-baby-crawler/cookiectf-baby-crawl/</link>
     <pubDate>Fri, 06 Mar 2020 21:29:01 &#43;0800</pubDate>
@@ -14,38 +14,6 @@
 Khi click vào đường link ta sẽ thấy html của trang web
 Quay trở lại giao diện chính, kiểm tra source code thì phát hiện 1 endpoint ?debug
 Kiểm tra thì thấy được đoạn code chạy ở server-side. Chú ý vào đoạn code này:]]></description>
-</item>
-<item>
-    <title>Lala</title>
-    <link>https://g03m0n.github.io/posts/la-la/lala/</link>
-    <pubDate>Sun, 03 Dec 2023 03:10:23 &#43;0700</pubDate>
-    <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/la-la/lala/</guid>
-    <description><![CDATA[<h1 id="heloooooooooooooooooooooooooooooooooooo">Heloooooooooooooooooooooooooooooooooooo</h1>]]></description>
-</item>
-<item>
-    <title>Test Hehe</title>
-    <link>https://g03m0n.github.io/posts/he-he/hehe/</link>
-    <pubDate>Sun, 03 Dec 2023 03:01:03 &#43;0700</pubDate>
-    <author>Author</author>
-    <guid>https://g03m0n.github.io/posts/he-he/hehe/</guid>
-    <description><![CDATA[]]></description>
-</item>
-<item>
-    <title>Lil Tu</title>
-    <link>https://g03m0n.github.io/posts/lil-tu/lil-tu/</link>
-    <pubDate>Sat, 02 Dec 2023 20:11:41 &#43;0700</pubDate>
-    <author>Author</author>
-    <guid>https://g03m0n.github.io/posts/lil-tu/lil-tu/</guid>
-    <description><![CDATA[Hello]]></description>
-</item>
-<item>
-    <title>Pham Anh Tu</title>
-    <link>https://g03m0n.github.io/posts/goem0n/pham-anh-tu/</link>
-    <pubDate>Sat, 02 Dec 2023 19:45:38 &#43;0700</pubDate>
-    <author>Author</author>
-    <guid>https://g03m0n.github.io/posts/goem0n/pham-anh-tu/</guid>
-    <description><![CDATA[#Wibu]]></description>
 </item>
 </channel>
 </rss>
