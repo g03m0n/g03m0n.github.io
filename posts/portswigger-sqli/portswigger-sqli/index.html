@@ -6,7 +6,7 @@
         <meta name="robots" content="noodp" />
         <title>PortSwigger - SQL Injection - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:title" content="PortSwigger - SQL Injection" />
 <meta property="og:description" content="1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data Link lab tại đâyLevel: APPRENTICE
-Mô tả Lab này chứa lỗ hổng SQLi trong bộ lọc danh mục sản phẩm. Khi người dùng chọn một danh mục, ứng dụng sẽ thực hiện truy vấn SQL như sau:
+Description Lab này chứa lỗ hổng SQLi trong bộ lọc danh mục sản phẩm. Khi người dùng chọn một danh mục, ứng dụng sẽ thực hiện truy vấn SQL như sau:
 SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để giải quyết bài lab, khiến ứng dụng hiển thị một hoặc nhiều sản phẩm chưa được phát hành." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://g03m0n.github.io/posts/portswigger-sqli/portswigger-sqli/" /><meta property="og:image" content="https://g03m0n.github.io/logo.png"/><meta property="article:section" content="posts" />
@@ -18,7 +18,7 @@ SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để g
 
 <meta name="twitter:title" content="PortSwigger - SQL Injection"/>
 <meta name="twitter:description" content="1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data Link lab tại đâyLevel: APPRENTICE
-Mô tả Lab này chứa lỗ hổng SQLi trong bộ lọc danh mục sản phẩm. Khi người dùng chọn một danh mục, ứng dụng sẽ thực hiện truy vấn SQL như sau:
+Description Lab này chứa lỗ hổng SQLi trong bộ lọc danh mục sản phẩm. Khi người dùng chọn một danh mục, ứng dụng sẽ thực hiện truy vấn SQL như sau:
 SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để giải quyết bài lab, khiến ứng dụng hiển thị một hoặc nhiều sản phẩm chưa được phát hành."/>
 <meta name="application-name" content="g03m0n">
 <meta name="apple-mobile-web-app-title" content="g03m0n"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
@@ -37,7 +37,7 @@ SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để g
                             "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
                             "width":  3200 ,
                             "height":  2048 
-                        }],"genre": "posts","keywords": "portswigger, lab, ctf","wordcount":  594 ,
+                        }],"genre": "posts","keywords": "portswigger, lab, ctf","wordcount":  766 ,
         "url": "https:\/\/g03m0n.github.io\/posts\/portswigger-sqli\/portswigger-sqli\/","datePublished": "2024-01-20T08:29:01+08:00","dateModified": "2024-01-20T08:29:01+08:00","publisher": {
             "@type": "Organization",
             "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
@@ -127,8 +127,8 @@ SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để g
         </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">PortSwigger - SQL Injection</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-category">included in <a href="/categories/portswigger/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PortSwigger</a></span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-01-20">2024-01-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;594 words&nbsp;
-                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-01-20">2024-01-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;766 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
         </div><div class="details toc" id="toc-static"  data-kept="">
                 <div class="details-summary toc-title">
                     <span>Contents</span>
@@ -138,23 +138,34 @@ SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để g
   <ul>
     <li><a href="#1-sql-injection-vulnerability-in-where-clause-allowing-retrieval-of-hidden-data">1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data</a>
       <ul>
-        <li><a href="#mô-tả">Mô tả</a></li>
+        <li><a href="#description">Description</a></li>
         <li><a href="#step">Step</a></li>
       </ul>
     </li>
     <li><a href="#2-sql-injection-vulnerability-allowing-login-bypass">2. SQL injection vulnerability allowing login bypass</a>
       <ul>
-        <li><a href="#mô-tả-1">Mô tả</a></li>
+        <li><a href="#description-1">Description</a></li>
         <li><a href="#step-1">Step</a></li>
       </ul>
     </li>
+    <li><a href="#3-sql-injection-attack-querying-the-database-type-and-version-on-oracle">3. SQL injection attack, querying the database type and version on Oracle</a></li>
+    <li><a href="#4-sql-injection-attack-querying-the-database-type-and-version-on-mysql-and-microsoft">4. SQL injection attack, querying the database type and version on MySQL and Microsoft</a></li>
+    <li><a href="#5-sql-injection-attack-listing-the-database-contents-on-non-oracle-databases">5. SQL injection attack, listing the database contents on non-Oracle databases</a></li>
+    <li><a href="#6-sql-injection-attack-listing-the-database-contents-on-oracle">6. SQL injection attack, listing the database contents on Oracle</a></li>
+    <li><a href="#7-sql-injection-union-attack-determining-the-number-of-columns-returned-by-the-query">7. SQL injection UNION attack, determining the number of columns returned by the query</a></li>
+    <li><a href="#8-sql-injection-union-attack-finding-a-column-containing-text">8. SQL injection UNION attack, finding a column containing text</a></li>
+    <li><a href="#9-sql-injection-union-attack-retrieving-data-from-other-tables">9. SQL injection UNION attack, retrieving data from other tables</a></li>
+    <li><a href="#10-sql-injection-union-attack-retrieving-multiple-values-in-a-single-column">10. SQL injection UNION attack, retrieving multiple values in a single column</a></li>
+    <li><a href="#11-blind-sql-injection-with-conditional-responses">11. Blind SQL injection with conditional responses</a></li>
+    <li><a href="#12-blind-sql-injection-with-conditional-errors">12. Blind SQL injection with conditional errors</a></li>
+    <li><a href="#13">13.</a></li>
   </ul>
 </nav></div>
             </div><div class="content" id="content"><h2 id="1-sql-injection-vulnerability-in-where-clause-allowing-retrieval-of-hidden-data">1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data</h2>
 <p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-retrieve-hidden-data" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <p>Level: APPRENTICE</p>
-<h3 id="mô-tả">Mô tả</h3>
+<h3 id="description">Description</h3>
 <p>Lab này chứa lỗ hổng SQLi trong bộ lọc danh mục sản phẩm. Khi người dùng chọn một danh mục, ứng dụng sẽ thực hiện truy vấn SQL như sau:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Gifts&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
 </span></span></code></pre></div><p>Để giải quyết bài lab, khiến ứng dụng hiển thị một hoặc nhiều sản phẩm chưa được phát hành.</p>
@@ -228,7 +239,7 @@ Có nghĩa là bây giờ trang web sẽ hiển thị tất cả các sản ph�
 <p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <p>Level: APPRENTICE</p>
-<h3 id="mô-tả-1">Mô tả</h3>
+<h3 id="description-1">Description</h3>
 <p>Lab này chứa lỗ hổng SQL Injection trong chức năng đăng nhập.</p>
 <p>Để giải quyết bài lab, thực hiện một cuộc tấn công SQLi để đăng nhập vào ứng dụng với tư cách là <code>administrator</code>.</p>
 <h3 id="step-1">Step</h3>
@@ -276,6 +287,50 @@ Solved</p>
         data-sizes="auto"
         alt="https://github.com/g03m0n/pics/assets/130943529/74fe5a4d-65f7-4d1d-89c6-504f56906344"
         title="image" /></p>
+<h2 id="3-sql-injection-attack-querying-the-database-type-and-version-on-oracle">3. SQL injection attack, querying the database type and version on Oracle</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h2 id="4-sql-injection-attack-querying-the-database-type-and-version-on-mysql-and-microsoft">4. SQL injection attack, querying the database type and version on MySQL and Microsoft</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h2 id="5-sql-injection-attack-listing-the-database-contents-on-non-oracle-databases">5. SQL injection attack, listing the database contents on non-Oracle databases</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h2 id="6-sql-injection-attack-listing-the-database-contents-on-oracle">6. SQL injection attack, listing the database contents on Oracle</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h2 id="7-sql-injection-union-attack-determining-the-number-of-columns-returned-by-the-query">7. SQL injection UNION attack, determining the number of columns returned by the query</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h2 id="8-sql-injection-union-attack-finding-a-column-containing-text">8. SQL injection UNION attack, finding a column containing text</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h2 id="9-sql-injection-union-attack-retrieving-data-from-other-tables">9. SQL injection UNION attack, retrieving data from other tables</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h2 id="10-sql-injection-union-attack-retrieving-multiple-values-in-a-single-column">10. SQL injection UNION attack, retrieving multiple values in a single column</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: APPRENTICE</p>
+<h2 id="11-blind-sql-injection-with-conditional-responses">11. Blind SQL injection with conditional responses</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h2 id="12-blind-sql-injection-with-conditional-errors">12. Blind SQL injection with conditional errors</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h2 id="13">13.</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
 </div><div class="post-footer" id="post-footer">
     <div class="post-info">
         <div class="post-info-line">
