@@ -11,7 +11,8 @@
     <pubDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
     <guid>https://g03m0n.github.io/posts/portswigger-sqli/portswigger-sqli/</guid>
-    <description><![CDATA[]]></description>
+    <description><![CDATA[1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data Link challenge tại đâyMô tả Lab này chứa lỗ hổng SQLi trong bộ lọc danh mục sản phẩm. Khi người dùng chọn một danh mục, ứng dụng sẽ thực hiện truy vấn SQL như sau:
+SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để giải quyết bài lab, khiến ứng dụng hiển thị một hoặc nhiều sản phẩm chưa được phát hành.]]></description>
 </item>
 <item>
     <title>CookieCTF - Baby Crawler</title>
