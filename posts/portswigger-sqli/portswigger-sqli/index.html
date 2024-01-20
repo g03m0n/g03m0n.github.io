@@ -37,7 +37,7 @@ SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để g
                             "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
                             "width":  3200 ,
                             "height":  2048 
-                        }],"genre": "posts","keywords": "portswigger, lab, ctf","wordcount":  976 ,
+                        }],"genre": "posts","keywords": "portswigger, lab, ctf","wordcount":  1032 ,
         "url": "https:\/\/g03m0n.github.io\/posts\/portswigger-sqli\/portswigger-sqli\/","datePublished": "2024-01-20T08:29:01+08:00","dateModified": "2024-01-20T08:29:01+08:00","publisher": {
             "@type": "Organization",
             "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
@@ -127,7 +127,7 @@ SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để g
         </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">PortSwigger - SQL Injection</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-category">included in <a href="/categories/portswigger/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PortSwigger</a></span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-01-20">2024-01-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;976 words&nbsp;
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-01-20">2024-01-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1032 words&nbsp;
                 <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
         </div><div class="details toc" id="toc-static"  data-kept="">
                 <div class="details-summary toc-title">
@@ -148,7 +148,7 @@ SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để g
         <li><a href="#step-1">Step</a></li>
       </ul>
     </li>
-    <li><a href="#3-sql-injection-attack-querying-the-database-type-and-version-on-oracle">3. SQL injection attack, querying the database type and version on Oracle</a>
+    <li><a href="#3-sql-injection-attack-querying-the-database-type-and-version-on-oracle-a-nameoracle-database-typea">3. SQL injection attack, querying the database type and version on Oracle <!-- raw HTML omitted --><!-- raw HTML omitted --></a>
       <ul>
         <li><a href="#description-2">Description</a></li>
         <li><a href="#step-2">Step</a></li>
@@ -307,7 +307,7 @@ Solved</p>
         data-sizes="auto"
         alt="https://github.com/g03m0n/pics/assets/130943529/74fe5a4d-65f7-4d1d-89c6-504f56906344"
         title="image" /></p>
-<h2 id="3-sql-injection-attack-querying-the-database-type-and-version-on-oracle">3. SQL injection attack, querying the database type and version on Oracle</h2>
+<h2 id="3-sql-injection-attack-querying-the-database-type-and-version-on-oracle-a-nameoracle-database-typea">3. SQL injection attack, querying the database type and version on Oracle <!-- raw HTML omitted --><!-- raw HTML omitted --></h2>
 <p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-querying-database-version-oracle" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <p>Level: PRACTITIONER</p>
@@ -355,6 +355,37 @@ Ta có thể tìm thấy số lượng cột chính xác bằng cách thêm <cod
 <p>Lab này chứa lỗ hổng SQL Injection trong filter danh mục sản phẩm. Sử dụng UNION Attack để truy xuất kết quả từ truy vấn được chèn.
 Để giải bài lab, hãy hiển thị phiên bản của cơ sở dữ liệu.</p>
 <h3 id="step-3">Step</h3>
+<p>Lab này tương tự như lab về <a href="#3-sql-injection-attack-querying-the-database-type-and-version-on-oracle" rel="">Oracle datable</a>
+ nhưng sử dụng MySQL database.
+Đầu tiên ta cũng <a href="#step-2" rel="">dự đoán số cột</a>
+.
+Database lần này cũng gồm 2 cột sau khi thử: <code>Accessories' UNION SELECT NULL,NULL --a</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/43ab0cd4-818f-4b73-b72e-b4fe1623432e"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/43ab0cd4-818f-4b73-b72e-b4fe1623432e, https://github.com/g03m0n/pics/assets/130943529/43ab0cd4-818f-4b73-b72e-b4fe1623432e 1.5x, https://github.com/g03m0n/pics/assets/130943529/43ab0cd4-818f-4b73-b72e-b4fe1623432e 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/43ab0cd4-818f-4b73-b72e-b4fe1623432e"
+        title="image" /></p>
+<p>Đến đây, ta có thể biết được <code>version</code> của database bằng payload: <code>' UNION SELECT NULL,@@version --'</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/a332d405-ea94-4692-87dc-01c5e4a08612"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/a332d405-ea94-4692-87dc-01c5e4a08612, https://github.com/g03m0n/pics/assets/130943529/a332d405-ea94-4692-87dc-01c5e4a08612 1.5x, https://github.com/g03m0n/pics/assets/130943529/a332d405-ea94-4692-87dc-01c5e4a08612 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/a332d405-ea94-4692-87dc-01c5e4a08612"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/5a5c3803-2cd7-42b0-a884-68982edd8373"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/5a5c3803-2cd7-42b0-a884-68982edd8373, https://github.com/g03m0n/pics/assets/130943529/5a5c3803-2cd7-42b0-a884-68982edd8373 1.5x, https://github.com/g03m0n/pics/assets/130943529/5a5c3803-2cd7-42b0-a884-68982edd8373 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/5a5c3803-2cd7-42b0-a884-68982edd8373"
+        title="image" /></p>
 <h2 id="5-sql-injection-attack-listing-the-database-contents-on-non-oracle-databases">5. SQL injection attack, listing the database contents on non-Oracle databases</h2>
 <p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
 </p>
