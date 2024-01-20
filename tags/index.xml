@@ -3,5 +3,21 @@
         <title>Tags - Tag - g03m0n</title>
         <link>https://g03m0n.github.io/tags/</link>
         <description>Tags - Tag - g03m0n</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><atom:link href="https://g03m0n.github.io/tags/" rel="self" type="application/rss+xml" /></channel>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 19 Jan 2024 21:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/" rel="self" type="application/rss+xml" /><item>
+    <title>ctf</title>
+    <link>https://g03m0n.github.io/tags/ctf/</link>
+    <pubDate>Fri, 19 Jan 2024 21:29:01 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://g03m0n.github.io/tags/ctf/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>easy_ctf</title>
+    <link>https://g03m0n.github.io/tags/easy_ctf/</link>
+    <pubDate>Fri, 19 Jan 2024 21:29:01 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://g03m0n.github.io/tags/easy_ctf/</guid>
+    <description><![CDATA[]]></description>
+</item>
+</channel>
 </rss>
