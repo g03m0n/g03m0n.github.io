@@ -154,33 +154,64 @@ Tiếp tục tìm kiếm các cột có trong bảng <code>USERS_JBIWMO</code></
 <p>Solved</p>
 <p></p>
 <h2 id="7-sql-injection-union-attack-determining-the-number-of-columns-returned-by-the-query">7. SQL injection UNION attack, determining the number of columns returned by the query</h2>
-<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/union-attacks/lab-determine-number-of-columns" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <p>Level: PRACTITIONER</p>
+<h3 id="description-6">Description</h3>
+<p>Bài lab yêu cầu ta xác định số cột của bảng bằng cách sử dụng SQL injection UNION attack.</p>
+<h3 id="step-6">Step</h3>
+<p>Tương tự cách xác định cột tại <a href="#step-3" rel="">đây</a>
+.</p>
+<p>Payload: <code>' UNION SELECT NULL, NULL, NULL --'</code></p>
+<p></p>
+<p>Solved</p>
+<p></p>
 <h2 id="8-sql-injection-union-attack-finding-a-column-containing-text">8. SQL injection UNION attack, finding a column containing text</h2>
-<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/union-attacks/lab-find-column-containing-text" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <p>Level: PRACTITIONER</p>
+<h3 id="description-7">Description</h3>
+<p>Bài lab yêu cầu ta tìm chuỗi dữ liệu cho trước <code>64fl9W</code> bằng cách sử dụng SQL injection UNION attack.</p>
+<h3 id="step-7">Step</h3>
+<p>Đầu tiên ta cũng <a href="#step-3" rel="">xác định số cột của bảng</a>
+.</p>
+<p>Payload: <code>' UNION SELECT NULL, NULL, NULL --'</code></p>
+<p></p>
+<p>Với UNION Attack, ta có thể tìm một cột chưa giá trị loại <code>string</code> bằng cách thử chèn đoạn <code>string</code> cần tìm vào:</p>
+<p>Payload: <code>' UNION SELECT NULL, '64fl9W' ,NULL --'</code></p>
+<p></p>
+<p>Solved</p>
+<p></p>
 <h2 id="9-sql-injection-union-attack-retrieving-data-from-other-tables">9. SQL injection UNION attack, retrieving data from other tables</h2>
 <p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <p>Level: PRACTITIONER</p>
+<h3 id="description-8">Description</h3>
+<h3 id="step-8">Step</h3>
 <h2 id="10-sql-injection-union-attack-retrieving-multiple-values-in-a-single-column">10. SQL injection UNION attack, retrieving multiple values in a single column</h2>
 <p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <p>Level: APPRENTICE</p>
+<h3 id="description-9">Description</h3>
+<h3 id="step-9">Step</h3>
 <h2 id="11-blind-sql-injection-with-conditional-responses">11. Blind SQL injection with conditional responses</h2>
 <p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <p>Level: PRACTITIONER</p>
+<h3 id="description-10">Description</h3>
+<h3 id="step-10">Step</h3>
 <h2 id="12-blind-sql-injection-with-conditional-errors">12. Blind SQL injection with conditional errors</h2>
 <p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <p>Level: PRACTITIONER</p>
+<h3 id="description-11">Description</h3>
+<h3 id="step-11">Step</h3>
 <h2 id="13">13.</h2>
 <p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <p>Level: PRACTITIONER</p>
+<h3 id="description-12">Description</h3>
+<h3 id="step-12">Step</h3>
 ]]></description>
 </item>
 <item>
