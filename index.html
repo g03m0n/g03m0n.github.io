@@ -124,7 +124,7 @@
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-01-20">2024-01-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cookiectf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CookieCTF</a></span></div><div class="content">Description Link challenge tại đâyStep Đây là giao diện chính của challenge.
 Thử nhập /flag.txt vẫn không có thay đổi gì. Ta thử nhập cat /flag.txt xem có xem được flag không nhưng lại hiện ra thông báo Blacklist characters detected!.
 Kiểm tra soucre code có thể thấy luồng hoạt động của server.
-@app.route(&#39;/&#39;, methods=[&#34;GET&#34;, &#34;POST&#34;]) def index(): result = &#34;&#34; file_path = None if request.method == &#34;POST&#34;: file_path = request.</div><div class="post-footer">
+Đoạn code này loại bỏ khoảng trắng của input người dùng nhập vào. Nó sử dụng phương thức translate() của lớp string để thay thế tất cả các ký tự khoảng trắng bằng giá trị None.</div><div class="post-footer">
         <a href="/posts/cookiectf-the-existed-file/cookiectf-the-existed-file/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cookiectf/">cookiectf</a>,&nbsp;<a href="/tags/ctf/">ctf</a>,&nbsp;<a href="/tags/easy_ctf/">easy_ctf</a>,&nbsp;<a href="/tags/web/">web</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">

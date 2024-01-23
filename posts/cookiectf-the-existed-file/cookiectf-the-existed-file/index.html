@@ -8,7 +8,7 @@
 <meta property="og:description" content="Description Link challenge tại đâyStep Đây là giao diện chính của challenge.
 Thử nhập /flag.txt vẫn không có thay đổi gì. Ta thử nhập cat /flag.txt xem có xem được flag không nhưng lại hiện ra thông báo Blacklist characters detected!.
 Kiểm tra soucre code có thể thấy luồng hoạt động của server.
-@app.route(&#39;/&#39;, methods=[&#34;GET&#34;, &#34;POST&#34;]) def index(): result = &#34;&#34; file_path = None if request.method == &#34;POST&#34;: file_path = request." />
+Đoạn code này loại bỏ khoảng trắng của input người dùng nhập vào. Nó sử dụng phương thức translate() của lớp string để thay thế tất cả các ký tự khoảng trắng bằng giá trị None." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://g03m0n.github.io/posts/cookiectf-the-existed-file/cookiectf-the-existed-file/" /><meta property="og:image" content="https://g03m0n.github.io/logo.png"/><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2024-01-20T08:29:01+08:00" />
@@ -21,7 +21,7 @@ Kiểm tra soucre code có thể thấy luồng hoạt động của server.
 <meta name="twitter:description" content="Description Link challenge tại đâyStep Đây là giao diện chính của challenge.
 Thử nhập /flag.txt vẫn không có thay đổi gì. Ta thử nhập cat /flag.txt xem có xem được flag không nhưng lại hiện ra thông báo Blacklist characters detected!.
 Kiểm tra soucre code có thể thấy luồng hoạt động của server.
-@app.route(&#39;/&#39;, methods=[&#34;GET&#34;, &#34;POST&#34;]) def index(): result = &#34;&#34; file_path = None if request.method == &#34;POST&#34;: file_path = request."/>
+Đoạn code này loại bỏ khoảng trắng của input người dùng nhập vào. Nó sử dụng phương thức translate() của lớp string để thay thế tất cả các ký tự khoảng trắng bằng giá trị None."/>
 <meta name="application-name" content="g03m0n">
 <meta name="apple-mobile-web-app-title" content="g03m0n"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -39,7 +39,7 @@ Kiểm tra soucre code có thể thấy luồng hoạt động của server.
                             "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
                             "width":  3200 ,
                             "height":  2048 
-                        }],"genre": "posts","keywords": "cookiectf, ctf, easy_ctf, web","wordcount":  338 ,
+                        }],"genre": "posts","keywords": "cookiectf, ctf, easy_ctf, web","wordcount":  250 ,
         "url": "https:\/\/g03m0n.github.io\/posts\/cookiectf-the-existed-file\/cookiectf-the-existed-file\/","datePublished": "2024-01-20T08:29:01+08:00","dateModified": "2024-01-20T08:29:01+08:00","publisher": {
             "@type": "Organization",
             "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
@@ -129,7 +129,7 @@ Kiểm tra soucre code có thể thấy luồng hoạt động của server.
         </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">CookieCTF - The Existed File</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-category">included in <a href="/categories/cookiectf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CookieCTF</a></span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-01-20">2024-01-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;338 words&nbsp;
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-01-20">2024-01-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;250 words&nbsp;
                 <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;2 minutes&nbsp;</div>
         </div><div class="details toc" id="toc-static"  data-kept="">
                 <div class="details-summary toc-title">
@@ -165,29 +165,15 @@ Kiểm tra soucre code có thể thấy luồng hoạt động của server.
         alt="https://github.com/g03m0n/pics/assets/130943529/3b6e0694-a1c4-47a4-97f3-2163278fa5ca"
         title="image" /></p>
 <p>Kiểm tra <code>soucre code</code> có thể thấy luồng hoạt động của server.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#34;GET&#34;</span>, <span style="color:#e6db74">&#34;POST&#34;</span>])
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">index</span>():
-</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>
-</span></span><span style="display:flex;"><span>    file_path <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> request<span style="color:#f92672">.</span>method <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;POST&#34;</span>:
-</span></span><span style="display:flex;"><span>      file_path <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>form<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;file_path&#34;</span>) 
-</span></span><span style="display:flex;"><span>      file_path <span style="color:#f92672">=</span> file_path<span style="color:#f92672">.</span>translate({ord(c): <span style="color:#66d9ef">None</span> <span style="color:#66d9ef">for</span> c <span style="color:#f92672">in</span> string<span style="color:#f92672">.</span>whitespace}) 
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># Blacklist filter</span>
-</span></span><span style="display:flex;"><span>      blacklisted <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;;&#34;</span>, <span style="color:#e6db74">&#34;&amp;&#34;</span>, <span style="color:#e6db74">&#34;|&#34;</span>, <span style="color:#e6db74">&#34;&amp;&amp;&#34;</span>, <span style="color:#e6db74">&#34;cat&#34;</span>, <span style="color:#e6db74">&#34;head&#34;</span>, <span style="color:#e6db74">&#34;tail&#34;</span>, <span style="color:#e6db74">&#34;zip&#34;</span>, <span style="color:#e6db74">&#34;base64&#34;</span>, <span style="color:#e6db74">&#34;bash&#34;</span>, <span style="color:#e6db74">&#34;sh&#34;</span>, <span style="color:#e6db74">&#34;python&#34;</span>, <span style="color:#e6db74">&#34;`&#34;</span>]
-</span></span><span style="display:flex;"><span>      is_blacklisted <span style="color:#f92672">=</span> any(bl <span style="color:#f92672">in</span> file_path <span style="color:#66d9ef">for</span> bl <span style="color:#f92672">in</span> blacklisted)
-</span></span><span style="display:flex;"><span>      
-</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> is_blacklisted:
-</span></span><span style="display:flex;"><span>          result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Blacklist characters detected!&#34;</span>
-</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">else</span>:
-</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">try</span>:
-</span></span><span style="display:flex;"><span>              command <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;ls -l </span><span style="color:#e6db74">{</span>file_path<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
-</span></span><span style="display:flex;"><span>              result <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>check_output(command, shell<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)<span style="color:#f92672">.</span>decode()
-</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">if</span> result:
-</span></span><span style="display:flex;"><span>                  result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;File is existed!&#39;</span>
-</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
-</span></span><span style="display:flex;"><span>              result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;File is not existed&#39;</span>
-</span></span></code></pre></div><p>Đoạn code này loại bỏ khoảng trắng của <code>input</code> người dùng nhập vào. Nó sử dụng phương thức <code>translate()</code> của lớp <code>string</code> để thay thế tất cả các ký tự khoảng trắng bằng giá trị <code>None</code>.
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/80e29e56-dda0-42ea-aa1c-3a47baba3b2c"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/80e29e56-dda0-42ea-aa1c-3a47baba3b2c, https://github.com/g03m0n/pics/assets/130943529/80e29e56-dda0-42ea-aa1c-3a47baba3b2c 1.5x, https://github.com/g03m0n/pics/assets/130943529/80e29e56-dda0-42ea-aa1c-3a47baba3b2c 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/80e29e56-dda0-42ea-aa1c-3a47baba3b2c"
+        title="image" /></p>
+<p>Đoạn code này loại bỏ khoảng trắng của <code>input</code> người dùng nhập vào. Nó sử dụng phương thức <code>translate()</code> của lớp <code>string</code> để thay thế tất cả các ký tự khoảng trắng bằng giá trị <code>None</code>.
 Sau đó sẽ sử dung hàm <code>is_blacklisted</code> để kiểm tra <code>input</code> có nằm trong blacklist hay không.</p>
 <p>Có thể thấy <code>blacklist</code> đã loại bỏ hầu hết các câu lệnh giúp ta đọc được file <code>flag</code>, tuy nhiên anh dev có lẽ đã quên mất <code>filter</code> 1 cái nữa đó là <code>$(command)</code>. Câu lệnh này tương đương với sử dụng dấu <code>backstick</code>.</p>
 <p><img
