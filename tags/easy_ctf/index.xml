@@ -13,8 +13,8 @@
 <p>Link challenge tại <a href="https://battle.cookiearena.org/arenas/mini-ctf-web-hacking/battle/the-existed-file" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <h2 id="step">Step</h2>
-<p>Đây là giao diện chính của challenge.
-</p>
+<p>Đây là giao diện chính của challenge.</p>
+<p></p>
 <p>Thử nhập <code>/flag.txt</code> vẫn không có thay đổi gì. Ta thử nhập <code>cat /flag.txt</code> xem có xem được <code>flag</code> không nhưng lại hiện ra thông báo <code>Blacklist characters detected!</code>.</p>
 <p></p>
 <p>Kiểm tra <code>soucre code</code> có thể thấy luồng hoạt động của server.</p>
@@ -23,23 +23,23 @@
 </span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>
 </span></span><span style="display:flex;"><span>    file_path <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> request<span style="color:#f92672">.</span>method <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;POST&#34;</span>:
-</span></span><span style="display:flex;"><span>        file_path <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>form<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;file_path&#34;</span>) 
-</span></span><span style="display:flex;"><span>        file_path <span style="color:#f92672">=</span> file_path<span style="color:#f92672">.</span>translate({ord(c): <span style="color:#66d9ef">None</span> <span style="color:#66d9ef">for</span> c <span style="color:#f92672">in</span> string<span style="color:#f92672">.</span>whitespace}) 
+</span></span><span style="display:flex;"><span>      file_path <span style="color:#f92672">=</span> request<span style="color:#f92672">.</span>form<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#34;file_path&#34;</span>) 
+</span></span><span style="display:flex;"><span>      file_path <span style="color:#f92672">=</span> file_path<span style="color:#f92672">.</span>translate({ord(c): <span style="color:#66d9ef">None</span> <span style="color:#66d9ef">for</span> c <span style="color:#f92672">in</span> string<span style="color:#f92672">.</span>whitespace}) 
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Blacklist filter</span>
-</span></span><span style="display:flex;"><span>        blacklisted <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;;&#34;</span>, <span style="color:#e6db74">&#34;&amp;&#34;</span>, <span style="color:#e6db74">&#34;|&#34;</span>, <span style="color:#e6db74">&#34;&amp;&amp;&#34;</span>, <span style="color:#e6db74">&#34;cat&#34;</span>, <span style="color:#e6db74">&#34;head&#34;</span>, <span style="color:#e6db74">&#34;tail&#34;</span>, <span style="color:#e6db74">&#34;zip&#34;</span>, <span style="color:#e6db74">&#34;base64&#34;</span>, <span style="color:#e6db74">&#34;bash&#34;</span>, <span style="color:#e6db74">&#34;sh&#34;</span>, <span style="color:#e6db74">&#34;python&#34;</span>, <span style="color:#e6db74">&#34;`&#34;</span>]
-</span></span><span style="display:flex;"><span>        is_blacklisted <span style="color:#f92672">=</span> any(bl <span style="color:#f92672">in</span> file_path <span style="color:#66d9ef">for</span> bl <span style="color:#f92672">in</span> blacklisted)
-</span></span><span style="display:flex;"><span>        
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> is_blacklisted:
-</span></span><span style="display:flex;"><span>            result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Blacklist characters detected!&#34;</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">try</span>:
-</span></span><span style="display:flex;"><span>                command <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;ls -l </span><span style="color:#e6db74">{</span>file_path<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
-</span></span><span style="display:flex;"><span>                result <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>check_output(command, shell<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)<span style="color:#f92672">.</span>decode()
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> result:
-</span></span><span style="display:flex;"><span>                    result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;File is existed!&#39;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
-</span></span><span style="display:flex;"><span>                result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;File is not existed&#39;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># Blacklist filter</span>
+</span></span><span style="display:flex;"><span>      blacklisted <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;;&#34;</span>, <span style="color:#e6db74">&#34;&amp;&#34;</span>, <span style="color:#e6db74">&#34;|&#34;</span>, <span style="color:#e6db74">&#34;&amp;&amp;&#34;</span>, <span style="color:#e6db74">&#34;cat&#34;</span>, <span style="color:#e6db74">&#34;head&#34;</span>, <span style="color:#e6db74">&#34;tail&#34;</span>, <span style="color:#e6db74">&#34;zip&#34;</span>, <span style="color:#e6db74">&#34;base64&#34;</span>, <span style="color:#e6db74">&#34;bash&#34;</span>, <span style="color:#e6db74">&#34;sh&#34;</span>, <span style="color:#e6db74">&#34;python&#34;</span>, <span style="color:#e6db74">&#34;`&#34;</span>]
+</span></span><span style="display:flex;"><span>      is_blacklisted <span style="color:#f92672">=</span> any(bl <span style="color:#f92672">in</span> file_path <span style="color:#66d9ef">for</span> bl <span style="color:#f92672">in</span> blacklisted)
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> is_blacklisted:
+</span></span><span style="display:flex;"><span>          result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Blacklist characters detected!&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>              command <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;ls -l </span><span style="color:#e6db74">{</span>file_path<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</span></span><span style="display:flex;"><span>              result <span style="color:#f92672">=</span> subprocess<span style="color:#f92672">.</span>check_output(command, shell<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)<span style="color:#f92672">.</span>decode()
+</span></span><span style="display:flex;"><span>              <span style="color:#66d9ef">if</span> result:
+</span></span><span style="display:flex;"><span>                  result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;File is existed!&#39;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>              result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;File is not existed&#39;</span>
 </span></span></code></pre></div><p>Đoạn code này loại bỏ khoảng trắng của <code>input</code> người dùng nhập vào. Nó sử dụng phương thức <code>translate()</code> của lớp <code>string</code> để thay thế tất cả các ký tự khoảng trắng bằng giá trị <code>None</code>.
 Sau đó sẽ sử dung hàm <code>is_blacklisted</code> để kiểm tra <code>input</code> có nằm trong blacklist hay không.</p>
 <p>Có thể thấy <code>blacklist</code> đã loại bỏ hầu hết các câu lệnh giúp ta đọc được file <code>flag</code>, tuy nhiên anh dev có lẽ đã quên mất <code>filter</code> 1 cái nữa đó là <code>$(command)</code>. Câu lệnh này tương đương với sử dụng dấu <code>backstick</code>.</p>
@@ -64,8 +64,10 @@ Sau đó sẽ sử dung hàm <code>is_blacklisted</code> để kiểm tra <code>
     <pubDate>Fri, 19 Jan 2024 21:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
     <guid>https://g03m0n.github.io/posts/cookiectf-baby-crawler/cookiectf-baby-crawl/</guid>
-    <description><![CDATA[<p>Link challenge tại <a href="https://battle.cookiearena.org/challenges/web/baby-crawler" target="_blank" rel="noopener noreffer">đây</a>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link challenge tại <a href="https://battle.cookiearena.org/challenges/web/baby-crawler" target="_blank" rel="noopener noreffer">đây</a>
 </p>
+<h2 id="step">Step</h2>
 <p>Đây là giao diện chính của challenge:</p>
 <p></p>
 <p>Ở challenge này, khi ấn vào nút <code>CRAWL</code> trang web sẽ hiển thị một đường link <code>Cached File</code></p>
