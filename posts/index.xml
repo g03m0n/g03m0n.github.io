@@ -298,7 +298,7 @@ Nhận thấy có một IP lạ là <code>192.168.134.135</code>.</p>
 <p></p>
 <p>Sử dụng <code>nmap</code> để kiểm tra các dịch vụ đang mở trên IP đó</p>
 <p></p>
-<p>Nhận thấy cổng <code>80</code> đang mở và đang sử dụng <code>nginx 1.10.3</code>.</p>
+<p>Có cổng <code>80</code> đang mở và đang sử dụng <code>nginx 1.10.3</code>.</p>
 <p></p>
 <h3 id="enumeration">Enumeration</h3>
 <p>Tiến hành quét các <code>directory</code> bằng <code>dirb</code></p>
@@ -310,8 +310,8 @@ Nhận thấy có một IP lạ là <code>192.168.134.135</code>.</p>
 <p></p>
 <p>Giao diện <code>login</code>:</p>
 <p></p>
-<p>Tiến hành <code>brute force</code> username/password bằng cách sử dụng <code>wpscan</code>
-Đầu tiên là tìm <code>username</code>:</p>
+<p>Tiến hành <code>brute force</code> <code>username/password</code> bằng cách sử dụng <code>wpscan</code>.
+Đầu tiên ta tìm <code>username</code>:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>wpscan <span style="color:#f92672">-</span>url http:<span style="color:#75715e">//loly.lc/wordpress</span>
 </span></span></code></pre></div><p></p>
 <p>Ta thu được username là <code>loly</code>.</p>
