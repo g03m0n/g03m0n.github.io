@@ -307,7 +307,7 @@ Từ <code>web_jscalc/challenge/routes/computerHelper.js</code>, hàm <code>calc
 </span></span><span style="display:flex;"><span>module.exports = {
 </span></span><span style="display:flex;"><span>    calculate(formula) {
 </span></span><span style="display:flex;"><span>        try {
-</span></span><span style="display:flex;"><span>            return eval(`(function() { return <span style="color:#e6db74">$</span>{ formula } ;}<span style="color:#f92672">())</span>`<span style="color:#f92672">)</span>;
+</span></span><span style="display:flex;"><span>            return eval(`(function() { return <span style="color:#e6db74">$</span>{ formula } ;}<span style="color:#f92672">())</span>`<span style="color:#f92672">)</span>;                                                         
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>        } catch <span style="color:#f92672">(</span>e<span style="color:#f92672">)</span> {
 </span></span><span style="display:flex;"><span>            if <span style="color:#f92672">(</span>e instanceof SyntaxError<span style="color:#f92672">)</span> {
