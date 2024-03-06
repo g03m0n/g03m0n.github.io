@@ -215,6 +215,52 @@ Tiếp tục tìm kiếm các cột có trong bảng <code>USERS_JBIWMO</code></
 ]]></description>
 </item>
 <item>
+    <title>Hackthebox - ProxyAsService</title>
+    <link>https://g03m0n.github.io/posts/hacthebox-proxyasservice/hackthebox-proxyasservice/</link>
+    <pubDate>Mon, 20 Nov 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/hacthebox-proxyasservice/hackthebox-proxyasservice/</guid>
+    <description><![CDATA[<h3 id="description">Description</h3>
+<p>Challenge này là một <code>proxy</code> giữa ta và một trang web khác.
+Ở đây là <a href="reddit.com" rel="">Reddit</a>
+.
+Lần đầu tiên khi truy cập vào challenge, ta sẽ được chuyển hướng đến một <code>subreddit</code> ngẫu nhiên về mèo:</p>
+<p></p>
+<p>Tuy nhiên, ta có thể thấy <code>url</code> của trang web vẫn nằm ở <code>proxy</code> chứ không hoàn toàn chuyển hướng đến <code>reddit</code>.</p>
+<h3 id="exploitaion">Exploitaion</h3>
+<p>Đầu tiên, kiểm tra source code của challenge.
+Ứng dụng web được chạy trên cổng <code>1337</code>.</p>
+<p></p>
+<p>Flag được lưu ở route <code>/environment</code>.</p>
+<p></p>
+<p>Tuy nhiên, ta chỉ có thể truy cập vào route <code>/environment</code> bằng <code>localhost</code>.</p>
+<p></p>
+<p>Kiểm tra file route.py.</p>
+<p></p>
+<p>Ta có thể thấy url được thêm vào cuối <code>target_url</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>target_url <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;http://</span><span style="color:#e6db74">{</span>SITE_NAME<span style="color:#e6db74">}{</span>url<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>
+</span></span></code></pre></div><p>Ở phía cuối của <code>url</code> không có dấu <code>/</code> nên ta có thể sử dụng cách khai thác này:</p>
+<pre tabindex="0"><code>http://1.1.1.1@0.0.0.0 =&gt; http://0.0.0.0
+</code></pre><p>Khi ta thêm dấu <code>@</code> vào cuối <code>url</code> thì tất cả các thành phần trước dấu <code>@</code> sẽ được comment và sẽ chuyển hướng đến <code>url</code> được điền phía sau dấu <code>@</code>.</p>
+<p>Kiểm tra:</p>
+<p></p>
+<p>Payload với route <code>/debug/environment</code> và port <code>1337</code>:</p>
+<pre tabindex="0"><code>http://94.237.58.211:56744/?url=@localhost:1337/debug/environment
+</code></pre><p>Xuất hiện thông báo lỗi.</p>
+<p></p>
+<p>Kiểm tra soucre code ta thấy server sử dụng một <code>blacklists</code> để kiểm tra đầu vào:</p>
+<p></p>
+<p><a href="https://book.hacktricks.xyz/pentesting-web/ssrf-server-side-request-forgery/url-format-bypass" target="_blank" rel="noopener noreffer">Đây</a>
+ là một số cách để truy cập <code>localhost</code>.
+Thử truy cập với <code>0.0.0.0</code>:
+Payload:</p>
+<pre tabindex="0"><code>http://94.237.58.211:56744/?url=@0.0.0.0:1337/debug/environment
+</code></pre><p></p>
+<p>Flag: <code>HTB{fl4gs_4s_4_S3rv1c3}</code></p>
+]]></description>
+</item>
+<item>
     <title>Hackthebox - jscalc</title>
     <link>https://g03m0n.github.io/posts/hackthebox-jscalc/hackthebox-jscalc/</link>
     <pubDate>Tue, 22 Aug 2023 08:29:01 &#43;0800</pubDate>
