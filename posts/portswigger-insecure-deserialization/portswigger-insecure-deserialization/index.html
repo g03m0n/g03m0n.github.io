@@ -35,7 +35,7 @@
                             "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
                             "width":  3200 ,
                             "height":  2048 
-                        }],"genre": "posts","keywords": "ctf, lab","wordcount":  855 ,
+                        }],"genre": "posts","keywords": "ctf, lab","wordcount":  861 ,
         "url": "https:\/\/g03m0n.github.io\/posts\/portswigger-insecure-deserialization\/portswigger-insecure-deserialization\/","datePublished": "2023-12-20T08:29:01+08:00","dateModified": "2023-12-20T08:29:01+08:00","publisher": {
             "@type": "Organization",
             "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
@@ -125,7 +125,7 @@
         </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">PortSwigger - Insecure Deserialization</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-category">included in <a href="/categories/portswigger/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PortSwigger</a></span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2023-12-20">2023-12-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;855 words&nbsp;
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2023-12-20">2023-12-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;861 words&nbsp;
                 <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
         </div><div class="details toc" id="toc-static"  data-kept="">
                 <div class="details-summary toc-title">
@@ -152,7 +152,7 @@
         <li><a href="#exploitaion-2">Exploitaion</a></li>
       </ul>
     </li>
-    <li><a href="#heading"></a>
+    <li><a href="#4-arbitrary-object-injection-in-php">4. Arbitrary object injection in PHP</a>
       <ul>
         <li><a href="#description-3">Description</a></li>
         <li><a href="#exploitaion-3">Exploitaion</a></li>
@@ -336,7 +336,7 @@ You also have access to a backup account: gregg:rosebud</p>
         data-sizes="auto"
         alt="https://github.com/g03m0n/pics/assets/130943529/9b72bd5c-a9ff-4756-a3d1-4ef4bca00242"
         title="image" /></p>
-<h2 id="heading"></h2>
+<h2 id="4-arbitrary-object-injection-in-php">4. Arbitrary object injection in PHP</h2>
 <h3 id="description-3">Description</h3>
 <blockquote>
 <p>This lab uses a serialization-based session mechanism and is vulnerable to arbitrary object injection as a result. To solve the lab, create and inject a malicious serialized object to delete the morale.txt file from Carlos&rsquo;s home directory. You will need to obtain source code access to solve this lab.
@@ -389,7 +389,7 @@ You can log in to your own account using the following credentials: wiener:peter
 </span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
 </span></span><span style="display:flex;"><span>            }
 </span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_put_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>, $template) <span style="color:#f92672">===</span> <span style="color:#66d9ef">false</span>) {
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>);
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>);                    
 </span></span><span style="display:flex;"><span>            }
 </span></span><span style="display:flex;"><span>        }
 </span></span><span style="display:flex;"><span>    }
@@ -407,8 +407,8 @@ You can log in to your own account using the following credentials: wiener:peter
  <code>__destruct()</code> khi nó thực hiện xóa file tại <code>lock_file_path</code>, nếu nó tồn tại. Mặt khác <code>__destruct()</code> sẽ được gọi khi server thực hiện deserialize.</p>
 <p>=&gt; Ta có thể tận dụng session cookie để thực hiện Object Injection như sau:</p>
 <pre tabindex="0"><code>O: 14: &#34;CustomTemplate&#34;: 1: {s: 14: &#34;lock_file_path&#34;; s: 23: &#34;/home/carlos/morale.txt&#34;;}
-</code></pre><p>Endcode base64 và edit cookie:
-<img
+</code></pre><p>Endcode base64 và edit cookie:</p>
+<p><img
         class="lazyload"
         src="/svg/loading.min.svg"
         data-src="https://github.com/g03m0n/pics/assets/130943529/7040aead-3257-47fa-af8b-e2a11028485d"
@@ -424,8 +424,8 @@ You can log in to your own account using the following credentials: wiener:peter
         data-sizes="auto"
         alt="https://github.com/g03m0n/pics/assets/130943529/8a24c0ce-2379-4cc6-b205-93adb3111cc8"
         title="image" /></p>
-<p>Solved
-<img
+<p>Solved</p>
+<p><img
         class="lazyload"
         src="/svg/loading.min.svg"
         data-src="https://github.com/g03m0n/pics/assets/130943529/3c35aba8-0c6c-48ce-9c34-cebdf83f5463"

