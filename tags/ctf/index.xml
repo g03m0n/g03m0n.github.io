@@ -283,6 +283,147 @@ Thay vì <code>inject</code> một câu lệnh để server thực hiện sau kh
 ]]></description>
 </item>
 <item>
+    <title>PortSwigger - Insecure Deserialization</title>
+    <link>https://g03m0n.github.io/posts/portswigger-insecure-deserialization/portswigger-insecure-deserialization/</link>
+    <pubDate>Wed, 20 Dec 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/portswigger-insecure-deserialization/portswigger-insecure-deserialization/</guid>
+    <description><![CDATA[<blockquote>
+<p>Thông thường cấu trúc của <code>Serialize Data</code> có dạng:
+<code>O: strlen(object name): object name: object size: {... elements...}</code></p>
+</blockquote>
+<h2 id="1--modifying-serialized-objects">1.  Modifying serialized objects</h2>
+<h3 id="description">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and is vulnerable to privilege escalation as a result. To solve the lab, edit the serialized object in the session cookie to exploit this vulnerability and gain administrative privileges. Then, delete Carlos&rsquo;s account.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitaion">Exploitaion</h3>
+<p>Challenge này yêu cầu ta thay đổi thuộc tính trên serialized objects để leo quyền lên admin.</p>
+<p>Đăng nhập bằng tài khoản <code>wiener:peter</code>.</p>
+<p></p>
+<p>Ta thấy <code>session cookie</code> là một object <code>User</code> sau khi được serialized và base64-encode. Để ý object <code>User</code> này có thuộc tính <code>admin</code> hiện có giá trị boolean <code>0</code> tức là <code>false</code>.</p>
+<p></p>
+<p>Vì user này không phải <code>admin</code> → không vào được trang <code>/admin</code>.
+=&gt; Ta thử thay đổi giá trị boolean ở serialized session cookie thành <code>1</code></p>
+<p></p>
+<p>End-code base64</p>
+<p></p>
+<p>Edit cookie của trang web và load lại trang:</p>
+<p></p>
+<p>=&gt; <code>User</code> đã đăng nhập được vào trang <code>/admin</code>
+Tiến hành xóa user <code>Carlos</code>.</p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="2-modifying-serialized-data-types">2. Modifying serialized data types</h2>
+<h3 id="description-1">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and is vulnerable to authentication bypass as a result. To solve the lab, edit the serialized object in the session cookie to access the administrator account. Then, delete Carlos.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitaion-1">Exploitaion</h3>
+<p>Tương tự lab 1, session cookie cũng được serialize từ <code>User</code> object</p>
+<p></p>
+<p>Lần này ứng dụng authenticate user thông qua thuộc tính access_token là chuỗi kí tự dài 32 kí tự.</p>
+<pre tabindex="0"><code>O: 4: &#34;User&#34;: 2: {s: 8: &#34;username&#34;; s: 6: &#34;wiener&#34;; s: 12: &#34;access_token&#34;;s: 32: &#34;t2blplwd06k5lr3coyxnjzy7ne355ge5&#34;;}
+</code></pre><p>Tuy nhiên, theo mô tả có thể ứng dụng này sử dụng PHP loose comparison bởi operator <code>==</code> để authenticate như sau:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$user <span style="color:#f92672">=</span> <span style="color:#a6e22e">unserialize</span>($_SESSION)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> ($user[<span style="color:#e6db74">&#39;access_token&#39;</span>] <span style="color:#f92672">==</span> $access_token) {
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Authenticate successfully
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>Như vậy ta sẽ bypass bằng cách chỉnh <code>access_token</code> về số nguyên 0 → bypass được <code>==</code> vì 0 <code>==</code> <code>string</code> sẽ trả về <code>true</code>. Serialized object sau khi chỉnh như sau:</p>
+<pre tabindex="0"><code>O: 4: &#34;User&#34;: 2: {s: 8: &#34;username&#34;; s: 6: &#34;wiener&#34;; s: 12: &#34;access_token&#34;;i: 0;}
+</code></pre><p>Endcode base64 và edit cookie</p>
+<p></p>
+<p>Đăng nhập vào <code>admin</code> panel thành công và tiến hành xóa user <code>Carlos</code>.</p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="3-using-application-functionality-to-exploit-insecure-deserialization">3. Using application functionality to exploit insecure deserialization</h2>
+<h3 id="description-2">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism. A certain feature invokes a dangerous method on data provided in a serialized object. To solve the lab, edit the serialized object in the session cookie and use it to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: wiener:peter
+You also have access to a backup account: gregg:rosebud</p>
+</blockquote>
+<h3 id="exploitaion-2">Exploitaion</h3>
+<p>Tương tự 2 labs trên, Session Cookie cũng được serialize từ <code>User</code> object</p>
+<p></p>
+<p>Lần này ứng dụng có thêm thuộc tính <code>avatar_link</code>. Mà ứng dụng này có chức năng <code>Delete account</code> =&gt; Khi ấn vào nút <code>Delete account</code> thì ứng dụng sẽ xóa cả <code>avatar</code> của người dùng.</p>
+<p>Nếu ta thay đổi đường dẫn tại thuộc tính <code>avatar_link</code> thành 1 file bất kì trong hệ thống thì file đó sẽ bị delete khỏi hệ thống khi <code>Delete account</code>.</p>
+<p>Chỉnh sửa <code>avatar_link</code> thành <code>/home/carlos/morale.txt</code> để tiến hành xóa file.</p>
+<pre tabindex="0"><code>O:4:&#34;User&#34;:3:{s:8:&#34;username&#34;;s:6:&#34;wiener&#34;;s:12:&#34;access_token&#34;;s:32:&#34;bqp5e5wpdhhaz3rt0knb1u6uowozl5se&#34;;s:11:&#34;avatar_link&#34;;s:23:&#34;/home/carlos/morale.txt&#34;;}
+</code></pre><p>Endcode base64 và Edit cookie.</p>
+<p></p>
+<p></p>
+<p>Load lại trang và Solved.</p>
+<p></p>
+<h2 id="heading"></h2>
+<h3 id="description-3">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and is vulnerable to arbitrary object injection as a result. To solve the lab, create and inject a malicious serialized object to delete the morale.txt file from Carlos&rsquo;s home directory. You will need to obtain source code access to solve this lab.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitaion-3">Exploitaion</h3>
+<p>Tương tự 3 labs trên, Session Cookie cũng được serialize từ <code>User</code> object</p>
+<p>Khi ấn vào <code>view-source</code> ta thấy một đường dẫn:</p>
+<p></p>
+<p>Kiểm tra thử đường dẫn xem có đọc được source code không:</p>
+<p></p>
+<p>Không có gì phản hồi. Ta thử thêm dấu <code>~</code> vào cuối đường dẫn, ta xem được mã nguồn file <code>/libs/CustomTemplate.php</code>.</p>
+<p>Mã nguồn file <code>/libs/CustomTemplate.php</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CustomTemplate</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $template_file_path;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $lock_file_path;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($template_file_path) {
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span> <span style="color:#f92672">=</span> $template_file_path;
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span> <span style="color:#f92672">=</span> $template_file_path <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;.lock&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">isTemplateLocked</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">file_exists</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getTemplate</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">file_get_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">saveTemplate</span>($template) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">isTemplateLocked</span>()) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_put_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>, <span style="color:#e6db74">&#34;&#34;</span>) <span style="color:#f92672">===</span> <span style="color:#66d9ef">false</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_put_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>, $template) <span style="color:#f92672">===</span> <span style="color:#66d9ef">false</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">function</span> __destruct() {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Carlos thought this would be a good idea
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_exists</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">unlink</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>Một class <code>CustomTemplate</code> được định nghĩa với 2 thuộc tính <code>template_file_path</code> và <code>lock_file_path</code>. Ta chỉ cần quan tâm <a href="https://www.php.net/manual/en/language.oop5.magic.php" target="_blank" rel="noopener noreffer">magic method</a>
+ <code>__destruct()</code> khi nó thực hiện xóa file tại <code>lock_file_path</code>, nếu nó tồn tại. Mặt khác <code>__destruct()</code> sẽ được gọi khi server thực hiện deserialize.</p>
+<p>=&gt; Ta có thể tận dụng session cookie để thực hiện Object Injection như sau:</p>
+<pre tabindex="0"><code>O: 14: &#34;CustomTemplate&#34;: 1: {s: 14: &#34;lock_file_path&#34;; s: 23: &#34;/home/carlos/morale.txt&#34;;}
+</code></pre><p>Endcode base64 và edit cookie:
+</p>
+<p></p>
+<p>Solved
+</p>
+]]></description>
+</item>
+<item>
     <title>Hackthebox - ProxyAsService</title>
     <link>https://g03m0n.github.io/posts/hacthebox-proxyasservice/hackthebox-proxyasservice/</link>
     <pubDate>Mon, 20 Nov 2023 08:29:01 &#43;0800</pubDate>
