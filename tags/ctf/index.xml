@@ -296,7 +296,7 @@ Thay vì <code>inject</code> một câu lệnh để server thực hiện sau kh
 <h3 id="description">Description</h3>
 <blockquote>
 <p>This lab uses a serialization-based session mechanism and is vulnerable to privilege escalation as a result. To solve the lab, edit the serialized object in the session cookie to exploit this vulnerability and gain administrative privileges. Then, delete Carlos&rsquo;s account.
-You can log in to your own account using the following credentials: wiener:peter</p>
+You can log in to your own account using the5 following credentials: wiener:peter</p>
 </blockquote>
 <h3 id="exploitaion">Exploitaion</h3>
 <p>Challenge này yêu cầu ta thay đổi thuộc tính trên serialized objects để leo quyền lên admin.</p>
