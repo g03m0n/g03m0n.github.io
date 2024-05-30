@@ -379,12 +379,14 @@ if __name__ == &#39;__main__&#39;:
 
     app.run(host=&#39;0.0.0.0&#39;, port=1337)
 </code></pre><p>Có thể thấy được rằng để lấy được flag thì <code>uid</code> phải là <code>admin</code> nhưng ở trong database lại không có user nào là <code>admin</code>.
-Vì vậy ta phải khiến cho chương trình hiện thị ra mỗi một cái bảng với cột uid = <code>admin</code>.
-Thử nghiệm ở trên (SQLite Online)[https://sqliteonline.com/] với câu lệnh như sau:</p>
+Vì vậy ta phải khiến cho chương trình hiện thị ra mỗi một cái bảng với cột uid = <code>admin</code>.</p>
+<p>Thử nghiệm ở trên <a href="https://sqliteonline.com/" target="_blank" rel="noopener noreffer">SQLite Online</a>
+ với câu lệnh như sau:</p>
 <pre tabindex="0"><code>SELECT uid FROM users WHERE uid=&#39;dream&#39; AND upw= &#39;cometrue&#39; AND level=&#39;9&#39; UNION SELECT &#39;admin&#39; AS uid;
 </code></pre><p></p>
 <p>Nhưng ta đã bị filter khá là nhiều ký tự, trong đó có cả <code>SELECT</code> và <code>admin</code>.</p>
-<p>Trong SQLite, theo (selectCore)[http://www.humane-assessment.com/blog/moose-custom-analyses-made-easy/#:~:text=For%20example%2C%20to%20build%20a%20parser%20for%20SQLite%2C%20you%20can%20follow%20the%20official%20abstract%20grammar.%20In%20this%20grammar%2C%20the%20selectCore%20is%20one%20of%20the%20central%20productions%20and%20the%20specification%20looks%20like%3A] ngoài kết hợp toán tử <code>UNION</code> với toán tử <code>SELECT</code> ta còn có thể kết hợp với toán tử <code>VALUES</code>.</p>
+<p>Trong SQLite, theo <a href="http://www.humane-assessment.com/blog/moose-custom-analyses-made-easy/#:~:text=For%20example%2C%20to%20build%20a%20parser%20for%20SQLite%2C%20you%20can%20follow%20the%20official%20abstract%20grammar.%20In%20this%20grammar%2C%20the%20selectCore%20is%20one%20of%20the%20central%20productions%20and%20the%20specification%20looks%20like%3A" target="_blank" rel="noopener noreffer">selectCore</a>
+ ngoài kết hợp toán tử <code>UNION</code> với toán tử <code>SELECT</code> ta còn có thể kết hợp với toán tử <code>VALUES</code>.</p>
 <p></p>
 <p>Thử nghiệm:</p>
 <pre tabindex="0"><code>SELECT uid FROM users WHERE uid=&#39;dream&#39; AND upw=&#39;&#39; AND level=0 UNION VALUES(&#39;admin&#39;);
