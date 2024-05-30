@@ -121,7 +121,7 @@ file_put_contents($file, $contents);
 <p>Ta có thể sử dụng cách này để xóa nội dung của file log.</p>
 <p>Như vậy ta đã có đủ 2 điều kiện để sử dụng kỹ thuật Phar Deserialization: Kiểm soát được file <code>laravel.log</code> với Wrapper <code>php://filter</code> và biết được đường dẫn của file <code>laravel.log</code> là <code>storage/logs/laravel.log</code></p>
 <p>Nhưng ta mới chỉ kiểm soát được một phần nhỏ file log, để thực hiện kỹ thuật Phar Deserialization ta cần phải kiểm soát được toàn bộ nội dung của file log.</p>
-<h3 id="deleting-and-writing-the-log-file">Deleting and <strong>Writing the log file</strong></h3>
+<h3 id="deleting-and-writing-the-log-file">Deleting and writing the log file</h3>
 <p>Cấu trúc của mỗi đoạn đầu của log như sau:</p>
 <pre tabindex="0"><code>[Date][Error_data]&lt;viewFile&gt;[Error_data]&lt;viewFile&gt;[Error_data]
 </code></pre><p>Trong PHP có nhiều filter chuyển đổi cho nhiều kiểu mã hóa khác nhau. Tất cả đều có tiền tố <a href="https://www.php.net/manual/en/filters.convert.php#filters.convert.iconv" target="_blank" rel="noopener noreffer">convert.iconv.*</a>
