@@ -1,8 +1,8 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
-        <title>VulHub - Category - Tu dep trai</title>
+        <title>VulHub - Category - g03m0n</title>
         <link>https://g03m0n.github.io/categories/vulhub/</link>
-        <description>VulHub - Category - Tu dep trai</description>
+        <description>VulHub - Category - g03m0n</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 21 Aug 2023 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/categories/vulhub/" rel="self" type="application/rss+xml" /><item>
     <title>Vulhub - Mr.Robot</title>
     <link>https://g03m0n.github.io/posts/vulhub-mrrobot/vulhub-mrrobot/</link>
