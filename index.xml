@@ -1060,6 +1060,12 @@ Các lệnh của được xử lý thông qua tham số <code>?doAs</code> và 
 <p></p>
 <p><strong>Bước 6:</strong> Khai thác thành công.</p>
 <p></p>
+<p><strong>Video demo</strong></p>
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe src="https://www.youtube.com/embed/aF7NSABWU2Q" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
+</div>
+
 ]]></description>
 </item>
 <item>
@@ -1154,6 +1160,12 @@ Content-Length: 680
 <p>Bước 5: Có <code>submitId</code> trong gói tin <code>Reponses</code>, ta vào đường dẫn sau để xem kết quả được thực thi:</p>
 <p><code>http://192.168.1.39:8081/logPage/?driverId={submissionId}&amp;logType=stdout</code></p>
 <p></p>
+<p><strong>Video demo</strong></p>
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe src="https://www.youtube.com/embed/ahpHgVADNf0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
+</div>
+
 ]]></description>
 </item>
 <item>
@@ -1192,6 +1204,12 @@ Từ phiên bản 1.3.0 trở đi, <code>Spark's standalone</code> master cung c
 <p><strong>Bước 8:</strong> <code>Submit-job</code> thành công:</p>
 <p></p>
 <p></p>
+<p><strong>Video demo</strong></p>
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe src="https://www.youtube.com/embed/68zsH0hyJU8" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
+</div>
+
 ]]></description>
 </item>
 <item>
