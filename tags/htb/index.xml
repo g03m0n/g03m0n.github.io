@@ -3,7 +3,31 @@
         <title>htb - Tag - g03m0n</title>
         <link>https://g03m0n.github.io/tags/htb/</link>
         <description>htb - Tag - g03m0n</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 20 Nov 2023 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/htb/" rel="self" type="application/rss+xml" /><item>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/htb/" rel="self" type="application/rss+xml" /><item>
+    <title>Hackthebox - Neonify</title>
+    <link>https://g03m0n.github.io/posts/hackthebox-neonify/hackthebox-neonify/</link>
+    <pubDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/hackthebox-neonify/hackthebox-neonify/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link challenge tại <a href="https://app.hackthebox.com/challenges/Neonify" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="step">Step</h2>
+<p>Đây là giao diện chính của challenge:</p>
+<p></p>
+<p>Đọc source code ta có thể thấy ứng dụng chạy bằng Ruby và sử dụng <a href="https://docs.ruby-lang.org/en/2.3.0/ERB.html" target="_blank" rel="noopener noreffer">ERB template</a>
+ để render. Đây có thể sẽ là một bài SSTI Ruby ERB template
+Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9, từ a tới z.</p>
+<p></p>
+<p>Ở đây regex sẽ chỉ match từ đầu tới cuối ở trong một dòng, tức là nếu chèn vào một string bất kì rồi dùng ký tự new line <code>(\n)</code> để xuống dòng, rồi chèn vào payload SSTI thì sẽ exploit thành công.
+Endcode payload:</p>
+<p></p>
+<p>Chèn payload và gửi request:</p>
+<p></p>
+<p>Flag: <code>HTB{r3pl4c3m3n7_s3cur1ty}</code></p>
+]]></description>
+</item>
+<item>
     <title>Hackthebox - ProxyAsService</title>
     <link>https://g03m0n.github.io/posts/hacthebox-proxyasservice/hackthebox-proxyasservice/</link>
     <pubDate>Mon, 20 Nov 2023 08:29:01 &#43;0800</pubDate>
