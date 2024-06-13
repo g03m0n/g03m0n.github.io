@@ -122,7 +122,8 @@
         <a href="/posts/hackthebox-jscalc-copy/hackthebox-jscalc/">Hackthebox - Neonify</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-06-10">2024-06-10</time></span>&nbsp;<span class="post-category">included in <a href="/categories/hackthebox/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Hackthebox</a></span></div><div class="content">Description Link challenge tại đâyStep Đây là giao diện chính của challenge:
-Đọc source code ta có thể thấy ứng dụng chạy bằng Ruby và sử dụng ERB templateđể render. Đây có thể sẽ là một bài SSTI Ruby ERB template Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9, từ a tới z.
+Đọc source code ta có thể thấy ứng dụng chạy bằng Ruby và sử dụng ERB templateđể render. Đây có thể sẽ là một bài SSTI Ruby ERB template.
+Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9, từ a tới z.
 Ở đây regex sẽ chỉ match từ đầu tới cuối ở trong một dòng, tức là nếu chèn vào một string bất kì rồi dùng ký tự new line (\n) để xuống dòng, rồi chèn vào payload SSTI thì sẽ exploit thành công.</div><div class="post-footer">
         <a href="/posts/hackthebox-jscalc-copy/hackthebox-jscalc/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/htb/">htb</a>,&nbsp;<a href="/tags/lab/">lab</a>,&nbsp;<a href="/tags/ctf/">ctf</a></div></div>
