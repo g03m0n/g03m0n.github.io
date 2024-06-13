@@ -16,7 +16,8 @@
 <p>Đây là giao diện chính của challenge:</p>
 <p></p>
 <p>Đọc source code ta có thể thấy ứng dụng chạy bằng Ruby và sử dụng <a href="https://docs.ruby-lang.org/en/2.3.0/ERB.html" target="_blank" rel="noopener noreffer">ERB template</a>
- để render. Đây có thể sẽ là một bài SSTI Ruby ERB template.</p>
+ để render.
+Đây có thể là một bài SSTI Ruby ERB template.</p>
 <p>Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9, từ a tới z.</p>
 <p></p>
 <p>Ở đây regex sẽ chỉ match từ đầu tới cuối ở trong một dòng, tức là nếu chèn vào một string bất kì rồi dùng ký tự new line <code>(\n)</code> để xuống dòng, rồi chèn vào payload SSTI thì sẽ exploit thành công.

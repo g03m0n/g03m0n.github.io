@@ -6,7 +6,7 @@
         <meta name="robots" content="noodp" />
         <title>Hackthebox - Neonify - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:title" content="Hackthebox - Neonify" />
 <meta property="og:description" content="Description Link challenge tại đâyStep Đây là giao diện chính của challenge:
-Đọc source code ta có thể thấy ứng dụng chạy bằng Ruby và sử dụng ERB templateđể render. Đây có thể sẽ là một bài SSTI Ruby ERB template.
+Đọc source code ta có thể thấy ứng dụng chạy bằng Ruby và sử dụng ERB templateđể render. Đây có thể là một bài SSTI Ruby ERB template.
 Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9, từ a tới z.
 Ở đây regex sẽ chỉ match từ đầu tới cuối ở trong một dòng, tức là nếu chèn vào một string bất kì rồi dùng ký tự new line (\n) để xuống dòng, rồi chèn vào payload SSTI thì sẽ exploit thành công." />
 <meta property="og:type" content="article" />
@@ -19,7 +19,7 @@ Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9,
 
 <meta name="twitter:title" content="Hackthebox - Neonify"/>
 <meta name="twitter:description" content="Description Link challenge tại đâyStep Đây là giao diện chính của challenge:
-Đọc source code ta có thể thấy ứng dụng chạy bằng Ruby và sử dụng ERB templateđể render. Đây có thể sẽ là một bài SSTI Ruby ERB template.
+Đọc source code ta có thể thấy ứng dụng chạy bằng Ruby và sử dụng ERB templateđể render. Đây có thể là một bài SSTI Ruby ERB template.
 Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9, từ a tới z.
 Ở đây regex sẽ chỉ match từ đầu tới cuối ở trong một dòng, tức là nếu chèn vào một string bất kì rồi dùng ký tự new line (\n) để xuống dòng, rồi chèn vào payload SSTI thì sẽ exploit thành công."/>
 <meta name="application-name" content="g03m0n">
@@ -39,7 +39,7 @@ Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9,
                             "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
                             "width":  3200 ,
                             "height":  2048 
-                        }],"genre": "posts","keywords": "htb, lab, ctf","wordcount":  125 ,
+                        }],"genre": "posts","keywords": "htb, lab, ctf","wordcount":  124 ,
         "url": "https:\/\/g03m0n.github.io\/posts\/hackthebox-jscalc-copy\/hackthebox-jscalc\/","datePublished": "2024-06-10T08:29:01+08:00","dateModified": "2023-06-10T08:29:01+08:00","publisher": {
             "@type": "Organization",
             "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
@@ -129,7 +129,7 @@ Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9,
         </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Hackthebox - Neonify</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-category">included in <a href="/categories/hackthebox/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Hackthebox</a></span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-06-10">2024-06-10</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;125 words&nbsp;
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-06-10">2024-06-10</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;124 words&nbsp;
                 <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;One minute&nbsp;</div>
         </div><div class="details toc" id="toc-static"  data-kept="">
                 <div class="details-summary toc-title">
@@ -156,7 +156,8 @@ Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9,
         alt="https://github.com/g03m0n/pics/assets/130943529/3f26043a-4afd-4640-9b3d-70362a9a1551"
         title="image" /></p>
 <p>Đọc source code ta có thể thấy ứng dụng chạy bằng Ruby và sử dụng <a href="https://docs.ruby-lang.org/en/2.3.0/ERB.html" target="_blank" rel="noopener noreffer">ERB template</a>
- để render. Đây có thể sẽ là một bài SSTI Ruby ERB template.</p>
+ để render.
+Đây có thể là một bài SSTI Ruby ERB template.</p>
 <p>Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9, từ a tới z.</p>
 <p><img
         class="lazyload"
