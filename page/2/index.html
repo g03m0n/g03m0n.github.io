@@ -119,13 +119,6 @@
 <a href="mailto:goemon2307@gmail.com" title="Email" rel=" me"><i class="far fa-envelope fa-fw" aria-hidden="true"></i></a>
 </div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/cookiectf-baby-sqlite-with-filter/cookiectf-babysqlitewithfilter/">CookieCTF - Baby SQLite With Filter</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-01-19">2024-01-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cookiectf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CookieCTF</a></span></div><div class="content">Description Link challenge tại đâyYou cannot create the query because we have blocked the following keywords. Challenge you to bypass it, how to know after each SQL Keyword you will be used what SQL statement. The blacklist sqli_filter = &lsquo;[&rsquo;, &lsquo;]&rsquo;, &lsquo;,&rsquo;, &lsquo;admin&rsquo;, &lsquo;select&rsquo;, &lsquo;&rsquo;&rsquo;, &lsquo;&quot;&rsquo;, &lsquo;\t&rsquo;, &lsquo;\n&rsquo;, &lsquo;\r&rsquo;, &lsquo;\x08&rsquo;, &lsquo;\x09&rsquo;, &lsquo;\x00&rsquo;, &lsquo;\x0b&rsquo;, &lsquo;\x0d&rsquo;, &rsquo; &lsquo;. The vulnerable parameter is &rsquo;level&rsquo; in Login function.
-Step Đây là giao diện chính của challenge:</div><div class="post-footer">
-        <a href="/posts/cookiectf-baby-sqlite-with-filter/cookiectf-babysqlitewithfilter/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/ctf/">ctf</a>,&nbsp;<a href="/tags/easy_ctf/">easy_ctf</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/portswigger-insecure-deserialization/portswigger-insecure-deserialization/">PortSwigger - Insecure Deserialization</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2023-12-20">2023-12-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/portswigger/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PortSwigger</a></span></div><div class="content">Thông thường cấu trúc của Serialize Data có dạng: O: strlen(object name): object name: object size: {... elements...}
@@ -158,6 +151,15 @@ Tuy nhiên, ta có thể thấy url của trang web vẫn nằm ở proxy chứ 
 Exploitaion Đầu tiên, kiểm tra source code của challenge. Ứng dụng web được chạy trên cổng 1337.</div><div class="post-footer">
         <a href="/posts/hacthebox-proxyasservice/hackthebox-proxyasservice/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/ctf/">ctf</a>,&nbsp;<a href="/tags/htb/">htb</a>,&nbsp;<a href="/tags/lab/">lab</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/hackthebox-jscalc/hackthebox-jscalc/">Hackthebox - jscalc</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2023-08-22">2023-08-22</time></span>&nbsp;<span class="post-category">included in <a href="/categories/hackthebox/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Hackthebox</a></span></div><div class="content">Description Link challenge tại đâyStep Đây là giao diện chính của challenge:
+Vì chương trình sử dụng hàm eval() để tính toán nên ta có thể tiêm vào một payload XSS:
+100*10-3+340 +&#39;&lt;img src=abc onerror=&#34;alert(123)&#34;&gt;&#39; Kiểm tra source code, đọc file package.json, nhận thấy challenge sử dụng node.js =&gt; Có thể execute JavaScript codeở back-end.
+Chương trình sử dụng API api/calculate. Từ web_jscalc/challenge/routes/computerHelper.js, hàm calculate() trả về kết quả từ hàm eval() và đưa ra một ngoại lệ chỉ khi có lỗi cú pháp.</div><div class="post-footer">
+        <a href="/posts/hackthebox-jscalc/hackthebox-jscalc/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/htb/">htb</a>,&nbsp;<a href="/tags/lab/">lab</a>,&nbsp;<a href="/tags/ctf/">ctf</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>

