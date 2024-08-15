@@ -4,28 +4,28 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noodp" />
-        <title>Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538) - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:title" content="Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)" />
+        <title>LPE-15538 - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:title" content="LPE-15538" />
 <meta property="og:description" content="Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538) Mô tả và ảnh hưởng
 Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình sai, có thể bị truy cập bởi attacker (theo mặc định, nó chỉ bị giới hạn truy cập từ localhost). Tùy thuộc vào phiên bản của Liferay Portal, attacker có thể khai thác lỗ hổng này bằng cách sử dụng dữ liệu đã được serialized để thực thi mã tùy ý trên hệ thống." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/" /><meta property="og:image" content="https://g03m0n.github.io/logo.png"/><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2024-05-01T08:29:01+08:00" />
-<meta property="article:modified_time" content="2024-05-01T08:29:01+08:00" /><meta property="og:site_name" content="g03m0n" />
+<meta property="article:published_time" content="2023-11-22T08:29:01+08:00" />
+<meta property="article:modified_time" content="2023-11-22T08:29:01+08:00" /><meta property="og:site_name" content="g03m0n" />
 
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://g03m0n.github.io/logo.png"/>
 
-<meta name="twitter:title" content="Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)"/>
+<meta name="twitter:title" content="LPE-15538"/>
 <meta name="twitter:description" content="Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538) Mô tả và ảnh hưởng
 Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình sai, có thể bị truy cập bởi attacker (theo mặc định, nó chỉ bị giới hạn truy cập từ localhost). Tùy thuộc vào phiên bản của Liferay Portal, attacker có thể khai thác lỗ hổng này bằng cách sử dụng dữ liệu đã được serialized để thực thi mã tùy ý trên hệ thống."/>
 <meta name="application-name" content="g03m0n">
 <meta name="apple-mobile-web-app-title" content="g03m0n"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/" /><link rel="prev" href="https://g03m0n.github.io/posts/cookiectf-the-existed-file/cookiectf-the-existed-file/" /><link rel="next" href="https://g03m0n.github.io/posts/cve-2021-3129/cve-2021-3129/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/" /><link rel="prev" href="https://g03m0n.github.io/posts/cve-2020-9840/cve-2020-9840/" /><link rel="next" href="https://g03m0n.github.io/posts/cve-2024-40075/cve-2024-40075/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
     {
         "@context": "http://schema.org",
         "@type": "BlogPosting",
-        "headline": "Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)",
+        "headline": "LPE-15538",
         "inLanguage": "en-us",
         "mainEntityOfPage": {
             "@type": "WebPage",
@@ -35,8 +35,8 @@ Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình s
                             "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
                             "width":  3200 ,
                             "height":  2048 
-                        }],"genre": "posts","keywords": "cve, laravel","wordcount":  668 ,
-        "url": "https:\/\/g03m0n.github.io\/posts\/liferay-tunnelservlet-deserialization-remote-code\/liferay-tunnelservlet-deserialization-remote-code\/","datePublished": "2024-05-01T08:29:01+08:00","dateModified": "2024-05-01T08:29:01+08:00","publisher": {
+                        }],"genre": "posts","keywords": "cve","wordcount":  668 ,
+        "url": "https:\/\/g03m0n.github.io\/posts\/liferay-tunnelservlet-deserialization-remote-code\/liferay-tunnelservlet-deserialization-remote-code\/","datePublished": "2023-11-22T08:29:01+08:00","dateModified": "2023-11-22T08:29:01+08:00","publisher": {
             "@type": "Organization",
             "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
                 "@type": "Person",
@@ -122,10 +122,10 @@ Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình s
                 <div class="container"><div class="toc" id="toc-auto">
             <h2 class="toc-title">Contents</h2>
             <div class="toc-content always-active" id="toc-content-auto"></div>
-        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</h1><div class="post-meta">
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">LPE-15538</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-05-01">2024-05-01</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;668 words&nbsp;
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2023-11-22">2023-11-22</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;668 words&nbsp;
                 <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
         </div><div class="details toc" id="toc-static"  data-kept="">
                 <div class="details-summary toc-title">
@@ -356,7 +356,7 @@ Trong trường hợp truyền vào <code>/api////////liferay</code> thì sẽ t
         title="Untitled" /></p>
 <p>→ <code>SecureFilter</code> không được add vào với request là <code>/api/////////liferay</code></p>
 <p>→ <code>SecureFilter</code> không được invoke nên bị bypass</p>
-<ol start="5">
+<ol>
 <li>Sửa lỗi của NPH.</li>
 </ol>
 <p>Liferay đã thêm một hàm <code>ProtectedClassLoaderObjectInputStream()</code> để filter những authenticated access, và userInputStream.</p>
@@ -385,213 +385,29 @@ Trong trường hợp truyền vào <code>/api////////liferay</code> thì sẽ t
         data-sizes="auto"
         alt="Liferay%20TunnelServlet%20Deserialization%20Remote%20Code%20%20304d530768824e88a05eb7c0540e7797/Untitled%2021.png"
         title="Untitled" /></p>
-<p><img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/92b4d68f-7a9f-4876-aa1b-2335c256752d"
-        data-srcset="https://github.com/user-attachments/assets/92b4d68f-7a9f-4876-aa1b-2335c256752d, https://github.com/user-attachments/assets/92b4d68f-7a9f-4876-aa1b-2335c256752d 1.5x, https://github.com/user-attachments/assets/92b4d68f-7a9f-4876-aa1b-2335c256752d 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/92b4d68f-7a9f-4876-aa1b-2335c256752d"
-        title="8c5edcf0-2e59-42ac-94e5-924dd109b020" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/75cb38c6-be3b-4ba9-a654-9a37061d2add"
-        data-srcset="https://github.com/user-attachments/assets/75cb38c6-be3b-4ba9-a654-9a37061d2add, https://github.com/user-attachments/assets/75cb38c6-be3b-4ba9-a654-9a37061d2add 1.5x, https://github.com/user-attachments/assets/75cb38c6-be3b-4ba9-a654-9a37061d2add 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/75cb38c6-be3b-4ba9-a654-9a37061d2add"
-        title="Untitled" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/23180149-507c-4428-b09a-7caba2a4578f"
-        data-srcset="https://github.com/user-attachments/assets/23180149-507c-4428-b09a-7caba2a4578f, https://github.com/user-attachments/assets/23180149-507c-4428-b09a-7caba2a4578f 1.5x, https://github.com/user-attachments/assets/23180149-507c-4428-b09a-7caba2a4578f 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/23180149-507c-4428-b09a-7caba2a4578f"
-        title="Untitled 1" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/28e6c3b4-7162-45e7-ad64-bfd4e8482752"
-        data-srcset="https://github.com/user-attachments/assets/28e6c3b4-7162-45e7-ad64-bfd4e8482752, https://github.com/user-attachments/assets/28e6c3b4-7162-45e7-ad64-bfd4e8482752 1.5x, https://github.com/user-attachments/assets/28e6c3b4-7162-45e7-ad64-bfd4e8482752 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/28e6c3b4-7162-45e7-ad64-bfd4e8482752"
-        title="Untitled 2" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/778f84bb-0b5a-4034-9cf8-692f3b5f3573"
-        data-srcset="https://github.com/user-attachments/assets/778f84bb-0b5a-4034-9cf8-692f3b5f3573, https://github.com/user-attachments/assets/778f84bb-0b5a-4034-9cf8-692f3b5f3573 1.5x, https://github.com/user-attachments/assets/778f84bb-0b5a-4034-9cf8-692f3b5f3573 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/778f84bb-0b5a-4034-9cf8-692f3b5f3573"
-        title="Untitled 3" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/6635493b-ad35-4f4c-8785-adba05f04518"
-        data-srcset="https://github.com/user-attachments/assets/6635493b-ad35-4f4c-8785-adba05f04518, https://github.com/user-attachments/assets/6635493b-ad35-4f4c-8785-adba05f04518 1.5x, https://github.com/user-attachments/assets/6635493b-ad35-4f4c-8785-adba05f04518 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/6635493b-ad35-4f4c-8785-adba05f04518"
-        title="Untitled 4" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/d80bd56b-7bf2-4b17-8b77-56cd15a7fc9a"
-        data-srcset="https://github.com/user-attachments/assets/d80bd56b-7bf2-4b17-8b77-56cd15a7fc9a, https://github.com/user-attachments/assets/d80bd56b-7bf2-4b17-8b77-56cd15a7fc9a 1.5x, https://github.com/user-attachments/assets/d80bd56b-7bf2-4b17-8b77-56cd15a7fc9a 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/d80bd56b-7bf2-4b17-8b77-56cd15a7fc9a"
-        title="Untitled 5" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/0eaffeb6-43cc-4eeb-a22a-44d4185257bc"
-        data-srcset="https://github.com/user-attachments/assets/0eaffeb6-43cc-4eeb-a22a-44d4185257bc, https://github.com/user-attachments/assets/0eaffeb6-43cc-4eeb-a22a-44d4185257bc 1.5x, https://github.com/user-attachments/assets/0eaffeb6-43cc-4eeb-a22a-44d4185257bc 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/0eaffeb6-43cc-4eeb-a22a-44d4185257bc"
-        title="Untitled 6" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/fb257b4b-79d7-4544-b5ec-f409cdf9f417"
-        data-srcset="https://github.com/user-attachments/assets/fb257b4b-79d7-4544-b5ec-f409cdf9f417, https://github.com/user-attachments/assets/fb257b4b-79d7-4544-b5ec-f409cdf9f417 1.5x, https://github.com/user-attachments/assets/fb257b4b-79d7-4544-b5ec-f409cdf9f417 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/fb257b4b-79d7-4544-b5ec-f409cdf9f417"
-        title="Untitled 7" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/ee0e1964-3150-4c3d-8c57-be78777cc335"
-        data-srcset="https://github.com/user-attachments/assets/ee0e1964-3150-4c3d-8c57-be78777cc335, https://github.com/user-attachments/assets/ee0e1964-3150-4c3d-8c57-be78777cc335 1.5x, https://github.com/user-attachments/assets/ee0e1964-3150-4c3d-8c57-be78777cc335 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/ee0e1964-3150-4c3d-8c57-be78777cc335"
-        title="Untitled 8" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/4d0695b5-997e-4f7d-b868-3f23698ce4c7"
-        data-srcset="https://github.com/user-attachments/assets/4d0695b5-997e-4f7d-b868-3f23698ce4c7, https://github.com/user-attachments/assets/4d0695b5-997e-4f7d-b868-3f23698ce4c7 1.5x, https://github.com/user-attachments/assets/4d0695b5-997e-4f7d-b868-3f23698ce4c7 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/4d0695b5-997e-4f7d-b868-3f23698ce4c7"
-        title="Untitled 9" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/d9db031f-fc56-4024-ab12-7c353c80b1b2"
-        data-srcset="https://github.com/user-attachments/assets/d9db031f-fc56-4024-ab12-7c353c80b1b2, https://github.com/user-attachments/assets/d9db031f-fc56-4024-ab12-7c353c80b1b2 1.5x, https://github.com/user-attachments/assets/d9db031f-fc56-4024-ab12-7c353c80b1b2 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/d9db031f-fc56-4024-ab12-7c353c80b1b2"
-        title="Untitled 10" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/9c4e9397-0d87-4568-99b7-a897808dbd1d"
-        data-srcset="https://github.com/user-attachments/assets/9c4e9397-0d87-4568-99b7-a897808dbd1d, https://github.com/user-attachments/assets/9c4e9397-0d87-4568-99b7-a897808dbd1d 1.5x, https://github.com/user-attachments/assets/9c4e9397-0d87-4568-99b7-a897808dbd1d 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/9c4e9397-0d87-4568-99b7-a897808dbd1d"
-        title="Untitled 11" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/f3b8ce43-eaec-49b9-a882-c6a0419bf0b5"
-        data-srcset="https://github.com/user-attachments/assets/f3b8ce43-eaec-49b9-a882-c6a0419bf0b5, https://github.com/user-attachments/assets/f3b8ce43-eaec-49b9-a882-c6a0419bf0b5 1.5x, https://github.com/user-attachments/assets/f3b8ce43-eaec-49b9-a882-c6a0419bf0b5 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/f3b8ce43-eaec-49b9-a882-c6a0419bf0b5"
-        title="Untitled 12" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/544170d2-d2c7-4eb9-9d4d-29901502ea34"
-        data-srcset="https://github.com/user-attachments/assets/544170d2-d2c7-4eb9-9d4d-29901502ea34, https://github.com/user-attachments/assets/544170d2-d2c7-4eb9-9d4d-29901502ea34 1.5x, https://github.com/user-attachments/assets/544170d2-d2c7-4eb9-9d4d-29901502ea34 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/544170d2-d2c7-4eb9-9d4d-29901502ea34"
-        title="Untitled 13" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/56a8d6d5-1e30-43a9-b672-aa69087242b2"
-        data-srcset="https://github.com/user-attachments/assets/56a8d6d5-1e30-43a9-b672-aa69087242b2, https://github.com/user-attachments/assets/56a8d6d5-1e30-43a9-b672-aa69087242b2 1.5x, https://github.com/user-attachments/assets/56a8d6d5-1e30-43a9-b672-aa69087242b2 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/56a8d6d5-1e30-43a9-b672-aa69087242b2"
-        title="Untitled 14" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/d3f2be15-1578-451b-9535-da35b79505a3"
-        data-srcset="https://github.com/user-attachments/assets/d3f2be15-1578-451b-9535-da35b79505a3, https://github.com/user-attachments/assets/d3f2be15-1578-451b-9535-da35b79505a3 1.5x, https://github.com/user-attachments/assets/d3f2be15-1578-451b-9535-da35b79505a3 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/d3f2be15-1578-451b-9535-da35b79505a3"
-        title="Untitled 15" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/42d0bd2f-2c2c-4e76-8ae5-6b5356993c85"
-        data-srcset="https://github.com/user-attachments/assets/42d0bd2f-2c2c-4e76-8ae5-6b5356993c85, https://github.com/user-attachments/assets/42d0bd2f-2c2c-4e76-8ae5-6b5356993c85 1.5x, https://github.com/user-attachments/assets/42d0bd2f-2c2c-4e76-8ae5-6b5356993c85 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/42d0bd2f-2c2c-4e76-8ae5-6b5356993c85"
-        title="Untitled 16" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/e805758d-3969-45c5-bfd9-38832adf4b79"
-        data-srcset="https://github.com/user-attachments/assets/e805758d-3969-45c5-bfd9-38832adf4b79, https://github.com/user-attachments/assets/e805758d-3969-45c5-bfd9-38832adf4b79 1.5x, https://github.com/user-attachments/assets/e805758d-3969-45c5-bfd9-38832adf4b79 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/e805758d-3969-45c5-bfd9-38832adf4b79"
-        title="Untitled 17" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/209e9302-a5f7-4e56-b669-a41982129161"
-        data-srcset="https://github.com/user-attachments/assets/209e9302-a5f7-4e56-b669-a41982129161, https://github.com/user-attachments/assets/209e9302-a5f7-4e56-b669-a41982129161 1.5x, https://github.com/user-attachments/assets/209e9302-a5f7-4e56-b669-a41982129161 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/209e9302-a5f7-4e56-b669-a41982129161"
-        title="Untitled 18" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/1c9e89a1-bbb2-4fd1-89c1-4fc0c091e252"
-        data-srcset="https://github.com/user-attachments/assets/1c9e89a1-bbb2-4fd1-89c1-4fc0c091e252, https://github.com/user-attachments/assets/1c9e89a1-bbb2-4fd1-89c1-4fc0c091e252 1.5x, https://github.com/user-attachments/assets/1c9e89a1-bbb2-4fd1-89c1-4fc0c091e252 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/1c9e89a1-bbb2-4fd1-89c1-4fc0c091e252"
-        title="Untitled 19" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/d8e1e385-fa53-409a-9695-e779a5337608"
-        data-srcset="https://github.com/user-attachments/assets/d8e1e385-fa53-409a-9695-e779a5337608, https://github.com/user-attachments/assets/d8e1e385-fa53-409a-9695-e779a5337608 1.5x, https://github.com/user-attachments/assets/d8e1e385-fa53-409a-9695-e779a5337608 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/d8e1e385-fa53-409a-9695-e779a5337608"
-        title="Untitled 20" />
-<img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/user-attachments/assets/4baf064b-ab03-49e4-8ac5-f532514efeaa"
-        data-srcset="https://github.com/user-attachments/assets/4baf064b-ab03-49e4-8ac5-f532514efeaa, https://github.com/user-attachments/assets/4baf064b-ab03-49e4-8ac5-f532514efeaa 1.5x, https://github.com/user-attachments/assets/4baf064b-ab03-49e4-8ac5-f532514efeaa 2x"
-        data-sizes="auto"
-        alt="https://github.com/user-attachments/assets/4baf064b-ab03-49e4-8ac5-f532514efeaa"
-        title="Untitled 21" /></p>
 </div><div class="post-footer" id="post-footer">
     <div class="post-info">
         <div class="post-info-line">
             <div class="post-info-mod">
-                <span>Updated on 2024-05-01</span>
+                <span>Updated on 2023-11-22</span>
             </div></div>
         <div class="post-info-line">
             <div class="post-info-md"></div>
             <div class="post-info-share">
-                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/" data-title="Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)" data-hashtags="cve,laravel"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/" data-hashtag="cve"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/" data-title="Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a></span>
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/" data-title="LPE-15538" data-hashtags="cve"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/" data-hashtag="cve"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/" data-title="LPE-15538"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a></span>
             </div>
         </div>
     </div>
 
     <div class="post-info-more">
-        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">cve</a>,&nbsp;<a href="/tags/laravel/">laravel</a></section>
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">cve</a></section>
         <section>
             <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
         </section>
     </div>
 
-    <div class="post-nav"><a href="/posts/cookiectf-the-existed-file/cookiectf-the-existed-file/" class="prev" rel="prev" title="CookieCTF - The Existed File"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>CookieCTF - The Existed File</a>
-            <a href="/posts/cve-2021-3129/cve-2021-3129/" class="next" rel="next" title="CVE-2021-3129">CVE-2021-3129<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+    <div class="post-nav"><a href="/posts/cve-2020-9840/cve-2020-9840/" class="prev" rel="prev" title="CVE-2020-9480"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>CVE-2020-9480</a>
+            <a href="/posts/cve-2024-40075/cve-2024-40075/" class="next" rel="next" title="CVE-2024-40075">CVE-2024-40075<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
 </div>
 <div id="comments"><div id="fb-root" class="comment"></div>
             <div
