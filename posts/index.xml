@@ -1100,12 +1100,12 @@ Các lệnh của được xử lý thông qua tham số <code>?doAs</code> và 
 ]]></description>
 </item>
 <item>
-    <title>CVE-2024-40075</title>
+    <title>cve-2024-40075</title>
     <link>https://g03m0n.github.io/posts/cve-2024-40075/</link>
     <pubDate>Wed, 22 Nov 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
     <guid>https://g03m0n.github.io/posts/cve-2024-40075/</guid>
-    <description><![CDATA[<h1 id="cve-2024-40075">CVE-2024-40075</h1>
+    <description><![CDATA[<h1 id="cve-2024-40075">cve-2024-40075</h1>
 <ol>
 <li>
 <p><strong>Description and Impact</strong>
