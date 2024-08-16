@@ -5,10 +5,10 @@
         <description>Lab - Tag - g03m0n</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/lab/" rel="self" type="application/rss+xml" /><item>
     <title>Hackthebox - Neonify</title>
-    <link>https://g03m0n.github.io/posts/hackthebox---neonify/hackthebox-neonify/</link>
+    <link>https://g03m0n.github.io/posts/hackthebox---neonify/</link>
     <pubDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/hackthebox---neonify/hackthebox-neonify/</guid>
+    <guid>https://g03m0n.github.io/posts/hackthebox---neonify/</guid>
     <description><![CDATA[<h2 id="description">Description</h2>
 <p>Link challenge tại <a href="https://app.hackthebox.com/challenges/Neonify" target="_blank" rel="noopener noreffer">đây</a>
 </p>
@@ -35,10 +35,10 @@
 </item>
 <item>
     <title>PortSwigger - SQL Injection</title>
-    <link>https://g03m0n.github.io/posts/portswigger---sqli/portswigger---sqli/</link>
+    <link>https://g03m0n.github.io/posts/portswigger---sqli/</link>
     <pubDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/portswigger---sqli/portswigger---sqli/</guid>
+    <guid>https://g03m0n.github.io/posts/portswigger---sqli/</guid>
     <description><![CDATA[<h2 id="1-sql-injection-vulnerability-in-where-clause-allowing-retrieval-of-hidden-data">1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data</h2>
 <p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-retrieve-hidden-data" target="_blank" rel="noopener noreffer">đây</a>
 </p>
@@ -246,10 +246,10 @@ Tiếp tục tìm kiếm các cột có trong bảng <code>USERS_JBIWMO</code></
 </item>
 <item>
     <title>PortSwigger - Insecure Deserialization</title>
-    <link>https://g03m0n.github.io/posts/portswigger---insecure-deserialization/portswigger-insecure-deserialization/</link>
+    <link>https://g03m0n.github.io/posts/portswigger---insecure-deserialization/</link>
     <pubDate>Wed, 20 Dec 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/portswigger---insecure-deserialization/portswigger-insecure-deserialization/</guid>
+    <guid>https://g03m0n.github.io/posts/portswigger---insecure-deserialization/</guid>
     <description><![CDATA[<blockquote>
 <p>Thông thường cấu trúc của <code>Serialize Data</code> có dạng:
 <code>O: strlen(object name): object name: object size: {... elements...}</code></p>
@@ -507,10 +507,10 @@ You can log in to your own account using the following credentials: wiener:peter
 </item>
 <item>
     <title>Hackthebox - ProxyAsService</title>
-    <link>https://g03m0n.github.io/posts/hacthebox---proxyasservice/hackthebox-proxyasservice/</link>
+    <link>https://g03m0n.github.io/posts/hacthebox---proxyasservice/</link>
     <pubDate>Mon, 20 Nov 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/hacthebox---proxyasservice/hackthebox-proxyasservice/</guid>
+    <guid>https://g03m0n.github.io/posts/hacthebox---proxyasservice/</guid>
     <description><![CDATA[<h3 id="description">Description</h3>
 <p>Challenge này là một <code>proxy</code> giữa ta và một trang web khác.
 Ở đây là <a href="reddit.com" rel="">Reddit</a>
@@ -552,10 +552,10 @@ Payload:</p>
 </item>
 <item>
     <title>Hackthebox - jscalc</title>
-    <link>https://g03m0n.github.io/posts/hackthebox---jscalc/hackthebox-jscalc/</link>
+    <link>https://g03m0n.github.io/posts/hackthebox---jscalc/</link>
     <pubDate>Tue, 22 Aug 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/hackthebox---jscalc/hackthebox-jscalc/</guid>
+    <guid>https://g03m0n.github.io/posts/hackthebox---jscalc/</guid>
     <description><![CDATA[<h2 id="description">Description</h2>
 <p>Link challenge tại <a href="https://app.hackthebox.com/challenges/jscalc" target="_blank" rel="noopener noreffer">đây</a>
 </p>
@@ -604,10 +604,10 @@ Từ <code>web_jscalc/challenge/routes/computerHelper.js</code>, hàm <code>calc
 </item>
 <item>
     <title>PortSwigger - XXE</title>
-    <link>https://g03m0n.github.io/posts/portswigger---xxe/portswigger-xxe/</link>
+    <link>https://g03m0n.github.io/posts/portswigger---xxe/</link>
     <pubDate>Mon, 21 Aug 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/portswigger---xxe/portswigger-xxe/</guid>
+    <guid>https://g03m0n.github.io/posts/portswigger---xxe/</guid>
     <description><![CDATA[<h2 id="description">Description</h2>
 <p>Link lab tại <a href="https://portswigger.net/web-security/xxe/lab-exploiting-xxe-to-retrieve-files" target="_blank" rel="noopener noreffer">đây</a>
 </p>
@@ -722,10 +722,10 @@ $FilterToConsumerBinding = Set-WmiInstance -Namespace root/subscription -Class _
 </item>
 <item>
     <title>Vulhub - Mr.Robot</title>
-    <link>https://g03m0n.github.io/posts/vulhub---mrrobot/vulhub-mrrobot/</link>
+    <link>https://g03m0n.github.io/posts/vulhub---mrrobot/</link>
     <pubDate>Mon, 21 Aug 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/vulhub---mrrobot/vulhub-mrrobot/</guid>
+    <guid>https://g03m0n.github.io/posts/vulhub---mrrobot/</guid>
     <description><![CDATA[<h2 id="description">Description</h2>
 <p>Link lab tại <a href="https://www.vulnhub.com/entry/mr-robot-1,151/" target="_blank" rel="noopener noreffer">đây</a>
 </p>
@@ -789,10 +789,10 @@ Truy cập <a href="https://gtfobins.github.io/gtfobins/nmap/" target="_blank" r
 </item>
 <item>
     <title>Vulhub - Loly</title>
-    <link>https://g03m0n.github.io/posts/vulhub---loly/vulhub-loly/</link>
+    <link>https://g03m0n.github.io/posts/vulhub---loly/</link>
     <pubDate>Sun, 20 Aug 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/vulhub---loly/vulhub-loly/</guid>
+    <guid>https://g03m0n.github.io/posts/vulhub---loly/</guid>
     <description><![CDATA[<h2 id="description">Description</h2>
 <p>Link lab tại <a href="https://www.vulnhub.com/entry/loly-1,538/" target="_blank" rel="noopener noreffer">đây</a>
 </p>

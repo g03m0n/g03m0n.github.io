@@ -5,10 +5,10 @@
         <description>Cve - Tag - g03m0n</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 01 May 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/cve/" rel="self" type="application/rss+xml" /><item>
     <title>CVE-2021-3129</title>
-    <link>https://g03m0n.github.io/posts/cve-2021-3129/cve-2021-3129/</link>
+    <link>https://g03m0n.github.io/posts/cve-2021-3129/</link>
     <pubDate>Wed, 01 May 2024 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cve-2021-3129/cve-2021-3129/</guid>
+    <guid>https://g03m0n.github.io/posts/cve-2021-3129/</guid>
     <description><![CDATA[<h1 id="laravel--v842-debug-mode-remote-code-execution-cve-2021-3129">Laravel &lt;= v8.4.2 debug mode: Remote code execution (CVE-2021-3129)</h1>
 <h1 id="description-and-impact">Description and Impact</h1>
 <p>Ignition là một công cụ gỡ lỗi phổ biến trong Laravel, đóng một vai trò quan trọng trong việc hỗ trợ các nhà phát triển trong quá trình phát triển ứng dụng. Nó được cài đặt mặc định từ Laravel 6+.</p>
@@ -362,10 +362,10 @@ if __name__ == &#39;__main__&#39;:
 </item>
 <item>
     <title>CVE-2022-33891</title>
-    <link>https://g03m0n.github.io/posts/cve-2022-33891/cve-2022-33891/</link>
+    <link>https://g03m0n.github.io/posts/cve-2022-33891/</link>
     <pubDate>Wed, 22 Nov 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cve-2022-33891/cve-2022-33891/</guid>
+    <guid>https://g03m0n.github.io/posts/cve-2022-33891/</guid>
     <description><![CDATA[<h3 id="description">Description</h3>
 <p>Apache Spark UI cho phép kích hoạt tính năng danh sách điều khiển truy cập (ACL) thông qua tùy chọn cấu hình <code>spark.acls.enable</code>.
 Trong đó tồn tại một bộ lọc xác thực có chức năng kiểm tra xem người dùng có quyền truy cập để xem hoặc sửa đổi ứng dụng hay không. Nếu ACL được bật, một đường dẫn mã trong <code>HttpSecurityFilter</code> có thể cho phép hacker thực hiện hành vi mạo danh bằng cách cung cấp tên người dùng tùy ý. Với cấu hình <code>spark.acls.enable</code> <code>true</code> sẽ kích hoạt lỗi chèn lệnh tùy ý. Đoạn mã này có nhiệm vụ kiểm tra quyền của người dùng bằng cách sử dụng lệnh bash shell kết hợp với lệnh unix id. Đoạn mã tồn tại lỗi:</p>
@@ -420,7 +420,7 @@ Các lệnh của được xử lý thông qua tham số <code>?doAs</code> và 
     <pubDate>Wed, 22 Nov 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
     <guid>https://g03m0n.github.io/posts/cve-2024-40075/</guid>
-    <description><![CDATA[<h1 id="cve-2024-40075-php-insecure-deserialization-at-laravel-v11x">CVE-2024-40075 PHP Insecure Deserialization at Laravel v11.x</h1>
+    <description><![CDATA[<h1 id="cve-2024-40075">CVE-2024-40075</h1>
 <ol>
 <li>
 <p><strong>Description and Impact</strong>
@@ -717,10 +717,10 @@ Trong trường hợp truyền vào <code>/api////////liferay</code> thì sẽ t
 </item>
 <item>
     <title>CVE-2020-9480</title>
-    <link>https://g03m0n.github.io/posts/cve-2020-9840/cve-2020-9840/</link>
+    <link>https://g03m0n.github.io/posts/cve-2020-9840/</link>
     <pubDate>Tue, 21 Nov 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cve-2020-9840/cve-2020-9840/</guid>
+    <guid>https://g03m0n.github.io/posts/cve-2020-9840/</guid>
     <description><![CDATA[<h3 id="description">Description</h3>
 <p>Lỗ hổng phát sinh khi tính năng xác thực chính (<code>spark.authenticate</code>) được bật bằng cách sử dụng shared secret. Thông thường, tính năng này yêu cầu người dùng cung cấp <code>shared secret</code> để khởi động tài nguyên của ứng dụng trên Spark <code>cluster</code>. Tuy nhiên, lệnh gọi thủ tục từ xa (RPC) có thể bỏ qua quá trình xác thực và bắt đầu thực thi lệnh thành công, ngay cả khi không có <code>shared secret</code>.
 Kẻ tấn công có thể khai thác lỗ hổng bảo mật này để thực thi từ xa các lệnh shell tùy ý trên máy chủ nơi Spark <code>cluster</code> đang chạy. Bằng cách tận dụng lỗ hổng bảo mật, kẻ tấn công có thể truy cập và kiểm soát trái phép toàn bộ <code>cluster</code>, có khả năng dẫn đến đánh cắp dữ liệu, xâm phạm hệ thống hoặc khai thác mạng thêm.

