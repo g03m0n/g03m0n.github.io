@@ -5,10 +5,10 @@
         <description>CookieCTF - Category - g03m0n</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/categories/cookiectf/" rel="self" type="application/rss+xml" /><item>
     <title>CookieCTF - The Existed File</title>
-    <link>https://g03m0n.github.io/posts/cookiectf---the-existed-file/</link>
+    <link>https://g03m0n.github.io/posts/cookiectf-the-existed-file/</link>
     <pubDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cookiectf---the-existed-file/</guid>
+    <guid>https://g03m0n.github.io/posts/cookiectf-the-existed-file/</guid>
     <description><![CDATA[<h2 id="description">Description</h2>
 <p>Link challenge tại <a href="https://battle.cookiearena.org/arenas/mini-ctf-web-hacking/battle/the-existed-file" target="_blank" rel="noopener noreffer">đây</a>
 </p>
@@ -39,10 +39,10 @@ Sau đó sẽ sử dung hàm <code>is_blacklisted</code> để kiểm tra <code>
 </item>
 <item>
     <title>CookieCTF - Baby Crawler</title>
-    <link>https://g03m0n.github.io/posts/cookiectf---baby-crawler/</link>
+    <link>https://g03m0n.github.io/posts/cookiectf-baby-crawler/</link>
     <pubDate>Fri, 19 Jan 2024 21:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cookiectf---baby-crawler/</guid>
+    <guid>https://g03m0n.github.io/posts/cookiectf-baby-crawler/</guid>
     <description><![CDATA[<h2 id="description">Description</h2>
 <p>Link challenge tại <a href="https://battle.cookiearena.org/challenges/web/baby-crawler" target="_blank" rel="noopener noreffer">đây</a>
 </p>
@@ -73,10 +73,10 @@ Thay vì <code>inject</code> một câu lệnh để server thực hiện sau kh
 </item>
 <item>
     <title>CookieCTF - Baby SQLite With Filter</title>
-    <link>https://g03m0n.github.io/posts/cookiectf---baby-sqlite-with-filter/</link>
+    <link>https://g03m0n.github.io/posts/cookiectf-baby-sqlite-with-filter/</link>
     <pubDate>Fri, 19 Jan 2024 21:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cookiectf---baby-sqlite-with-filter/</guid>
+    <guid>https://g03m0n.github.io/posts/cookiectf-baby-sqlite-with-filter/</guid>
     <description><![CDATA[<h2 id="description">Description</h2>
 <p>Link challenge tại <a href="https://battle.cookiearena.org/challenges/web/baby-sqlite-with-filter" target="_blank" rel="noopener noreffer">đây</a>
 </p>

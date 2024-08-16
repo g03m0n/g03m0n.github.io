@@ -5,10 +5,10 @@
         <description>Portswigger - Tag - g03m0n</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/portswigger/" rel="self" type="application/rss+xml" /><item>
     <title>PortSwigger - SQL Injection</title>
-    <link>https://g03m0n.github.io/posts/portswigger---sqli/</link>
+    <link>https://g03m0n.github.io/posts/portswigger-sqli/</link>
     <pubDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/portswigger---sqli/</guid>
+    <guid>https://g03m0n.github.io/posts/portswigger-sqli/</guid>
     <description><![CDATA[<h2 id="1-sql-injection-vulnerability-in-where-clause-allowing-retrieval-of-hidden-data">1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data</h2>
 <p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-retrieve-hidden-data" target="_blank" rel="noopener noreffer">đây</a>
 </p>

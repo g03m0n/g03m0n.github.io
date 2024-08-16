@@ -121,48 +121,48 @@
 <a href="mailto:goemon2307@gmail.com" title="Email" rel=" me"><i class="far fa-envelope fa-fw" aria-hidden="true"></i></a>
 </div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/hacthebox---proxyasservice/">Hackthebox - ProxyAsService</a>
+        <a href="/posts/hacthebox-proxyasservice/">Hackthebox - ProxyAsService</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2023-11-20">2023-11-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/hackthebox/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Hackthebox</a></span></div><div class="content">Description Challenge này là một proxy giữa ta và một trang web khác. Ở đây là Reddit. Lần đầu tiên khi truy cập vào challenge, ta sẽ được chuyển hướng đến một subreddit ngẫu nhiên về mèo:
 Tuy nhiên, ta có thể thấy url của trang web vẫn nằm ở proxy chứ không hoàn toàn chuyển hướng đến reddit.
 Exploitaion Đầu tiên, kiểm tra source code của challenge. Ứng dụng web được chạy trên cổng 1337.</div><div class="post-footer">
-        <a href="/posts/hacthebox---proxyasservice/">Read More</a><div class="post-tags">
+        <a href="/posts/hacthebox-proxyasservice/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/ctf/">Ctf</a>,&nbsp;<a href="/tags/htb/">Htb</a>,&nbsp;<a href="/tags/lab/">Lab</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/hackthebox---jscalc/">Hackthebox - jscalc</a>
+        <a href="/posts/hackthebox-jscalc/">Hackthebox - jscalc</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2023-08-22">2023-08-22</time></span>&nbsp;<span class="post-category">included in <a href="/categories/hackthebox/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Hackthebox</a></span></div><div class="content">Description Link challenge tại đâyStep Đây là giao diện chính của challenge:
 Vì chương trình sử dụng hàm eval() để tính toán nên ta có thể tiêm vào một payload XSS:
 100*10-3+340 +&#39;&lt;img src=abc onerror=&#34;alert(123)&#34;&gt;&#39; Kiểm tra source code, đọc file package.json, nhận thấy challenge sử dụng node.js =&gt; Có thể execute JavaScript codeở back-end.
 Chương trình sử dụng API api/calculate. Từ web_jscalc/challenge/routes/computerHelper.js, hàm calculate() trả về kết quả từ hàm eval() và đưa ra một ngoại lệ chỉ khi có lỗi cú pháp.</div><div class="post-footer">
-        <a href="/posts/hackthebox---jscalc/">Read More</a><div class="post-tags">
+        <a href="/posts/hackthebox-jscalc/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/htb/">Htb</a>,&nbsp;<a href="/tags/lab/">Lab</a>,&nbsp;<a href="/tags/ctf/">Ctf</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/portswigger---xxe/">PortSwigger - XXE</a>
+        <a href="/posts/portswigger-xxe/">PortSwigger - XXE</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2023-08-21">2023-08-21</time></span>&nbsp;<span class="post-category">included in <a href="/categories/portswigger/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PortSwigger</a></span></div><div class="content">Description Link lab tại đâyThis lab has a &ldquo;Check stock&rdquo; feature that parses XML input and returns any unexpected values in the response. To solve the lab, inject an XML external entity to retrieve the contents of the /etc/passwd file.
 Exploitation Ứng dụng có chức năng kiểm tra hàng tồn kho tại mỗi post của sản phẩm
 Khi click Check stock, một POST request gửi đến /product/stock với body là một dạng XML gồm 2 trường query chính là productId và storeId.</div><div class="post-footer">
-        <a href="/posts/portswigger---xxe/">Read More</a><div class="post-tags">
+        <a href="/posts/portswigger-xxe/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/lab/">Lab</a>,&nbsp;<a href="/tags/ctf/">Ctf</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/vulhub---mrrobot/">Vulhub - Mr.Robot</a>
+        <a href="/posts/vulhub-mrrobot/">Vulhub - Mr.Robot</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2023-08-21">2023-08-21</time></span>&nbsp;<span class="post-category">included in <a href="/categories/vulhub/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>VulHub</a></span></div><div class="content">Description Link lab tại đâyStep Reconnaissance Đầu tiên ta sử dụng arp-scan để quét các địa chỉ IP có trong dải mạng. Nhận thấy có một IP lạ là 192.168.134.136.
 Sử dụng nmap để kiểm tra các dịch vụ đang mở trên IP đó
 Có thể thấy port 80 đang sử dụng Apache httpd và port 22 là SSH.
 Enumeration Đầu tiên, truy cập vào endpoint /robots.txt ta có thể thấy key 1/3 và một file fsocity.</div><div class="post-footer">
-        <a href="/posts/vulhub---mrrobot/">Read More</a><div class="post-tags">
+        <a href="/posts/vulhub-mrrobot/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vulhub/">Vulhub</a>,&nbsp;<a href="/tags/lab/">Lab</a>,&nbsp;<a href="/tags/ctf/">Ctf</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/vulhub---loly/">Vulhub - Loly</a>
+        <a href="/posts/vulhub-loly/">Vulhub - Loly</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2023-08-20">2023-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/vulhub/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>VulHub</a></span></div><div class="content">Description Link lab tại đâyStep Reconnaissance Đầu tiên ta sử dụng arp-scan để quét các địa chỉ IP có trong dải mạng. Nhận thấy có một IP lạ là 192.168.134.135.
 Sử dụng nmap để kiểm tra các dịch vụ đang mở trên IP đó
 Có cổng 80 đang mở và đang sử dụng nginx 1.10.3.
 Enumeration Tiến hành quét các directory bằng dirb
 dirb 192.168.134.135 Ta thu được kết quả trang web này sử dụng Wordpress tại endpoint /wordpress.</div><div class="post-footer">
-        <a href="/posts/vulhub---loly/">Read More</a><div class="post-tags">
+        <a href="/posts/vulhub-loly/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vulhub/">Vulhub</a>,&nbsp;<a href="/tags/lab/">Lab</a>,&nbsp;<a href="/tags/ctf/">Ctf</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">

