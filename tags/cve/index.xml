@@ -416,10 +416,10 @@ Các lệnh của được xử lý thông qua tham số <code>?doAs</code> và 
 </item>
 <item>
     <title>CVE-2024-40075</title>
-    <link>https://g03m0n.github.io/posts/cve-2024-40075/cve-2024-40075/</link>
+    <link>https://g03m0n.github.io/posts/cve-2024-40075/</link>
     <pubDate>Wed, 22 Nov 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cve-2024-40075/cve-2024-40075/</guid>
+    <guid>https://g03m0n.github.io/posts/cve-2024-40075/</guid>
     <description><![CDATA[<h1 id="cve-2024-40075-php-insecure-deserialization-at-laravel-v11x">CVE-2024-40075 PHP Insecure Deserialization at Laravel v11.x</h1>
 <ol>
 <li>
@@ -617,10 +617,10 @@ Laravel là một framework ứng dụng web mã nguồn mở được viết b�
 </item>
 <item>
     <title>Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</title>
-    <link>https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/</link>
+    <link>https://g03m0n.github.io/posts/liferay/</link>
     <pubDate>Wed, 22 Nov 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/</guid>
+    <guid>https://g03m0n.github.io/posts/liferay/</guid>
     <description><![CDATA[<h1 id="liferay-tunnelservlet-deserialization-remote-code-execution-lpe-15538">Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</h1>
 <p>{{ .Resources.Match &ldquo;images/*&rdquo;}}</p>
 <ol>
@@ -820,10 +820,10 @@ Content-Length: 680
 </item>
 <item>
     <title>CVE-2018-11770</title>
-    <link>https://g03m0n.github.io/posts/cve-2018-11770/cve-2018-11770/</link>
+    <link>https://g03m0n.github.io/posts/cve-2018-11770/</link>
     <pubDate>Mon, 20 Nov 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cve-2018-11770/cve-2018-11770/</guid>
+    <guid>https://g03m0n.github.io/posts/cve-2018-11770/</guid>
     <description><![CDATA[<h3 id="description">Description</h3>
 <p>CVE-2018-11770 được phát hiện bởi nhà nghiên cứu Trung Quốc Fengwei Zhang (Alibaba Cloud Security Team), API REST <code>CreateSubmissionRequest</code> có thể bị khai thác khi ở chế độ <code>standalone</code> cho phép hacker gửi mã độc và thực thi mã từ xa.
 Nguyên nhân xảy ra

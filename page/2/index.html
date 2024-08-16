@@ -134,18 +134,18 @@
         <a href="/posts/cve-2022-33891/cve-2022-33891/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/apache_spark/">Apache_spark</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/cve-2024-40075/cve-2024-40075/">CVE-2024-40075</a>
+        <a href="/posts/cve-2024-40075/">CVE-2024-40075</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2023-11-22">2023-11-22</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">CVE-2024-40075 PHP Insecure Deserialization at Laravel v11.x Description and Impact Laravel là một framework ứng dụng web mã nguồn mở được viết bằng PHP. Do phương thức __destruct của lớp Monolog\Handler\Handler gọi phương thức close, GroupHandler đã ghi đè phương thức này và gọi phương thức close của mỗi handler. Khi deserialize các đối tượng độc hại, phương thức getStreamName sẽ gọi phương thức __toString của đối tượng đó. Kẻ tấn công có thể lợi dụng những phương thức có sẵn tồn tại trong ứng dụng để tạo ra chuỗi khai thác dựa trên Laravel và thực thi mã tùy ý.</div><div class="post-footer">
-        <a href="/posts/cve-2024-40075/cve-2024-40075/">Read More</a><div class="post-tags">
+        <a href="/posts/cve-2024-40075/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/">Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</a>
+        <a href="/posts/liferay/">Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2023-11-22">2023-11-22</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538) {{ .Resources.Match &ldquo;images/*&rdquo;}}
 Mô tả và ảnh hưởng
 Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình sai, có thể bị truy cập bởi attacker (theo mặc định, nó chỉ bị giới hạn truy cập từ localhost). Tùy thuộc vào phiên bản của Liferay Portal, attacker có thể khai thác lỗ hổng này bằng cách sử dụng dữ liệu đã được serialized để thực thi mã tùy ý trên hệ thống.</div><div class="post-footer">
-        <a href="/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/">Read More</a><div class="post-tags">
+        <a href="/posts/liferay/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/apache_spark/">Apache_spark</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/cve-2020-9840/cve-2020-9840/">CVE-2020-9480</a>
@@ -154,10 +154,10 @@ Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình s
         <a href="/posts/cve-2020-9840/cve-2020-9840/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/apache_spark/">Apache_spark</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/cve-2018-11770/cve-2018-11770/">CVE-2018-11770</a>
+        <a href="/posts/cve-2018-11770/">CVE-2018-11770</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2023-11-20">2023-11-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">Description CVE-2018-11770 được phát hiện bởi nhà nghiên cứu Trung Quốc Fengwei Zhang (Alibaba Cloud Security Team), API REST CreateSubmissionRequest có thể bị khai thác khi ở chế độ standalone cho phép hacker gửi mã độc và thực thi mã từ xa. Nguyên nhân xảy ra Từ phiên bản 1.3.0 trở đi, Spark's standalone master cung cấp một REST API để gửi công việc từ xa, bên cạnh việc sử dụng spark-submit.</div><div class="post-footer">
-        <a href="/posts/cve-2018-11770/cve-2018-11770/">Read More</a><div class="post-tags">
+        <a href="/posts/cve-2018-11770/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/apache_spark/">Apache_spark</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
