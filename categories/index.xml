@@ -1,0 +1,47 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Categories - Category - g03m0n</title>
+        <link>https://g03m0n.github.io/categories/</link>
+        <description>Categories - Category - g03m0n</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/categories/" rel="self" type="application/rss+xml" /><item>
+    <title>Hackthebox</title>
+    <link>https://g03m0n.github.io/categories/hackthebox/</link>
+    <pubDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://g03m0n.github.io/categories/hackthebox/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>CVEs</title>
+    <link>https://g03m0n.github.io/categories/cves/</link>
+    <pubDate>Wed, 01 May 2024 08:29:01 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://g03m0n.github.io/categories/cves/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>CookieCTF</title>
+    <link>https://g03m0n.github.io/categories/cookiectf/</link>
+    <pubDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://g03m0n.github.io/categories/cookiectf/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>PortSwigger</title>
+    <link>https://g03m0n.github.io/categories/portswigger/</link>
+    <pubDate>Sat, 20 Jan 2024 08:29:01 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://g03m0n.github.io/categories/portswigger/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>VulHub</title>
+    <link>https://g03m0n.github.io/categories/vulhub/</link>
+    <pubDate>Mon, 21 Aug 2023 08:29:01 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://g03m0n.github.io/categories/vulhub/</guid>
+    <description><![CDATA[]]></description>
+</item>
+</channel>
+</rss>

