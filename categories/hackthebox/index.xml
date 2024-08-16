@@ -5,10 +5,10 @@
         <description>Hackthebox - Category - g03m0n</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/categories/hackthebox/" rel="self" type="application/rss+xml" /><item>
     <title>Hackthebox - Neonify</title>
-    <link>https://g03m0n.github.io/posts/hackthebox-neonify/</link>
+    <link>https://g03m0n.github.io/posts/hackthebox---neonify/</link>
     <pubDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/hackthebox-neonify/</guid>
+    <guid>https://g03m0n.github.io/posts/hackthebox---neonify/</guid>
     <description><![CDATA[<h2 id="description">Description</h2>
 <p>Link challenge tại <a href="https://app.hackthebox.com/challenges/Neonify" target="_blank" rel="noopener noreffer">đây</a>
 </p>
@@ -35,10 +35,10 @@
 </item>
 <item>
     <title>Hackthebox - ProxyAsService</title>
-    <link>https://g03m0n.github.io/posts/hacthebox-proxyasservice/</link>
+    <link>https://g03m0n.github.io/posts/hacthebox---proxyasservice/</link>
     <pubDate>Mon, 20 Nov 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/hacthebox-proxyasservice/</guid>
+    <guid>https://g03m0n.github.io/posts/hacthebox---proxyasservice/</guid>
     <description><![CDATA[<h3 id="description">Description</h3>
 <p>Challenge này là một <code>proxy</code> giữa ta và một trang web khác.
 Ở đây là <a href="reddit.com" rel="">Reddit</a>
@@ -80,10 +80,10 @@ Payload:</p>
 </item>
 <item>
     <title>Hackthebox - jscalc</title>
-    <link>https://g03m0n.github.io/posts/hackthebox-jscalc/</link>
+    <link>https://g03m0n.github.io/posts/hackthebox---jscalc/</link>
     <pubDate>Tue, 22 Aug 2023 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/hackthebox-jscalc/</guid>
+    <guid>https://g03m0n.github.io/posts/hackthebox---jscalc/</guid>
     <description><![CDATA[<h2 id="description">Description</h2>
 <p>Link challenge tại <a href="https://app.hackthebox.com/challenges/jscalc" target="_blank" rel="noopener noreffer">đây</a>
 </p>
