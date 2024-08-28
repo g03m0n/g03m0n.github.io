@@ -5,6 +5,52 @@
         <description>Hackthebox - Category - g03m0n</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/categories/hackthebox/" rel="self" type="application/rss+xml" /><item>
     <title>Blind SQL Injection at Rouyi framework ≤ v4.7.9</title>
+    <link>https://g03m0n.github.io/posts/blind-sqli-at-rouyi-v4.7.9/</link>
+    <pubDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/blind-sqli-at-rouyi-v4.7.9/</guid>
+    <description><![CDATA[<h1 id="blind-sql-injection-at-rouyi-framework--v479">Blind SQL Injection at Rouyi framework ≤ v4.7.9</h1>
+<h2 id="1-description-and-impact">1. <strong>Description and Impact</strong></h2>
+<p>The Blind SQL Injection vulnerability occurs in the file <code>com/ruoyi/generator/controller/GenController</code> specifically at the endpoint <code>/tool/gen/createTable</code>. Manipulating this file allows an attacker to execute arbitrary SQL commands, which can endanger the security, integrity, and availability of the system.</p>
+<p>SQL injection vulnerability in <code>/tool/gen/createTable</code> in Ruoyi Framework at version ≤ 4.7.9 allows attackers to execute arbitrary SQL commands via the <code>sql</code> parameter.</p>
+<table>
+<thead>
+<tr>
+<th><strong>Type</strong></th>
+<th><strong>Required Authentication</strong></th>
+<th><strong>Version Affected</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SQL Injection</td>
+<td>Yes</td>
+<td>All versions</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-root-cause-analysis">2. <strong>Root Cause Analysis</strong></h2>
+<p>After patching vulnerabilities <a href="https://nvd.nist.gov/vuln/detail/CVE-2022-4566" target="_blank" rel="noopener noreffer">CVE-2022-4566</a>
+ with commit <a href="https://gitee.com/y_project/RuoYi/commit/167970e5c4da7bb46217f576dc50622b83f32b40" target="_blank" rel="noopener noreffer">https://gitee.com/y_project/RuoYi/commit/167970e5c4da7bb46217f576dc50622b83f32b40</a>
+, the SQLi vulnerability still exists at the endpoint <code>/tool/gen/createTable</code> as <strong>Blind SQLi.</strong></p>
+<p>Read my CVE-2022-4566 analyze <a href="https://g03m0n.github.io/posts/cve-2022-4566/" target="_blank" rel="noopener noreffer">here</a>
+</p>
+<h2 id="3-steps-to-reproduce">3. <strong>Steps to reproduce</strong></h2>
+<p>Set up environment:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> <span style="color:#a6e22e">git</span> <span style="color:#66d9ef">clone</span> <span style="color:#a6e22e">https</span><span style="color:#f92672">://</span><span style="color:#a6e22e">gitee</span><span style="color:#f92672">.</span><span style="color:#a6e22e">com</span><span style="color:#f92672">/</span><span style="color:#a6e22e">y_project</span><span style="color:#f92672">/</span><span style="color:#a6e22e">RuoYi</span><span style="color:#f92672">.</span><span style="color:#a6e22e">git</span>
+</span></span></code></pre></div><p><a href="https://doc.ruoyi.vip/ruoyi/document/hjbs.html" target="_blank" rel="noopener noreffer">https://doc.ruoyi.vip/ruoyi/document/hjbs.html</a>
+</p>
+<p>PoC</p>
+<p>Log in using the account<code>admin/admin123</code>and send a POST request to the endpoint <code>/tool/gen/createTable</code></p>
+<p>Payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>sql<span style="color:#f92672">=</span>create table test <span style="color:#66d9ef">as</span> select<span style="color:#f92672">/**/*</span> <span style="color:#f92672">from</span> sys_job where <span style="color:#ae81ff">1</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> union select<span style="color:#f92672">/**/</span>sleep(<span style="color:#ae81ff">10</span>),<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">4</span>,<span style="color:#ae81ff">5</span>,<span style="color:#ae81ff">6</span>,<span style="color:#ae81ff">7</span>,<span style="color:#ae81ff">8</span>,<span style="color:#ae81ff">9</span>,<span style="color:#ae81ff">10</span>,<span style="color:#ae81ff">11</span>,<span style="color:#ae81ff">12</span>,<span style="color:#ae81ff">13</span>;
+</span></span></code></pre></div><p></p>
+<p><a href="https://youtu.be/4rmbBW8QHOk" target="_blank" rel="noopener noreffer">https://youtu.be/4rmbBW8QHOk</a>
+</p>
+]]></description>
+</item>
+<item>
+    <title>Blind SQL Injection at Rouyi framework ≤ v4.7.9</title>
     <link>https://g03m0n.github.io/posts/cve-2024-42900/</link>
     <pubDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>

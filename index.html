@@ -121,6 +121,13 @@
 <a href="mailto:goemon2307@gmail.com" title="Email" rel=" me"><i class="far fa-envelope fa-fw" aria-hidden="true"></i></a>
 </div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/blind-sqli-at-rouyi-v4.7.9/">Blind SQL Injection at Rouyi framework ≤ v4.7.9</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-06-10">2024-06-10</time></span>&nbsp;<span class="post-category">included in <a href="/categories/hackthebox/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Hackthebox</a></span></div><div class="content">Blind SQL Injection at Rouyi framework ≤ v4.7.9 1. Description and Impact The Blind SQL Injection vulnerability occurs in the file com/ruoyi/generator/controller/GenController specifically at the endpoint /tool/gen/createTable. Manipulating this file allows an attacker to execute arbitrary SQL commands, which can endanger the security, integrity, and availability of the system.
+SQL injection vulnerability in /tool/gen/createTable in Ruoyi Framework at version ≤ 4.7.9 allows attackers to execute arbitrary SQL commands via the sql parameter.</div><div class="post-footer">
+        <a href="/posts/blind-sqli-at-rouyi-v4.7.9/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/rouyi/">Rouyi</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/cve-2024-42900/">Blind SQL Injection at Rouyi framework ≤ v4.7.9</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-06-10">2024-06-10</time></span>&nbsp;<span class="post-category">included in <a href="/categories/hackthebox/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Hackthebox</a></span></div><div class="content">Blind SQL Injection at Rouyi framework ≤ v4.7.9 1. Description and Impact The Blind SQL Injection vulnerability occurs in the file com/ruoyi/generator/controller/GenController specifically at the endpoint /tool/gen/createTable. Manipulating this file allows an attacker to execute arbitrary SQL commands, which can endanger the security, integrity, and availability of the system.
@@ -159,14 +166,6 @@ Kiểm tra soucre code có thể thấy luồng hoạt động của server.
 Đoạn code này loại bỏ khoảng trắng của input người dùng nhập vào. Nó sử dụng phương thức translate() của lớp string để thay thế tất cả các ký tự khoảng trắng bằng giá trị None.</div><div class="post-footer">
         <a href="/posts/cookiectf--the-existed-file/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cookiectf/">Cookiectf</a>,&nbsp;<a href="/tags/ctf/">Ctf</a>,&nbsp;<a href="/tags/easy_ctf/">Easy_ctf</a>,&nbsp;<a href="/tags/web/">Web</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/portswigger-sqli/">PortSwigger - SQL Injection</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-01-20">2024-01-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/portswigger/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PortSwigger</a></span></div><div class="content">1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data Link lab tại đâyLevel: APPRENTICE
-Description Lab này chứa lỗ hổng SQLi trong bộ lọc danh mục sản phẩm. Khi người dùng chọn một danh mục, ứng dụng sẽ thực hiện truy vấn SQL như sau:
-SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để giải quyết bài lab, khiến ứng dụng hiển thị một hoặc nhiều sản phẩm chưa được phát hành.</div><div class="post-footer">
-        <a href="/posts/portswigger-sqli/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/portswigger/">Portswigger</a>,&nbsp;<a href="/tags/lab/">Lab</a>,&nbsp;<a href="/tags/ctf/">Ctf</a></div></div>
 </article><ul class="pagination"><li class="page-item active">
                     <span class="page-link">
                         <a href="/">1</a>
