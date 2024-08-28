@@ -93,8 +93,14 @@
 <p>Payload:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>sql<span style="color:#f92672">=</span>create table test <span style="color:#66d9ef">as</span> select<span style="color:#f92672">/**/*</span> <span style="color:#f92672">from</span> sys_job where <span style="color:#ae81ff">1</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> union select<span style="color:#f92672">/**/</span>sleep(<span style="color:#ae81ff">10</span>),<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">4</span>,<span style="color:#ae81ff">5</span>,<span style="color:#ae81ff">6</span>,<span style="color:#ae81ff">7</span>,<span style="color:#ae81ff">8</span>,<span style="color:#ae81ff">9</span>,<span style="color:#ae81ff">10</span>,<span style="color:#ae81ff">11</span>,<span style="color:#ae81ff">12</span>,<span style="color:#ae81ff">13</span>;
 </span></span></code></pre></div><p></p>
-<p><a href="https://youtu.be/4rmbBW8QHOk" target="_blank" rel="noopener noreffer">https://youtu.be/4rmbBW8QHOk</a>
-</p>
+
+   
+       
+       <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+         <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="allowfullscreen" loading="eager" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube.com/embed/4rmbBW8QHOk?autoplay=0&controls=1&end=0&loop=0&mute=0&start=0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" title="YouTube video"
+         ></iframe>
+       </div>
+
 ]]></description>
 </item>
 <item>
