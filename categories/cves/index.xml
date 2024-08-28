@@ -106,10 +106,8 @@ AND/**/extractvalue(1,concat(0x7e,(select/**/version()),0x7e));
     <author>g03m0n</author>
     <guid>https://g03m0n.github.io/posts/cve-2022-4566/</guid>
     <description><![CDATA[<h1 id="sql-injection-at-rouyi-framework-cve-2022-4566">SQL Injection at Rouyi framework (CVE-2022-4566)</h1>
-<ol>
-<li>
-<p><strong>Description and Impact</strong>
-CVE-2022-4566 is a critical vulnerability identified in the RuoYi Framework. This vulnerability occurs in the file com/ruoyi/generator/controller/GenController and is related to SQL injection attacks. Manipulating this file allows an attacker to execute arbitrary SQL commands, potentially compromising the security, integrity, and availability of the system.</p>
+<h2 id="1-description-and-impact">1. <strong>Description and Impact</strong></h2>
+<p>CVE-2022-4566 is a critical vulnerability identified in the RuoYi Framework. This vulnerability occurs in the file <code>com/ruoyi/generator/controller/GenController</code> and is related to SQL injection attacks. Manipulating this file allows an attacker to execute arbitrary SQL commands, potentially compromising the security, integrity, and availability of the system.</p>
 <table>
 <thead>
 <tr>
@@ -130,9 +128,7 @@ CVE-2022-4566 is a critical vulnerability identified in the RuoYi Framework. Thi
 </tr>
 </tbody>
 </table>
-</li>
-<li>
-<p>Root cause analysis</p>
+<h2 id="2-root-cause-analysis">2. Root cause analysis</h2>
 <p>First, the application allows users to create tables by sending a POST packet containing SQL statements to the endpoint <code>/tool/gen/createTables</code></p>
 <p></p>
 <p>Success create table:</p>
@@ -164,19 +160,13 @@ CVE-2022-4566 is a critical vulnerability identified in the RuoYi Framework. Thi
 <p>→ This is the Sink of the vulnerability</p>
 <p></p>
 <p>→ This is an Error-Based SQL Injection vulnerability.</p>
-</li>
-<li>
-<p>Steps to reproduce</p>
+<h2 id="3-steps-to-reproduce">3. Steps to reproduce</h2>
 <p>Send a POST request to the endpoint <code>/tool/gen/createTable</code> with the Payload:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-jsx" data-lang="jsx"><span style="display:flex;"><span><span style="color:#a6e22e">sql</span><span style="color:#f92672">=</span><span style="color:#a6e22e">CREATE</span> <span style="color:#a6e22e">table</span> <span style="color:#a6e22e">keke</span> <span style="color:#a6e22e">as</span> <span style="color:#a6e22e">SELECT</span><span style="color:#75715e">/**/</span><span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">sys_job</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> 
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">AND</span><span style="color:#75715e">/**/</span><span style="color:#a6e22e">extractvalue</span>(<span style="color:#ae81ff">1</span>,<span style="color:#a6e22e">concat</span>(<span style="color:#ae81ff">0x7e</span>,(<span style="color:#a6e22e">select</span><span style="color:#75715e">/**/</span><span style="color:#a6e22e">version</span>()),<span style="color:#ae81ff">0x7e</span>));
-</span></span></code></pre></div></li>
-<li>
-<p>Recomendation</p>
+</span></span></code></pre></div><h2 id="4-recomendation">4. Recomendation</h2>
 <p>In version 4.7.6, RuoYi added a commit with the code <a href="https://gitee.com/y_project/RuoYi/commit/167970e5c4da7bb46217f576dc50622b83f32b40" target="_blank" rel="noopener noreffer">167970e5c4da7bb46217f576dc50622b83f32b40</a>
  to add some statements to the blacklist and not directly return <code>e.getMessage()</code> to summarize error information to avoid SQL injection.</p>
-</li>
-</ol>
 <h2 id="references">References</h2>
 <p><a href="https://gitee.com/y_project/RuoYi/issues/I65V2B" target="_blank" rel="noopener noreffer">https://gitee.com/y_project/RuoYi/issues/I65V2B</a>
 </p>
