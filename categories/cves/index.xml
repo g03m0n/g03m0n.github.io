@@ -27,12 +27,6 @@
 </tr>
 </tbody>
 </table>
-<p>Impact:</p>
-<ul>
-<li><strong>Internal Port Scanning:</strong> Attackers can map the internal network and identify running services by analyzing the server&rsquo;s response time (time-based blind SSRF).</li>
-<li><strong>Denial of Service (DoS):</strong> Setting the timeout to 0 or targeting critical internal services (like the database port) can exhaust server resources.</li>
-<li><strong>Cloud Metadata Exposure:</strong> If hosted on a cloud provider (AWS, GCP, Azure), this could allow access to the instance metadata service (e.g., <code>169.254.169.254</code>) to steal temporary credentials.</li>
-</ul>
 <h2 id="steps-to-reproduce">Steps to Reproduce</h2>
 <p>First, from the Dashboard interface, go to <strong>Koha Administration</strong> → <strong>Z39.50/SRU servers:</strong></p>
 <p></p>
@@ -116,7 +110,6 @@ Access <strong><code>Receive Shipments</code></strong> to create a new Invoice:<
 <th>Version Affected</th>
 <th>Required Authentication</th>
 <th>?-day</th>
-<th>CVSS</th>
 </tr>
 </thead>
 <tbody>
@@ -125,7 +118,6 @@ Access <strong><code>Receive Shipments</code></strong> to create a new Invoice:<
 <td>≤ 25.11</td>
 <td>Yes</td>
 <td>0-day</td>
-<td>8.5</td>
 </tr>
 </tbody>
 </table>
