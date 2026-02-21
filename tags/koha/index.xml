@@ -3,13 +3,111 @@
         <title>Koha - Tag - g03m0n</title>
         <link>https://g03m0n.github.io/tags/koha/</link>
         <description>Koha - Tag - g03m0n</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 31 Dec 2025 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/koha/" rel="self" type="application/rss+xml" /><item>
-    <title>Stored XSS in Koha version ≤25.11 (CVE-2026-26378)</title>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 31 Dec 2025 08:31:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/koha/" rel="self" type="application/rss+xml" /><item>
+    <title>SSRF in Koha version ≤ 25.11 (CVE-2026-26379)</title>
+    <link>https://g03m0n.github.io/posts/cve-2026-26379/</link>
+    <pubDate>Wed, 31 Dec 2025 08:31:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2026-26379/</guid>
+    <description><![CDATA[<h1 id="ssrf-in-koha-version--2511-cve-2026-26379">SSRF in Koha version ≤ 25.11 (CVE-2026-26379)</h1>
+<h2 id="description-and-impact">Description and Impact</h2>
+<table>
+<thead>
+<tr>
+<th><strong>Type</strong></th>
+<th><strong>Affected Version</strong></th>
+<th><strong>?-day</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SSRF</td>
+<td>≤25.11 (latest)</td>
+<td>0-day</td>
+</tr>
+</tbody>
+</table>
+<p>Impact:</p>
+<ul>
+<li><strong>Internal Port Scanning:</strong> Attackers can map the internal network and identify running services by analyzing the server&rsquo;s response time (time-based blind SSRF).</li>
+<li><strong>Denial of Service (DoS):</strong> Setting the timeout to 0 or targeting critical internal services (like the database port) can exhaust server resources.</li>
+<li><strong>Cloud Metadata Exposure:</strong> If hosted on a cloud provider (AWS, GCP, Azure), this could allow access to the instance metadata service (e.g., <code>169.254.169.254</code>) to steal temporary credentials.</li>
+</ul>
+<h2 id="steps-to-reproduce">Steps to Reproduce</h2>
+<p>First, from the Dashboard interface, go to <strong>Koha Administration</strong> → <strong>Z39.50/SRU servers:</strong></p>
+<p></p>
+<p>Select <strong><code>+ New Z39.50 server</code></strong></p>
+<p></p>
+<p>Assume the internal network is hosting an application on port 8888: <code>nc -nvlp 8888</code></p>
+<p></p>
+<p>Fill in the information as follows:</p>
+<p></p>
+<p>Save.</p>
+<p>Go to <a href="http://192.168.116.130:8080/cgi-bin/koha/cataloguing/z3950_search.pl" target="_blank" rel="noopener noreffer">http://192.168.116.130:8080/cgi-bin/koha/cataloguing/z3950_search.pl</a>
+ and fill in the information as shown in the image:</p>
+<p></p>
+<p>Click Search.</p>
+<p>A request is sent to the server:</p>
+<p></p>
+<ul>
+<li>If the response is <code>Connection timeout</code>, it means there is an internal service with port 8888 open:</li>
+</ul>
+<p></p>
+<ul>
+<li>If there is no service listening on port 8888, the response is <code>Connection failed</code>:</li>
+</ul>
+<p></p>
+]]></description>
+</item>
+<item>
+    <title>Cross-Site Scripting via File Upload in Koha (CVE-2026-26378)</title>
     <link>https://g03m0n.github.io/posts/cve-2026-26378/</link>
-    <pubDate>Wed, 31 Dec 2025 08:29:01 &#43;0800</pubDate>
+    <pubDate>Wed, 31 Dec 2025 08:30:01 &#43;0800</pubDate>
     <author>g03m0n</author>
     <guid>https://g03m0n.github.io/posts/cve-2026-26378/</guid>
-    <description><![CDATA[<h1 id="stored-xss-in-koha-version-2511-cve-2026-26378">Stored XSS in Koha version ≤25.11 (CVE-2026-26378)</h1>
+    <description><![CDATA[<h1 id="cross-site-scripting-via-file-upload-in-koha-cve-2026-26378">Cross-Site Scripting via File Upload in Koha (CVE-2026-26378)</h1>
+<h2 id="description-and-impact">Description and Impact</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Version Affected</th>
+<th>?-day</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>XSS via File Upload</td>
+<td>≤ 25.11 (latest)</td>
+<td>0-day</td>
+</tr>
+</tbody>
+</table>
+<h2 id="steps-to-reproduce">Steps to Reproduce</h2>
+<p>First, create an arbitrary vendor (if one already exists, skip this step):</p>
+<p></p>
+<p>Vendor <code>ABC</code> was successfully created.
+Access <strong><code>Receive Shipments</code></strong> to create a new Invoice:</p>
+<p></p>
+<p></p>
+<p>Successfully created an Invoice with <code>invoiceid=3</code> :</p>
+<p></p>
+<p>Then, access the URL: <code>cgi-bin/koha/acqui/invoice-files.pl?invoiceid=3</code> :</p>
+<p></p>
+<p>Proceed to upload an SVG file containing the XSS payload as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bnf" data-lang="bnf"><span style="display:flex;"><span>&lt;<span style="color:#a6e22e">svg xmlns=&#34;http://www.w3.org/2000/svg&#34; onload=&#34;alert(document.domain)&#34;</span>&gt;&lt;<span style="color:#a6e22e">/svg</span>&gt;
+</span></span></code></pre></div><p></p>
+<p>Since the application allows <code>inline</code> rendering for files with an <code>image</code> Content-Type, it is possible to upload an SVG file containing an XSS payload. Clicking to view the file will cause the JavaScript to execute in the browser → <strong>Triggering XSS</strong>.</p>
+<p></p>
+]]></description>
+</item>
+<item>
+    <title>Stored XSS in Koha version ≤25.11 (CVE-2026-26377)</title>
+    <link>https://g03m0n.github.io/posts/cve-2026-26377/</link>
+    <pubDate>Wed, 31 Dec 2025 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2026-26377/</guid>
+    <description><![CDATA[<h1 id="stored-xss-in-koha-version-2511-cve-2026-26377">Stored XSS in Koha version ≤25.11 (CVE-2026-26377)</h1>
 <h2 id="description-and-impact">Description and Impact</h2>
 <table>
 <thead>
