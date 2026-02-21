@@ -117,6 +117,24 @@
 <a href="mailto:goemon2307@gmail.com" title="Email" rel=" me"><i class="far fa-envelope fa-fw" aria-hidden="true"></i></a>
 </div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/portswigger---sqli/portswigger---sqli/">PortSwigger - SQL Injection</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-01-20">2024-01-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/portswigger/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PortSwigger</a></span></div><div class="content">1. SQL injection vulnerability in WHERE clause allowing retrieval of hidden data Link lab tại đâyLevel: APPRENTICE
+Description Lab này chứa lỗ hổng SQLi trong bộ lọc danh mục sản phẩm. Khi người dùng chọn một danh mục, ứng dụng sẽ thực hiện truy vấn SQL như sau:
+SELECT * FROM products WHERE category = &#39;Gifts&#39; AND released = 1 Để giải quyết bài lab, khiến ứng dụng hiển thị một hoặc nhiều sản phẩm chưa được phát hành.</div><div class="post-footer">
+        <a href="/posts/portswigger---sqli/portswigger---sqli/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/portswigger/">Portswigger</a>,&nbsp;<a href="/tags/lab/">Lab</a>,&nbsp;<a href="/tags/ctf/">Ctf</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/cookiectf---baby-crawler/cookiectf-baby-crawl/">CookieCTF - Baby Crawler</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-01-19">2024-01-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cookiectf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CookieCTF</a></span></div><div class="content">Description Link challenge tại đâyStep Đây là giao diện chính của challenge:
+Ở challenge này, khi ấn vào nút CRAWL trang web sẽ hiển thị một đường link Cached File
+Khi click vào đường link ta sẽ thấy html của trang web
+Quay trở lại giao diện chính, kiểm tra source code thì phát hiện 1 endpoint ?debug
+Kiểm tra thì thấy được đoạn code chạy ở server-side. Chú ý vào đoạn code này:</div><div class="post-footer">
+        <a href="/posts/cookiectf---baby-crawler/cookiectf-baby-crawl/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/ctf/">Ctf</a>,&nbsp;<a href="/tags/easy_ctf/">Easy_ctf</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/cookiectf---baby-sqlite-with-filter/cookiectf-babysqlitewithfilter/">CookieCTF - Baby SQLite With Filter</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-01-19">2024-01-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cookiectf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CookieCTF</a></span></div><div class="content">Description Link challenge tại đâyYou cannot create the query because we have blocked the following keywords. Challenge you to bypass it, how to know after each SQL Keyword you will be used what SQL statement. The blacklist sqli_filter = &lsquo;[&rsquo;, &lsquo;]&rsquo;, &lsquo;,&rsquo;, &lsquo;admin&rsquo;, &lsquo;select&rsquo;, &lsquo;&rsquo;&rsquo;, &lsquo;&quot;&rsquo;, &lsquo;\t&rsquo;, &lsquo;\n&rsquo;, &lsquo;\r&rsquo;, &lsquo;\x08&rsquo;, &lsquo;\x09&rsquo;, &lsquo;\x00&rsquo;, &lsquo;\x0b&rsquo;, &lsquo;\x0d&rsquo;, &rsquo; &lsquo;. The vulnerable parameter is &rsquo;level&rsquo; in Login function.
@@ -142,20 +160,6 @@ Step Đây là giao diện chính của challenge:</div><div class="post-footer"
 </span>&nbsp;<span class="post-publish">published on <time datetime="2023-11-22">2023-11-22</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">CVE-2024-40075 PHP Insecure Deserialization at Laravel v11.x Description and Impact Laravel là một framework ứng dụng web mã nguồn mở được viết bằng PHP. Do phương thức __destruct của lớp Monolog\Handler\Handler gọi phương thức close, GroupHandler đã ghi đè phương thức này và gọi phương thức close của mỗi handler. Khi deserialize các đối tượng độc hại, phương thức getStreamName sẽ gọi phương thức __toString của đối tượng đó. Kẻ tấn công có thể lợi dụng những phương thức có sẵn tồn tại trong ứng dụng để tạo ra chuỗi khai thác dựa trên Laravel và thực thi mã tùy ý.</div><div class="post-footer">
         <a href="/posts/cve-2024-40075/cve-2024-40075/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/">Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538)</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2023-11-22">2023-11-22</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">Liferay TunnelServlet Deserialization Remote Code Execution (LPE-15538) {{ .Resources.Match &ldquo;images/*&rdquo;}}
-Mô tả và ảnh hưởng
-Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình sai, có thể bị truy cập bởi attacker (theo mặc định, nó chỉ bị giới hạn truy cập từ localhost). Tùy thuộc vào phiên bản của Liferay Portal, attacker có thể khai thác lỗ hổng này bằng cách sử dụng dữ liệu đã được serialized để thực thi mã tùy ý trên hệ thống.</div><div class="post-footer">
-        <a href="/posts/liferay-tunnelservlet-deserialization-remote-code/liferay-tunnelservlet-deserialization-remote-code/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/apache_spark/">Apache_spark</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/cve-2020-9840/cve-2020-9840/">CVE-2020-9480</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2023-11-21">2023-11-21</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">Description Lỗ hổng phát sinh khi tính năng xác thực chính (spark.authenticate) được bật bằng cách sử dụng shared secret. Thông thường, tính năng này yêu cầu người dùng cung cấp shared secret để khởi động tài nguyên của ứng dụng trên Spark cluster. Tuy nhiên, lệnh gọi thủ tục từ xa (RPC) có thể bỏ qua quá trình xác thực và bắt đầu thực thi lệnh thành công, ngay cả khi không có shared secret.</div><div class="post-footer">
-        <a href="/posts/cve-2020-9840/cve-2020-9840/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/apache_spark/">Apache_spark</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -167,6 +171,10 @@ Liferay TunnelServlet bị lỗ hổng insecure deserialization do cấu hình s
                 </li><li class="page-item ">
                     <span class="page-link">
                         <a href="/page/3/">3</a>
+                    </span>
+                </li><li class="page-item ">
+                    <span class="page-link">
+                        <a href="/page/4/">4</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">
