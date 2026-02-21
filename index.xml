@@ -46,7 +46,7 @@
 <p>Add payload : <code>&quot;&gt;&lt;script&gt;alert(&quot;Stored XSS&quot;)&lt;/script&gt;</code> into content.</p>
 <p></p>
 <p><strong>Save → Trigger XSS</strong></p>
-<p>![image.png](image 5.png)</p>
+<p></p>
 <p>Additionally, when returning to the <strong>Mainpage</strong>, XSS is also <strong>Triggered</strong> because there are no measures to control the content before rendering it to the screen.</p>
 <p></p>
 ]]></description>
