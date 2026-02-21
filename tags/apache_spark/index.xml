@@ -1,8 +1,8 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
-        <title>apache_spark - Tag - g03m0n</title>
+        <title>Apache_spark - Tag - g03m0n</title>
         <link>https://g03m0n.github.io/tags/apache_spark/</link>
-        <description>apache_spark - Tag - g03m0n</description>
+        <description>Apache_spark - Tag - g03m0n</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 22 Nov 2023 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/apache_spark/" rel="self" type="application/rss+xml" /><item>
     <title>CVE-2022-33891</title>
     <link>https://g03m0n.github.io/posts/cve-2022-33891/cve-2022-33891/</link>

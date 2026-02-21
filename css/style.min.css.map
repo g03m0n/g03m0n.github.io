@@ -1,7 +1,7 @@
 {
 	"version": 3,
 	"file": "style.min.css",
-	"sourceRoot": "D:/g03m0n",
+	"sourceRoot": "D:/g03m0n/g03m0n",
 	"sources": [
 		"themes/KeepIt/assets/css/style.scss",
 		"themes/KeepIt/assets/css/_variables.scss",
