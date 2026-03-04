@@ -216,12 +216,12 @@ Access <strong><code>Receive Shipments</code></strong> to create a new Invoice:<
 ]]></description>
 </item>
 <item>
-    <title>Blind SQL Injection at Rouyi framework ≤ v4.7.9</title>
+    <title>Blind SQL Injection at Rouyi framework ≤ v4.7.9 (CVE-2024-42900)</title>
     <link>https://g03m0n.github.io/posts/cve-2024-42900/</link>
     <pubDate>Tue, 27 Aug 2024 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
     <guid>https://g03m0n.github.io/posts/cve-2024-42900/</guid>
-    <description><![CDATA[<h1 id="blind-sql-injection-at-rouyi-framework--v479">Blind SQL Injection at Rouyi framework ≤ v4.7.9</h1>
+    <description><![CDATA[<h1 id="blind-sql-injection-at-rouyi-framework--v479-cve-2024-42900">Blind SQL Injection at Rouyi framework ≤ v4.7.9 (CVE-2024-42900)</h1>
 <h2 id="1-description-and-impact">1. <strong>Description and Impact</strong></h2>
 <p>The Blind SQL Injection vulnerability occurs in the file <code>com/ruoyi/generator/controller/GenController</code> specifically at the endpoint <code>/tool/gen/createTable</code>. Manipulating this file allows an attacker to execute arbitrary SQL commands, which can endanger the security, integrity, and availability of the system.</p>
 <p>SQL injection vulnerability in <code>/tool/gen/createTable</code> in Ruoyi Framework at version ≤ 4.7.9 allows attackers to execute arbitrary SQL commands via the <code>sql</code> parameter.</p>
