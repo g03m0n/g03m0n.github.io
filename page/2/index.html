@@ -117,6 +117,15 @@
 <a href="mailto:goemon2307@gmail.com" title="Email" rel=" me"><i class="far fa-envelope fa-fw" aria-hidden="true"></i></a>
 </div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/hackthebox---neonify/hackthebox-neonify/">Hackthebox - Neonify</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-06-10">2024-06-10</time></span>&nbsp;<span class="post-category">included in <a href="/categories/hackthebox/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Hackthebox</a></span></div><div class="content">Description Link challenge tại đâyStep Đây là giao diện chính của challenge:
+Đọc source code ta có thể thấy ứng dụng chạy bằng Ruby và sử dụng ERB templateđể render. Đây có thể là một bài SSTI Ruby ERB Template.
+Ngoài ra input còn bị regrex match với tất cả kí tự từ 0 tới 9, từ a tới z.
+Ở đây regex sẽ chỉ match từ đầu tới cuối ở trong một dòng, tức là nếu chèn vào một string bất kì rồi dùng ký tự new line (\n) để xuống dòng, rồi chèn vào payload SSTI thì sẽ exploit thành công.</div><div class="post-footer">
+        <a href="/posts/hackthebox---neonify/hackthebox-neonify/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/htb/">Htb</a>,&nbsp;<a href="/tags/lab/">Lab</a>,&nbsp;<a href="/tags/ctf/">Ctf</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/cve-2021-3129/cve-2021-3129/">CVE-2021-3129</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-05-01">2024-05-01</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">Laravel &lt;= v8.4.2 debug mode: Remote code execution (CVE-2021-3129) Description and Impact Ignition là một công cụ gỡ lỗi phổ biến trong Laravel, đóng một vai trò quan trọng trong việc hỗ trợ các nhà phát triển trong quá trình phát triển ứng dụng. Nó được cài đặt mặc định từ Laravel 6+.
@@ -157,13 +166,6 @@ Kiểm tra thì thấy được đoạn code chạy ở server-side. Chú ý và
 Step Đây là giao diện chính của challenge:</div><div class="post-footer">
         <a href="/posts/cookiectf---baby-sqlite-with-filter/cookiectf-babysqlitewithfilter/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/ctf/">Ctf</a>,&nbsp;<a href="/tags/easy_ctf/">Easy_ctf</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/portswigger---insecure-deserialization/portswigger-insecure-deserialization/">PortSwigger - Insecure Deserialization</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2023-12-20">2023-12-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/portswigger/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>PortSwigger</a></span></div><div class="content">Thông thường cấu trúc của Serialize Data có dạng: O: strlen(object name): object name: object size: {... elements...}
-1. Modifying serialized objects Description This lab uses a serialization-based session mechanism and is vulnerable to privilege escalation as a result. To solve the lab, edit the serialized object in the session cookie to exploit this vulnerability and gain administrative privileges. Then, delete Carlos&rsquo;s account. You can log in to your own account using the5 following credentials: wiener:peter</div><div class="post-footer">
-        <a href="/posts/portswigger---insecure-deserialization/portswigger-insecure-deserialization/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/ctf/">Ctf</a>,&nbsp;<a href="/tags/lab/">Lab</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
