@@ -1,0 +1,10 @@
+/* Ép code block tự động xuống dòng và có thanh cuộn ngang nếu cần */
+.post-content pre {
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow-x: auto !important;
+}
+
+.post-content .highlight {
+    max-width: 100%;
+}
