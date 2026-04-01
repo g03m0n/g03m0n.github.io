@@ -1,49 +1,31 @@
-/* =========================================
-   1. SỬA LAYOUT: THANH CUỘN VÀ CHỐNG TRÀN
-   ========================================= */
+/* 1. Ép nền tối cho mọi ngóc ngách của khối code, bất kể Light/Dark Mode */
+.post-content .highlight,
+.post-content .highlight > .chroma,
+.post-content .highlight table,
+.post-content .highlight pre,
+.post-content .highlight code {
+    background-color: #282c34 !important;
+    background: #282c34 !important;
+}
+
+/* 2. Sửa layout: Có thanh cuộn, không bị tràn chữ */
 .post-content .highlight {
     max-width: 100%;
-    overflow-x: auto !important; 
-    border-radius: 6px; /* Bo góc nhẹ cho hiện đại */
-    margin-bottom: 20px;
+    overflow-x: auto !important;
+    border-radius: 6px;
 }
 
-.post-content .highlight pre,
-.post-content pre {
+.post-content .highlight pre {
     white-space: pre !important;       
     word-wrap: normal !important;      
-    word-break: normal !important;     
     overflow-x: visible !important;
-    margin: 0 !important;
-    padding: 15px !important;
 }
 
-/* =========================================
-   2. SỬA MÀU SẮC: NỀN TỐI CHO KHỐI CODE
-   ========================================= */
-/* Ép nền màu xám đậm (kiểu One Dark) cho mọi chế độ (Light/Dark) để chữ màu nổi lên */
-.post-content .highlight,
-.post-content .highlight pre,
-.post-content pre {
-    background-color: #282c34 !important; 
-}
-
-/* Đảm bảo chữ mặc định bên trong không bị đen */
-.post-content .highlight code,
-.post-content pre code {
-    color: #abb2bf !important;
-    background-color: transparent !important;
-}
-
-/* =========================================
-   3. SỬA MÀU SẮC: INLINE CODE (Code xen kẽ chữ)
-   ========================================= */
-/* Dành cho các từ nằm trong cặp dấu ` ` ở giữa các đoạn văn */
+/* 3. Inline code (code xen kẽ chữ) */
 .post-content p code, 
 .post-content li code {
-    background-color: rgba(0, 0, 0, 0.05) !important; /* Nền xám rất nhẹ */
-    color: #e83e8c !important; /* Chữ màu hồng đậm cho dễ nhìn */
+    background-color: #f1f3f5 !important; 
+    color: #e83e8c !important; 
     padding: 2px 5px !important;
     border-radius: 4px !important;
-    border: none !important; /* Tắt cái viền đỏ chói đi nếu có */
 }
