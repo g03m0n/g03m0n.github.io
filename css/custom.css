@@ -1,31 +1,37 @@
-/* 1. Ép nền tối cho mọi ngóc ngách của khối code, bất kể Light/Dark Mode */
-.post-content .highlight,
-.post-content .highlight > .chroma,
-.post-content .highlight table,
-.post-content .highlight pre,
-.post-content .highlight code {
-    background-color: #282c34 !important;
-    background: #282c34 !important;
-}
-
-/* 2. Sửa layout: Có thanh cuộn, không bị tràn chữ */
+/* 1. Xử lý khung chứa: Ép màu nền đen nhạt cho cả khối để đồng bộ với màu của Hugo */
 .post-content .highlight {
-    max-width: 100%;
-    overflow-x: auto !important;
-    border-radius: 6px;
+    background-color: #272822 !important; /* Phải khớp với màu #272822 trong HTML của cậu */
+    border-radius: 6px !important;
+    position: relative !important; /* Cực kỳ quan trọng để nút Copy đứng đúng chỗ */
+    margin-bottom: 20px !important;
+    padding: 0 !important;
 }
 
+/* 2. Xử lý nội dung code: Cuộn ngang, không wrap */
 .post-content .highlight pre {
+    background-color: transparent !important; /* Xóa nền thừa để dùng nền của thẻ cha */
+    margin: 0 !important;
+    padding: 15px 15px 15px 15px !important;
     white-space: pre !important;       
     word-wrap: normal !important;      
-    overflow-x: visible !important;
+    word-break: normal !important;     
+    overflow-x: auto !important; /* Hiện thanh cuộn */
 }
 
-/* 3. Inline code (code xen kẽ chữ) */
+/* 3. Đẩy thanh cuộn không đè lên nút Copy (tùy chọn) */
+.post-content .highlight pre::-webkit-scrollbar {
+    height: 8px;
+}
+.post-content .highlight pre::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+}
+
+/* 4. Chữ inline code xen kẽ văn bản (không bị chói) */
 .post-content p code, 
 .post-content li code {
-    background-color: #f1f3f5 !important; 
-    color: #e83e8c !important; 
+    background-color: rgba(120, 120, 120, 0.1) !important; 
+    color: #d63384 !important; 
     padding: 2px 5px !important;
     border-radius: 4px !important;
 }
