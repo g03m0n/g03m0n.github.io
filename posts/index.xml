@@ -22,6 +22,7 @@
 <th>Type</th>
 <th>Version Affected</th>
 <th>Required Authentication</th>
+<th>?-day</th>
 </tr>
 </thead>
 <tbody>
@@ -29,6 +30,7 @@
 <td>ORM Leaking</td>
 <td>finmars-core ≤ 1.24.5</td>
 <td>Yes</td>
+<td>0-day</td>
 </tr>
 </tbody>
 </table>
