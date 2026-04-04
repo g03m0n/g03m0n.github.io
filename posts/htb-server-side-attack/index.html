@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Module - Server-Side Attack - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:title" content="Module - Server-Side Attack" />
+<meta property="og:description" content="Server-Side Attack Application interface:
+After accessing the website, the application automatically sends POST requests to retrieve data
+At first glance, this request appears to be an SSRF vulnerability. After testing, it was confirmed to have SSRF, but there is no outbound traffic, and a port scan revealed only ports 80 and 3306 are open, making it ineffective for exploitation:
+Port scan:
+File name scan:
+Notice that the application accepts user input to display the count on the screen:" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://g03m0n.github.io/posts/htb-server-side-attack/" /><meta property="og:image" content="https://g03m0n.github.io/logo.png" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-04-03T08:29:01+08:00" />
+<meta property="article:modified_time" content="2026-04-03T08:29:01+08:00" /><meta property="og:site_name" content="g03m0n" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://g03m0n.github.io/logo.png" /><meta name="twitter:title" content="Module - Server-Side Attack"/>
+<meta name="twitter:description" content="Server-Side Attack Application interface:
+After accessing the website, the application automatically sends POST requests to retrieve data
+At first glance, this request appears to be an SSRF vulnerability. After testing, it was confirmed to have SSRF, but there is no outbound traffic, and a port scan revealed only ports 80 and 3306 are open, making it ineffective for exploitation:
+Port scan:
+File name scan:
+Notice that the application accepts user input to display the count on the screen:"/>
+<meta name="application-name" content="g03m0n">
+<meta name="apple-mobile-web-app-title" content="g03m0n"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://g03m0n.github.io/posts/htb-server-side-attack/" /><link rel="prev" href="https://g03m0n.github.io/posts/orm-leak-vulnerability-in-finmars/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Module - Server-Side Attack",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/g03m0n.github.io\/posts\/htb-server-side-attack\/"
+        },"image": [{
+                            "@type": "ImageObject",
+                            "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
+                            "width":  3200 ,
+                            "height":  2048 
+                        }],"genre": "posts","keywords": "htb, lab, ctf","wordcount":  157 ,
+        "url": "https:\/\/g03m0n.github.io\/posts\/htb-server-side-attack\/","datePublished": "2026-04-03T08:29:01+08:00","dateModified": "2026-04-03T08:29:01+08:00","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
+                "@type": "Person",
+                "name": "g03m0n"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="auto" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="g03m0n"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="/images/avatar.png"
+        data-srcset="/images/avatar.png, /images/avatar.png 1.5x, /images/avatar.png 2x"
+        data-sizes="auto"
+        alt="/images/avatar.png"
+        title="/images/avatar.png" />g03m0n</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/" title="Posts"> Posts </a><a class="menu-item" href="/categories/" title="Categories"> Categories </a><a class="menu-item" href="/tags/" title="Tags"> Tags </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search" id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="g03m0n"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="/images/avatar.png"
+        data-srcset="/images/avatar.png, /images/avatar.png 1.5x, /images/avatar.png 2x"
+        data-sizes="auto"
+        alt="/images/avatar.png"
+        title="/images/avatar.png" />g03m0n</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search" id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="Posts">Posts</a><a class="menu-item" href="/categories/" title="Categories">Categories</a><a class="menu-item" href="/tags/" title="Tags">Tags</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content always-active" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Module - Server-Side Attack</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/hackthebox/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Hackthebox</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2026-04-03">2026-04-03</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;157 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;One minute&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents"></nav></div>
+            </div><div class="content" id="content"><h1 id="server-side-attack">Server-Side Attack</h1>
+<p>Application interface:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/iamges/htb-serverside-attack-0.png"
+        data-srcset="/iamges/htb-serverside-attack-0.png, /iamges/htb-serverside-attack-0.png 1.5x, /iamges/htb-serverside-attack-0.png 2x"
+        data-sizes="auto"
+        alt="/iamges/htb-serverside-attack-0.png"
+        title="/iamges/htb-serverside-attack-0.png" /></p>
+<p>After accessing the website, the application automatically sends POST requests to retrieve data</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/iamges/htb-serverside-attack-1.png"
+        data-srcset="/iamges/htb-serverside-attack-1.png, /iamges/htb-serverside-attack-1.png 1.5x, /iamges/htb-serverside-attack-1.png 2x"
+        data-sizes="auto"
+        alt="/iamges/htb-serverside-attack-1.png"
+        title="/iamges/htb-serverside-attack-1.png" /></p>
+<p>At first glance, this request appears to be an SSRF vulnerability. After testing, it was confirmed to have SSRF, but there is no outbound traffic, and a port scan revealed only ports 80 and 3306 are open, making it ineffective for exploitation:</p>
+<p>Port scan:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/iamges/htb-serverside-attack-2.png"
+        data-srcset="/iamges/htb-serverside-attack-2.png, /iamges/htb-serverside-attack-2.png 1.5x, /iamges/htb-serverside-attack-2.png 2x"
+        data-sizes="auto"
+        alt="/iamges/htb-serverside-attack-2.png"
+        title="/iamges/htb-serverside-attack-2.png" /></p>
+<p>File name scan:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/iamges/htb-serverside-attack-3.png"
+        data-srcset="/iamges/htb-serverside-attack-3.png, /iamges/htb-serverside-attack-3.png 1.5x, /iamges/htb-serverside-attack-3.png 2x"
+        data-sizes="auto"
+        alt="/iamges/htb-serverside-attack-3.png"
+        title="/iamges/htb-serverside-attack-3.png" /></p>
+<p>Notice that the application accepts user input to display the count on the screen:</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/iamges/htb-serverside-attack-4.png"
+        data-srcset="/iamges/htb-serverside-attack-4.png, /iamges/htb-serverside-attack-4.png 1.5x, /iamges/htb-serverside-attack-4.png 2x"
+        data-sizes="auto"
+        alt="/iamges/htb-serverside-attack-4.png"
+        title="/iamges/htb-serverside-attack-4.png" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/iamges/htb-serverside-attack-5.png"
+        data-srcset="/iamges/htb-serverside-attack-5.png, /iamges/htb-serverside-attack-5.png 1.5x, /iamges/htb-serverside-attack-5.png 2x"
+        data-sizes="auto"
+        alt="/iamges/htb-serverside-attack-5.png"
+        title="/iamges/htb-serverside-attack-5.png" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/iamges/htb-serverside-attack-6.png"
+        data-srcset="/iamges/htb-serverside-attack-6.png, /iamges/htb-serverside-attack-6.png 1.5x, /iamges/htb-serverside-attack-6.png 2x"
+        data-sizes="auto"
+        alt="/iamges/htb-serverside-attack-6.png"
+        title="/iamges/htb-serverside-attack-6.png" /></p>
+<p>Attempting to exploit the SSTI vulnerability.</p>
+<p>Since the application uses PHP, I tried a Twig template payload — a well-known template from the Symfony framework: <code>{{7*'7'}}</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/iamges/htb-serverside-attack-7.png"
+        data-srcset="/iamges/htb-serverside-attack-7.png, /iamges/htb-serverside-attack-7.png 1.5x, /iamges/htb-serverside-attack-7.png 2x"
+        data-sizes="auto"
+        alt="/iamges/htb-serverside-attack-7.png"
+        title="/iamges/htb-serverside-attack-7.png" /></p>
+<p>Confirm that the application is vulnerable to SSTI.</p>
+<p>Twig RCE payload: <code>{{['id']|filter('system')}}</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/iamges/htb-serverside-attack-8.png"
+        data-srcset="/iamges/htb-serverside-attack-8.png, /iamges/htb-serverside-attack-8.png 1.5x, /iamges/htb-serverside-attack-8.png 2x"
+        data-sizes="auto"
+        alt="/iamges/htb-serverside-attack-8.png"
+        title="/iamges/htb-serverside-attack-8.png" /></p>
+<p>However, the application blocks the <code>'  '</code> character, causing an error when used:</p>
+<p>Payload: <code>http://truckapi.htb/?id=FusionExpress03{{['ls /']|filter('system')}}</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/iamges/htb-serverside-attack-9.png"
+        data-srcset="/iamges/htb-serverside-attack-9.png, /iamges/htb-serverside-attack-9.png 1.5x, /iamges/htb-serverside-attack-9.png 2x"
+        data-sizes="auto"
+        alt="/iamges/htb-serverside-attack-9.png"
+        title="/iamges/htb-serverside-attack-9.png" /></p>
+<p>Since the application runs on Linux, this can be bypassed using <code>${IFS}</code>, which is equivalent to the <code>'  '</code> character</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/iamges/htb-serverside-attack-10.png"
+        data-srcset="/iamges/htb-serverside-attack-10.png, /iamges/htb-serverside-attack-10.png 1.5x, /iamges/htb-serverside-attack-10.png 2x"
+        data-sizes="auto"
+        alt="/iamges/htb-serverside-attack-10.png"
+        title="/iamges/htb-serverside-attack-10.png" /></p>
+<p>Read the flag:</p>
+<p>Payload: <code>http://truckapi.htb/?id=FusionExpress03{{['ls${IFS}/flag.txt']|filter('system')}}</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/iamges/htb-serverside-attack-11.png"
+        data-srcset="/iamges/htb-serverside-attack-11.png, /iamges/htb-serverside-attack-11.png 1.5x, /iamges/htb-serverside-attack-11.png 2x"
+        data-sizes="auto"
+        alt="/iamges/htb-serverside-attack-11.png"
+        title="/iamges/htb-serverside-attack-11.png" /></p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2026-04-03</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://g03m0n.github.io/posts/htb-server-side-attack/" data-title="Module - Server-Side Attack" data-hashtags="htb,lab,ctf"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://g03m0n.github.io/posts/htb-server-side-attack/" data-hashtag="htb"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://g03m0n.github.io/posts/htb-server-side-attack/" data-title="Module - Server-Side Attack"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/htb/">Htb</a>,&nbsp;<a href="/tags/lab/">Lab</a>,&nbsp;<a href="/tags/ctf/">Ctf</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/orm-leak-vulnerability-in-finmars/" class="prev" rel="prev" title="ORM Leak Vulnerability in Finmars"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>ORM Leak Vulnerability in Finmars</a></div>
+</div>
+<div id="comments"><div id="fb-root" class="comment"></div>
+            <div
+                class="fb-comments"
+                data-href="https://g03m0n.github.io/posts/htb-server-side-attack/"
+                data-width="100%"
+                data-numposts="10"
+            ></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://developers.facebook.com/docs/plugins/comments/"></a>Facebook</a>.
+            </noscript><div id="utterances" class="comment"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://utteranc.es/">Utterances</a>.
+            </noscript></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.123.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2019 - 2026</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/css/lightgallery-bundle.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/copy-tex.min.css"><link rel="stylesheet" href="/css/custom.css"><script type="text/javascript" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v5.0&amp;appId=2950291851778582&amp;autoLogAppEvents=1" defer></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/lightgallery.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/plugins/thumbnail/lg-thumbnail.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery@2.4.0/plugins/zoom/lg-zoom.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/contrib/mhchem.min.js"></script><script type="text/javascript" src="/js/custom.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":100},"comment":{"utterances":{"darkTheme":"github-dark","issueTerm":"pathname","label":"","lightTheme":"github-light","repo":"g03m0n/comments"}},"lightgallery":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","maxResultLength":20,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

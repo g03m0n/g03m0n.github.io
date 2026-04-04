@@ -3,7 +3,43 @@
         <title>Htb - Tag - g03m0n</title>
         <link>https://g03m0n.github.io/tags/htb/</link>
         <description>Htb - Tag - g03m0n</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/htb/" rel="self" type="application/rss+xml" /><item>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 03 Apr 2026 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/htb/" rel="self" type="application/rss+xml" /><item>
+    <title>Module - Server-Side Attack</title>
+    <link>https://g03m0n.github.io/posts/htb-server-side-attack/</link>
+    <pubDate>Fri, 03 Apr 2026 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/htb-server-side-attack/</guid>
+    <description><![CDATA[<h1 id="server-side-attack">Server-Side Attack</h1>
+<p>Application interface:</p>
+<p></p>
+<p>After accessing the website, the application automatically sends POST requests to retrieve data</p>
+<p></p>
+<p>At first glance, this request appears to be an SSRF vulnerability. After testing, it was confirmed to have SSRF, but there is no outbound traffic, and a port scan revealed only ports 80 and 3306 are open, making it ineffective for exploitation:</p>
+<p>Port scan:</p>
+<p></p>
+<p>File name scan:</p>
+<p></p>
+<p>Notice that the application accepts user input to display the count on the screen:</p>
+<p></p>
+<p></p>
+<p></p>
+<p>Attempting to exploit the SSTI vulnerability.</p>
+<p>Since the application uses PHP, I tried a Twig template payload — a well-known template from the Symfony framework: <code>{{7*'7'}}</code></p>
+<p></p>
+<p>Confirm that the application is vulnerable to SSTI.</p>
+<p>Twig RCE payload: <code>{{['id']|filter('system')}}</code></p>
+<p></p>
+<p>However, the application blocks the <code>'  '</code> character, causing an error when used:</p>
+<p>Payload: <code>http://truckapi.htb/?id=FusionExpress03{{['ls /']|filter('system')}}</code></p>
+<p></p>
+<p>Since the application runs on Linux, this can be bypassed using <code>${IFS}</code>, which is equivalent to the <code>'  '</code> character</p>
+<p></p>
+<p>Read the flag:</p>
+<p>Payload: <code>http://truckapi.htb/?id=FusionExpress03{{['ls${IFS}/flag.txt']|filter('system')}}</code></p>
+<p></p>
+]]></description>
+</item>
+<item>
     <title>Hackthebox - Neonify</title>
     <link>https://g03m0n.github.io/posts/hackthebox---neonify/hackthebox-neonify/</link>
     <pubDate>Mon, 10 Jun 2024 08:29:01 &#43;0800</pubDate>

@@ -117,75 +117,30 @@
 <a href="mailto:goemon2307@gmail.com" title="Email" rel=" me"><i class="far fa-envelope fa-fw" aria-hidden="true"></i></a>
 </div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/htb-server-side-attack/">Module - Server-Side Attack</a>
+        <a href="/posts/vulhub---loly/vulhub-loly/">Vulhub - Loly</a>
     </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2026-04-03">2026-04-03</time></span>&nbsp;<span class="post-category">included in <a href="/categories/hackthebox/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Hackthebox</a></span></div><div class="content">Server-Side Attack Application interface:
-After accessing the website, the application automatically sends POST requests to retrieve data
-At first glance, this request appears to be an SSRF vulnerability. After testing, it was confirmed to have SSRF, but there is no outbound traffic, and a port scan revealed only ports 80 and 3306 are open, making it ineffective for exploitation:
-Port scan:
-File name scan:
-Notice that the application accepts user input to display the count on the screen:</div><div class="post-footer">
-        <a href="/posts/htb-server-side-attack/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/htb/">Htb</a>,&nbsp;<a href="/tags/lab/">Lab</a>,&nbsp;<a href="/tags/ctf/">Ctf</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/orm-leak-vulnerability-in-finmars/">ORM Leak Vulnerability in Finmars</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2026-03-31">2026-03-31</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">ORM Leak Vulnerability in Finmars I recently conducted research on ORM Leaking- Top 2 web hacking technique by PortSwigger. Following this study, I utilized Sourcegraphto scan open-source repositories for potential vulnerabilities. This investigation led to the discovery of an ORM Leaking flaw within the Finmars repository.
-Let&rsquo;s analyze the vulnerability.
-Description and Impact Type Version Affected Required Authentication ?-day ORM Leaking finmars-core ≤ 1.24.5 Yes 0-day Root Cause Analysis The Source The application contains a security vulnerability within the category data extraction feature (/api/v1/specific-data/values-for-select/).</div><div class="post-footer">
-        <a href="/posts/orm-leak-vulnerability-in-finmars/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/finmars/">Finmars</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/cve-2026-26379/">SSRF in Koha version ≤ 25.11 (CVE-2026-26379)</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2025-12-31">2025-12-31</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">SSRF in Koha version ≤ 25.11 (CVE-2026-26379) Description and Impact Type Affected Version ?-day SSRF ≤25.11 (latest) 0-day Steps to Reproduce First, from the Dashboard interface, go to Koha Administration → Z39.50/SRU servers:
-Select + New Z39.50 server
-Assume the internal network is hosting an application on port 8888: nc -nvlp 8888
-Fill in the information as follows:
-Save.
-Go to http://192.168.116.130:8080/cgi-bin/koha/cataloguing/z3950_search.pland fill in the information as shown in the image:</div><div class="post-footer">
-        <a href="/posts/cve-2026-26379/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/koha/">Koha</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/cve-2026-26378/">Cross-Site Scripting via File Upload in Koha (CVE-2026-26378)</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2025-12-31">2025-12-31</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">Cross-Site Scripting via File Upload in Koha (CVE-2026-26378) Description and Impact Type Version Affected ?-day XSS via File Upload ≤ 25.11 (latest) 0-day Steps to Reproduce First, create an arbitrary vendor (if one already exists, skip this step):
-Vendor ABC was successfully created. Access Receive Shipments to create a new Invoice:
-Successfully created an Invoice with invoiceid=3 :
-Then, access the URL: cgi-bin/koha/acqui/invoice-files.pl?invoiceid=3 :
-Proceed to upload an SVG file containing the XSS payload as follows:</div><div class="post-footer">
-        <a href="/posts/cve-2026-26378/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/koha/">Koha</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/cve-2026-26377/">Stored XSS in Koha version ≤25.11 (CVE-2026-26377)</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2025-12-31">2025-12-31</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">Stored XSS in Koha version ≤25.11 (CVE-2026-26377) Description and Impact Type Version Affected Required Authentication ?-day Stored XSS ≤ 25.11 Yes 0-day This vulnerability poses a critical risk as the malicious payload is saved on the server, affecting multiple users without requiring social engineering. Successful exploitation permits attackers to exfiltrate sensitive data, impersonate high-privileged users (Administrator account takeover), and compromise the confidentiality and integrity of the application.
-Steps to Reproduce (Tesing on Koha version 25.</div><div class="post-footer">
-        <a href="/posts/cve-2026-26377/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/koha/">Koha</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/cve-2025-68461/">Stored-XSS via animate tag in Roundcube (CVE-2025-68461)</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2025-12-31">2025-12-31</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div><div class="content">Stored-XSS via animate tag in Roundcube (CVE-2025-68461) Description and Impact Type Version Affected Authentication Required ?-day CVSS Stored-XSS &lt;1.5.12, &lt;1.6.12 Yes 1-day 7.2 Roundcube Webmail before 1.5.12 and 1.6 before 1.6.12 is prone to a Cross-Site-Scripting (XSS) vulnerability via the animate tag in an SVG document.
-Root cause analysis program\lib\Roundcube\rcube_washtml.php:dumpHtml()
-Ứng dụng kiểm tra xem thẻ hiện tại ($tagName) có phải là một trong các thẻ hoạt ảnh (animate, animatecolor, …) hay không.</div><div class="post-footer">
-        <a href="/posts/cve-2025-68461/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/cve/">Cve</a>,&nbsp;<a href="/tags/roundcube/">Roundcube</a></div></div>
-</article><ul class="pagination"><li class="page-item active">
+</span>&nbsp;<span class="post-publish">published on <time datetime="2023-08-20">2023-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/vulhub/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>VulHub</a></span></div><div class="content">Description Link lab tại đâyStep Reconnaissance Đầu tiên ta sử dụng arp-scan để quét các địa chỉ IP có trong dải mạng. Nhận thấy có một IP lạ là 192.168.134.135.
+Sử dụng nmap để kiểm tra các dịch vụ đang mở trên IP đó
+Có cổng 80 đang mở và đang sử dụng nginx 1.10.3.
+Enumeration Tiến hành quét các directory bằng dirb
+dirb 192.168.134.135 Ta thu được kết quả trang web này sử dụng Wordpress tại endpoint /wordpress.</div><div class="post-footer">
+        <a href="/posts/vulhub---loly/vulhub-loly/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/vulhub/">Vulhub</a>,&nbsp;<a href="/tags/lab/">Lab</a>,&nbsp;<a href="/tags/ctf/">Ctf</a></div></div>
+</article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
                     </span>
                 </li><li class="page-item ">
-                    <span class="page-link">
-                        <a href="/page/2/">2</a>
-                    </span>
+                    <span class="page-link" aria-hidden="true">&hellip;</span>
                 </li><li class="page-item ">
                     <span class="page-link">
                         <a href="/page/3/">3</a>
                     </span>
                 </li><li class="page-item ">
-                    <span class="page-link" aria-hidden="true">&hellip;</span>
-                </li><li class="page-item ">
+                    <span class="page-link">
+                        <a href="/page/4/">4</a>
+                    </span>
+                </li><li class="page-item active">
                     <span class="page-link">
                         <a href="/page/5/">5</a>
                     </span>
