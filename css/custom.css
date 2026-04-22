@@ -37,7 +37,7 @@
 }
 
 /* Nhắm mục tiêu vào các thẻ code nằm trong bảng hoặc nội dung */
-.content code, td code, p code {
+.single .content code {
+    display: inline !important;
     vertical-align: baseline;
-    display: inline; 
 }
