@@ -156,6 +156,72 @@
 <td><strong>Kiểm tra &amp; Bypass SSL Pinning</strong></td>
 <td>- <em>Dấu hiệu app cài SSL Pinning:</em> Dùng Network Security Config, Custom TrustManager, thư viện OkHttp, TrustKit.<br>- <em>Cách Bypass:</em> Dùng Objection, Frida Scripts, HTTP Toolkit hoặc decompile để xóa code check SSL rồi recompile.</td>
 </tr>
+<tr>
+<td></td>
+<td><strong>API Testing</strong></td>
+<td>- Dùng Burp Suite (sau khi bypass SSL) để test các lỗi logic web như IDOR, BOLA, SQLi trên API, bypass thanh toán.</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Memory Dumping</strong></td>
+<td>- Dump bộ nhớ RAM khi app đang chạy để tìm mật khẩu, token, key giải mã chưa kịp xóa. - Công cụ: Fridump, tính năng memory của Objection.</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Runtime Hooking</strong></td>
+<td>- Dùng Frida hook trực tiếp vào các hàm nghi ngờ (tạo OTP, check mã PIN) để thay đổi tham số đầu vào hoặc giá trị trả về (return value) ngay lập tức.</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Lỗ hổng</th>
+<th style="text-align:left">Mô tả</th>
+<th style="text-align:left">Checklist</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>1. SSL Pinning</strong></td>
+<td style="text-align:left">Lỗ hổng <strong>SSL Pinning</strong> xảy ra khi ứng dụng không xác minh đúng chứng chỉ SSL hoặc public key của máy chủ trong quá trình handshake SSL/TLS. Điều này cho phép kẻ tấn công thực hiện <em>man-in-the-middle</em> để chặn và giải mã giao tiếp của ứng dụng.</td>
+<td style="text-align:left">- Kiểm tra xem <strong>SSL Pinning</strong> có được triển khai không. <br> - <strong>Objection:</strong> Sử dụng lệnh <code>android sslpinning disable</code>. <br> - <strong>Frida:</strong> Sử dụng <code>frida-multiple-unpinning</code> -&gt; <code>frida -U --codeshare akabe1/frida-multiple-unpinning -f YOUR_BINARY</code> <br> - <strong>Xposed:</strong> Cài đặt module <em>TrustMeAlready</em> hoặc <em>SSLUnpinning</em>. <br> - Bypass SSL Pinning sử dụng <strong>APKLab</strong>. <br> - Kiểm tra xem có thể thao túng mã (<em>code manipulation</em>) không.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>2. Root Detection</strong></td>
+<td style="text-align:left">Lỗ hổng <strong>Root Detection</strong> xảy ra khi ứng dụng không phát hiện và ngăn chặn đúng cách quyền truy cập từ các thiết bị đã root, cho phép người dùng có khả năng giành quyền truy cập trái phép vào dữ liệu hoặc chức năng của app.</td>
+<td style="text-align:left">- Kiểm tra xem <strong>Root Detection</strong> có được triển khai không. <br> - Module <strong>MagiskHide</strong> trong ứng dụng Magisk (= &lt;v23.0). <br> - <strong>Zygisk DenyList</strong> trong ứng dụng Magisk (&gt;v23.0). <br> - <em>Tampering</em> (Chỉnh sửa) mã Smali. <br> - <strong>Frida</strong> -&gt; Dùng script <em>fridantiroot</em>. <br> - <strong>Medusa Framework</strong> -&gt; Sử dụng module <code>helpers/anti_debug</code>. <br> - <strong>Objection:</strong> Dùng <code>dex2jar</code> lấy class file -&gt; Phân tích tìm library check root -&gt; Chạy <code>objection -g com.test.app explore</code> -&gt; Tìm method bằng <code>android hooking list class_methods &lt;class&gt;</code> -&gt; Set lại kết quả <code>android hooking set return_value &lt;method&gt; false</code>. Nếu app vẫn báo root, bấm Back ra ngoài (không kill app) rồi vào lại. <br> - Đổi tên binaries: Đôi khi chỉ cần đổi tên binary <code>su</code> là đủ để bypass (nhưng cẩn thận hỏng môi trường). <br> - Unmount <code>/proc</code> để ngăn app đọc danh sách tiến trình. <br> - Dùng <strong>Frida/Xposed</strong> hook các API (Java/native) để ẩn file, tiến trình và trả về các giá trị giả (<em>bogus values</em>). <br> - Hook low-level API bằng kernel modules. <br> - Patch ứng dụng để xóa bỏ các hàm kiểm tra.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>3. Emulator Detection</strong></td>
+<td style="text-align:left">Lỗ hổng <strong>Emulator Detection</strong> xảy ra khi ứng dụng không phát hiện và ngăn chặn truy cập từ trình giả lập (<em>emulator</em>), cho phép người dùng bypass các kiểm soát bảo mật hoặc truy cập tính năng trái phép.</td>
+<td style="text-align:left">- Kiểm tra xem <strong>Emulator Detection</strong> có được triển khai không. <br> - Chỉnh sửa các thuộc tính trong file <code>build.prop</code>. <br> - Patch chức năng nhận diện: Ghi đè mã <em>bytecode</em> hoặc <em>native code</em> liên quan bằng các lệnh <strong>NOP</strong>. <br> - Dùng <strong>Frida/Xposed</strong> hook các API hệ thống file (Java/native) để trả về các thông số giống máy thật thay vì thông số giả lập. Ví dụ: override hàm <code>TelephonyManager.getDeviceID</code> để trả về một mã IMEI hợp lệ.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>4. Sensitive Data in ADB Logcat Logs</strong></td>
+<td style="text-align:left">Lỗ hổng rò rỉ dữ liệu qua <strong>ADB Logcat</strong> xảy ra khi ứng dụng ghi log các dữ liệu nhạy cảm (mật khẩu, thông tin cá nhân) vào <em>system log</em>, khiến chúng có thể bị lộ cho kẻ tấn công.</td>
+<td style="text-align:left">- Quét Logcat logs tìm dữ liệu nhạy cảm bằng lệnh: <br> `adb logcat</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>5. Sensitive Data Stored in Local Storage</strong></td>
+<td style="text-align:left">Lỗ hổng lưu trữ dữ liệu nội bộ xảy ra khi app lưu thông tin nhạy cảm ở dạng không mã hóa (<em>unencrypted</em>) hoặc không an toàn trong <strong>Local Storage</strong> của thiết bị.</td>
+<td style="text-align:left">- Kiểm tra cả <em>internal</em> và <em>external storage</em> tìm các file có dữ liệu nhạy cảm. <br> - Tìm các file development, backup hoặc file cũ bị sót lại trong bản production. <br> - Kiểm tra các file <strong>SQLite databases</strong> (tại <code>/data/data/&lt;package-name&gt;/databases</code>). Nếu có mã hóa, hãy xem password sinh ra thế nào và có được bảo vệ bằng <strong>Keystore</strong> hay không. <br> - Kiểm tra <strong>Shared Preferences</strong> (file XML tại <code>/data/data/&lt;package-name&gt;/shared_prefs</code>). Nếu không dùng thư viện như <code>secure-preferences</code>, dữ liệu mặc định sẽ là plaintext. <br> - Kiểm tra quyền (permissions) của thư mục data. Chỉ user/group của app (vd: <code>u0_a82</code>) mới được có quyền rwx. <br> - <strong>Ghost Files trong Shared Preferences:</strong> Nếu bạn có quyền WRITE vào thư mục <code>shared_prefs</code> (dù không có quyền overwrite file hiện tại), bạn có thể tạo một file <code>.bak</code> chứa setting giả mạo. Ở lần chạy tới, Android sẽ tự đổi tên file <code>.bak</code> đó đè lên file gốc một cách âm thầm. <br> - Kiểm tra <strong>Firebase Real-time databases</strong>: Test xem có bị misconfigured bằng cách truy cập <code>https://_firebaseProjectName_.firebaseio.com/.json</code>. <br> - Kiểm tra <strong>Realm database</strong> (đuôi <code>.realm</code>, mặc định tên <code>default</code> tại thư mục <code>/files/</code>). Dùng <em>Realm Browser</em> để xem có bị lộ data unencrypted không.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>6. Sensitive Data in Application Memory</strong></td>
+<td style="text-align:left">Xảy ra khi ứng dụng lưu trữ thông tin nhạy cảm trong bộ nhớ RAM (<em>Application Memory</em>) ở dạng không an toàn, khiến dữ liệu có thể bị trích xuất nếu kẻ tấn công có quyền truy cập bộ nhớ.</td>
+<td style="text-align:left">- Sử dụng công cụ <code>fridump.py</code> để dump bộ nhớ ứng dụng và phân tích tìm các dữ liệu nhạy cảm (password, token&hellip;).</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>7. Weak Signer Certificate</strong></td>
+<td style="text-align:left">Lỗ hổng xảy ra khi ứng dụng được ký (<em>signed</em>) bằng một chứng chỉ (<em>certificate</em>) yếu hoặc đã bị lộ, cho phép kẻ tấn công chỉnh sửa ứng dụng hoặc mạo danh.</td>
+<td style="text-align:left">- Kiểm tra xem app có dùng thuật toán ký yếu như <code>SHA1withRSA</code> không. <br> - Kiểm tra lỗ hổng <strong>Janus</strong> (cho phép sửa APK mà không hỏng chữ ký). <br> - Kiểm tra xem ứng dụng có đang dùng <em>debug certificate</em> (chứng chỉ test) thay vì chứng chỉ release không.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>8. Vulnerable Android Activities</strong></td>
+<td style="text-align:left"><em>Android activities</em> là các thành phần đại diện cho màn hình giao diện. Một Activity có lỗ hổng (do code kém an toàn hoặc dùng thư viện lỗi) có thể bị khai thác để chiếm quyền hoặc bypass logic ứng dụng.</td>
+<td style="text-align:left">- <strong>[Authentication Bypass]:</strong> Kiểm tra xem có thể gọi trực tiếp các protected activities thông qua ADB mà không cần đăng nhập không. <br> - <strong>[Exported Sensitive Activity]:</strong> Đảm bảo các activities được đặt cờ <code>exported</code> đã được phân quyền và kiểm soát chặt chẽ. <br> - <strong>[Task Hijacking]:</strong> Kiểm tra khả năng bị chiếm quyền điều khiển luồng activity (hijacking). <br> - <strong>[DOS]:</strong> Gửi các payload lỗi để xem activity có gây ra hiện tượng crash app hoặc từ chối dịch vụ (Denial of Service) hay không.</td>
+</tr>
 </tbody>
 </table>
 ]]></description>
