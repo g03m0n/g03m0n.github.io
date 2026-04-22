@@ -35,3 +35,9 @@
     padding: 2px 5px !important;
     border-radius: 4px !important;
 }
+
+/* Nhắm mục tiêu vào các thẻ code nằm trong bảng hoặc nội dung */
+.content code, td code, p code {
+    vertical-align: baseline;
+    display: inline; 
+}
