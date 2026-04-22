@@ -2,8 +2,8 @@
     xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     ><url>
+            <loc>https://g03m0n.github.io/posts/android-pentesting/</loc><lastmod>2026-04-04T08:29:01&#43;08:00</lastmod></url><url>
             <loc>https://g03m0n.github.io/posts/htb-server-side-attack/</loc><lastmod>2026-04-03T08:29:01&#43;08:00</lastmod></url><url>
-            <loc>https://g03m0n.github.io/posts/android-pentesting/</loc><lastmod>2026-04-01T08:31:01&#43;08:00</lastmod></url><url>
             <loc>https://g03m0n.github.io/posts/orm-leak-vulnerability-in-finmars/</loc><lastmod>2026-03-31T08:31:01&#43;08:00</lastmod></url><url>
             <loc>https://g03m0n.github.io/posts/cve-2026-26379/</loc><lastmod>2025-12-31T08:31:01&#43;08:00</lastmod></url><url>
             <loc>https://g03m0n.github.io/posts/cve-2026-26378/</loc><lastmod>2025-12-31T08:30:01&#43;08:00</lastmod></url><url>
@@ -28,16 +28,16 @@
             <loc>https://g03m0n.github.io/posts/portswigger---xxe/portswigger-xxe/</loc><lastmod>2023-08-21T08:29:01&#43;08:00</lastmod></url><url>
             <loc>https://g03m0n.github.io/posts/vulhub---mrrobot/vulhub-mrrobot/</loc><lastmod>2023-08-21T08:29:01&#43;08:00</lastmod></url><url>
             <loc>https://g03m0n.github.io/posts/vulhub---loly/vulhub-loly/</loc><lastmod>2023-08-20T08:29:01&#43;08:00</lastmod></url><url>
-            <loc>https://g03m0n.github.io/categories/</loc><lastmod>2026-04-03T08:29:01&#43;08:00</lastmod></url><url>
+            <loc>https://g03m0n.github.io/tags/android/</loc><lastmod>2026-04-04T08:29:01&#43;08:00</lastmod></url><url>
+            <loc>https://g03m0n.github.io/categories/android/</loc><lastmod>2026-04-04T08:29:01&#43;08:00</lastmod></url><url>
+            <loc>https://g03m0n.github.io/categories/</loc><lastmod>2026-04-04T08:29:01&#43;08:00</lastmod></url><url>
+            <loc>https://g03m0n.github.io/</loc><lastmod>2026-04-04T08:29:01&#43;08:00</lastmod></url><url>
+            <loc>https://g03m0n.github.io/posts/</loc><lastmod>2026-04-04T08:29:01&#43;08:00</lastmod></url><url>
+            <loc>https://g03m0n.github.io/tags/</loc><lastmod>2026-04-04T08:29:01&#43;08:00</lastmod></url><url>
             <loc>https://g03m0n.github.io/tags/ctf/</loc><lastmod>2026-04-03T08:29:01&#43;08:00</lastmod></url><url>
-            <loc>https://g03m0n.github.io/</loc><lastmod>2026-04-03T08:29:01&#43;08:00</lastmod></url><url>
             <loc>https://g03m0n.github.io/categories/hackthebox/</loc><lastmod>2026-04-03T08:29:01&#43;08:00</lastmod></url><url>
             <loc>https://g03m0n.github.io/tags/htb/</loc><lastmod>2026-04-03T08:29:01&#43;08:00</lastmod></url><url>
             <loc>https://g03m0n.github.io/tags/lab/</loc><lastmod>2026-04-03T08:29:01&#43;08:00</lastmod></url><url>
-            <loc>https://g03m0n.github.io/posts/</loc><lastmod>2026-04-03T08:29:01&#43;08:00</lastmod></url><url>
-            <loc>https://g03m0n.github.io/tags/</loc><lastmod>2026-04-03T08:29:01&#43;08:00</lastmod></url><url>
-            <loc>https://g03m0n.github.io/tags/android/</loc><lastmod>2026-04-01T08:31:01&#43;08:00</lastmod></url><url>
-            <loc>https://g03m0n.github.io/categories/android/</loc><lastmod>2026-04-01T08:31:01&#43;08:00</lastmod></url><url>
             <loc>https://g03m0n.github.io/tags/cve/</loc><lastmod>2026-03-31T08:31:01&#43;08:00</lastmod></url><url>
             <loc>https://g03m0n.github.io/categories/cves/</loc><lastmod>2026-03-31T08:31:01&#43;08:00</lastmod></url><url>
             <loc>https://g03m0n.github.io/tags/finmars/</loc><lastmod>2026-03-31T08:31:01&#43;08:00</lastmod></url><url>
