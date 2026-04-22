@@ -40,7 +40,7 @@
 <tr>
 <td></td>
 <td><strong>AllowBackup</strong></td>
-<td>- Tìm flag <code>&lt;application android:allowBackup=&quot;true&quot;&gt;</code>. Nếu <code>true</code> (hoặc không khai báo, vì mặc định là true), kẻ tấn công có thể dùng <code>adb backup</code> để lấy file nhạy cảm.<br>- <em>Lệnh test:</em> <code>adb backup -f backup.ab com.example.app</code></td>
+<td>- Tìm flag <code>&lt;application android:allowBackup=&quot;true&quot;&gt;</code>. <br>- Nếu <code>true</code> (hoặc không khai báo, vì mặc định là true), kẻ tấn công có thể dùng <code>adb backup</code> để lấy file nhạy cảm.<br>- <em>Lệnh test:</em> <code>adb backup -f backup.ab com.example.app</code></td>
 </tr>
 <tr>
 <td></td>
