@@ -197,10 +197,22 @@
 <td style="text-align:left">- Kiểm tra xem app có dùng thuật toán ký yếu như <code>SHA1withRSA</code> không. {{ br }} - Kiểm tra lỗ hổng <strong>Janus</strong> (cho phép sửa APK mà không hỏng chữ ký). {{ br }} - Kiểm tra xem ứng dụng có đang dùng <em>debug certificate</em> (chứng chỉ test) thay vì chứng chỉ release không.</td>
 </tr>
 <tr>
+<td style="text-align:left"></td>
+<td style="text-align:left"><strong>2. Vulnerable 3rd-Party Libraries/SDKs</strong></td>
+<td style="text-align:left">Sử dụng các thư viện, SDK bên thứ ba có chứa lỗ hổng bảo mật đã biết (CVE) hoặc mã độc.</td>
+<td style="text-align:left">- Dùng <strong>OWASP Dependency-Check</strong> hoặc <strong>MobSF</strong> quét các thư viện. {{ br }} - Kiểm tra các SDK quảng cáo, tracking xem có thu thập dữ liệu trái phép không.</td>
+</tr>
+<tr>
 <td style="text-align:left"><strong>M3: Insecure Authentication / Authorization</strong></td>
 <td style="text-align:left"><strong>1. Android Lock/Biometric Authentication Bypass</strong></td>
 <td style="text-align:left">Một số ứng dụng sử dụng màn hình khóa (<em>Screen Lock</em>) hoặc sinh trắc học (<em>Biometric/Fingerprint</em>) của thiết bị để xác thực người dùng trước khi cho phép dùng chức năng nhạy cảm.</td>
 <td style="text-align:left">- Kiểm tra xem cơ chế xác thực này có thể bị <em>bypass</em> bằng cách dùng Frida/Objection (hook vào API sinh trắc học của Android trả về <code>true</code>) hoặc can thiệp trực tiếp vào mã nguồn (<em>code modification</em>) hay không.</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left"><strong>2. Insecure Session Management</strong></td>
+<td style="text-align:left">Quản lý phiên làm việc kém an toàn trên thiết bị, như token không hết hạn, lưu trữ JWT dạng plaintext, không thu hồi token khi log out.</td>
+<td style="text-align:left">- Kiểm tra thời gian sống của token (Expiration). {{ br }} - Kiểm tra JWT có chứa dữ liệu nhạy cảm không mã hóa ở payload không. {{ br }} - Đăng xuất và dùng lại token cũ xem còn hợp lệ không.</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>M4: Insufficient Input / Output Validation</strong></td>
@@ -227,10 +239,22 @@
 <td style="text-align:left">- Thực hiện kiểm thử bảo mật toàn diện trên API (<em>API security tests</em>). {{ br }} - Kiểm tra các lỗi kiểm soát truy cập (<em>Broken Access Controls</em> như IDOR, BOLA). {{ br }} - Test các lỗ hổng <em>Server-side injections</em> (SQLi, Command Injection&hellip;). {{ br }} - Xác định các luồng rò rỉ dữ liệu nhạy cảm từ phía server. {{ br }} - Thực hiện <em>Fuzz testing</em> để tìm lỗi crash hoặc logic sai từ các input.</td>
 </tr>
 <tr>
+<td style="text-align:left"></td>
+<td style="text-align:left"><strong>5. XML External Entity (XXE) &amp; Local Data Injection</strong></td>
+<td style="text-align:left">Ứng dụng parse các file XML không an toàn dẫn đến XXE, hoặc cho phép người dùng tiêm mã độc vào các truy vấn SQLite cục bộ.</td>
+<td style="text-align:left">- Nếu app nhận file XML hoặc parse RSS feed, test các payload <strong>XXE</strong> để đọc file hệ thống. {{ br }} - Test lỗi SQL Injection ở các trường tìm kiếm/lưu trữ offline bằng SQLite.</td>
+</tr>
+<tr>
 <td style="text-align:left"><strong>M5: Insecure Communication</strong></td>
 <td style="text-align:left"><strong>1. SSL Pinning</strong></td>
 <td style="text-align:left">Lỗ hổng <strong>SSL Pinning</strong> xảy ra khi ứng dụng không xác minh đúng chứng chỉ SSL hoặc public key của máy chủ trong quá trình handshake SSL/TLS. Điều này cho phép kẻ tấn công thực hiện <em>man-in-the-middle</em> để chặn và giải mã giao tiếp của ứng dụng.</td>
 <td style="text-align:left">- Kiểm tra xem <strong>SSL Pinning</strong> có được triển khai không. {{ br }} - <strong>Objection:</strong> Sử dụng lệnh <code>android sslpinning disable</code>. {{ br }} - <strong>Frida:</strong> Sử dụng <code>frida-multiple-unpinning</code> -&gt; <code>frida -U --codeshare akabe1/frida-multiple-unpinning -f YOUR_BINARY</code> {{ br }} - <strong>Xposed:</strong> Cài đặt module <em>TrustMeAlready</em> hoặc <em>SSLUnpinning</em>. {{ br }} - Bypass SSL Pinning sử dụng <strong>APKLab</strong>. {{ br }} - Kiểm tra xem có thể thao túng mã (<em>code manipulation</em>) không.</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left"><strong>2. Cleartext Communication &amp; Weak TLS Suites</strong></td>
+<td style="text-align:left">Gửi dữ liệu qua HTTP hoặc sử dụng các phiên bản TLS/Cipher suites lỗi thời, dễ bị giải mã.</td>
+<td style="text-align:left">- Dùng Wireshark/Burp Suite bắt traffic xem có HTTP thuần không. {{ br }} - Kiểm tra server SSL/TLS bằng công cụ <code>testssl.sh</code> để loại bỏ TLS 1.0, 1.1 và các cipher yếu.</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>M6: Inadequate Privacy Controls</strong></td>
@@ -243,6 +267,12 @@
 <td style="text-align:left"><strong>2. Background Screen Caching</strong></td>
 <td style="text-align:left"><strong>Screen caching</strong> là tính năng tối ưu trải nghiệm của hệ điều hành di động (tự động chụp lại ảnh màn hình app khi thu nhỏ). Điều này vô tình gây rò rỉ dữ liệu nhạy cảm hiển thị trên màn hình.</td>
 <td style="text-align:left">- Đẩy ứng dụng xuống chạy ngầm (<em>background</em>), sau đó kiểm tra xem ảnh chụp màn hình (<em>screenshot</em>) lưu trong hệ thống có chứa thông tin nhạy cảm không. Để an toàn, app phải bật cờ <code>FLAG_SECURE</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left"><strong>3. Clipboard &amp; Keyboard Cache Leakage</strong></td>
+<td style="text-align:left">Rò rỉ dữ liệu qua bộ nhớ tạm (Clipboard) khi copy/paste hoặc qua từ điển của bàn phím hệ thống/bên thứ ba.</td>
+<td style="text-align:left">- Kiểm tra xem có copy được dữ liệu từ các ô nhập password/OTP không. {{ br }} - Đảm bảo các trường nhạy cảm có thuộc tính <code>android:inputType=&quot;textPassword&quot;</code> hoặc <code>textNoSuggestions</code>.</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>M7: Insufficient Binary Protections</strong></td>
@@ -267,6 +297,12 @@
 <td style="text-align:left"><strong>4. Missing Integrity Checks</strong></td>
 <td style="text-align:left"><strong>Integrity checks</strong> (Kiểm tra tính toàn vẹn) là quá trình xác minh tính xác thực của mã nguồn ứng dụng, đảm bảo nó chưa bị can thiệp (<em>tampered</em>) hay repackage bởi kẻ tấn công.</td>
 <td style="text-align:left">- Thực hiện <em>Decompile</em> (giải mã), chỉnh sửa một vài thông số/logic, <em>recompile</em> (đóng gói lại), tự sign bằng key giả và kiểm tra xem ứng dụng có còn hoạt động bình thường không (Nếu chạy được -&gt; Lỗ hổng).</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left"><strong>5. Tapjacking (Screen Overlay Attack)</strong></td>
+<td style="text-align:left">Một ứng dụng độc hại vẽ chồng (overlay) lên trên giao diện của ứng dụng nạn nhân để lừa người dùng bấm vào các nút nhạy cảm.</td>
+<td style="text-align:left">- Kiểm tra xem các màn hình nhạy cảm có bật cờ <code>filterTouchesWhenObscured=&quot;true&quot;</code> hoặc dùng <code>setFilterTouchesWhenObscured(true)</code> không.</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>M8: Security Misconfiguration</strong></td>
@@ -324,9 +360,15 @@
 </tr>
 <tr>
 <td style="text-align:left"><strong>M10: Insufficient Cryptography</strong></td>
-<td style="text-align:left"><strong>. Other Security Checks</strong></td>
+<td style="text-align:left"><strong>1. Other Security Checks</strong></td>
 <td style="text-align:left">Các cấu hình bảo mật nhỏ gọn nhưng quan trọng để tăng cường <em>hardening</em> cho phía Client (UI/UX an toàn).</td>
 <td style="text-align:left">- Kiểm tra xem các khóa mã hóa (<em>cryptographic keys</em>) có bị dùng lại không. {{ br }} - Kiểm tra bộ nhớ đệm bàn phím (<em>keyboard cache/dictionary</em>) đã bị tắt cho các trường nhạy cảm chưa. {{ br }} - Kiểm tra xem chức năng Copy/Paste đã bị chặn ở các ô nhập mật khẩu/OTP chưa. {{ br }} - Kiểm tra xem dữ liệu nhạy cảm có được che giấu (<em>masked</em>) trên UI khi chuyển app không. {{ br }} - Kiểm tra xem app có chặn bàn phím của bên thứ ba (<em>third-party keyboards</em>) khi nhập liệu quan trọng không.</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left"><strong>2. Weak Cryptographic Algorithms &amp; Hardcoded IVs</strong></td>
+<td style="text-align:left">Sử dụng các thuật toán mã hóa lỗi thời (MD5, RC4, DES, AES-ECB) hoặc tái sử dụng Khóa/IV (Initialization Vector), hardcode Khóa/IV trong source code.</td>
+<td style="text-align:left">- Quét source code tìm các instance của <code>Cipher.getInstance(&quot;AES/ECB/...&quot;)</code>. {{ br }} - Kiểm tra xem IV có bị hardcode cố định không (IV phải sinh ngẫu nhiên). {{ br }} - Đảm bảo Khóa mã hóa phải được sinh ra và quản lý bởi phần cứng <strong>Android Keystore</strong>.</td>
 </tr>
 </tbody>
 </table>
