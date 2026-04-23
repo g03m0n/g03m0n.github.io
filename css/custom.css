@@ -42,6 +42,11 @@
     vertical-align: baseline;
 }
 
-.content {
-    max-width: 1400px !important; /* Bạn có thể thay đổi số 1400px này cho vừa mắt, hoặc dùng tỷ lệ % như 90% */
+
+.page {
+    max-width: 1400px !important; /* Tăng giới hạn tối đa lên (có thể tùy chỉnh số này) */
+    width: 85% !important;        /* Tăng phần trăm chiếm dụng không gian (tùy chỉnh 80-100%) */
+}
+.container {
+    max-width: 1600px !important; /* Rộng hơn .page một chút để có chỗ cho mục lục */
 }
