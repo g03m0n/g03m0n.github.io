@@ -192,13 +192,13 @@
 <td style="text-align:left"><strong>M2: Inadequate Supply Chain Security</strong></td>
 <td style="text-align:left"><strong>1. Weak Signer Certificate</strong></td>
 <td style="text-align:left">Lỗ hổng xảy ra khi ứng dụng được ký (<em>signed</em>) bằng một chứng chỉ (<em>certificate</em>) yếu hoặc đã bị lộ, cho phép kẻ tấn công chỉnh sửa ứng dụng hoặc mạo danh.</td>
-<td style="text-align:left">- Kiểm tra xem app có dùng thuật toán ký yếu như <code>SHA1withRSA</code> không. {{ br }} - Kiểm tra lỗ hổng <strong>Janus</strong> (cho phép sửa APK mà không hỏng chữ ký). {{ br }} - Kiểm tra xem ứng dụng có đang dùng <em>debug certificate</em> (chứng chỉ test) thay vì chứng chỉ release không.</td>
+<td style="text-align:left">- Kiểm tra xem app có dùng thuật toán ký yếu như <code>SHA1withRSA</code> không. <br> - Kiểm tra lỗ hổng <strong>Janus</strong> (cho phép sửa APK mà không hỏng chữ ký). <br> - Kiểm tra xem ứng dụng có đang dùng <em>debug certificate</em> (chứng chỉ test) thay vì chứng chỉ release không.</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
 <td style="text-align:left"><strong>2. Vulnerable 3rd-Party Libraries/SDKs</strong></td>
 <td style="text-align:left">Sử dụng các thư viện, SDK bên thứ ba có chứa lỗ hổng bảo mật đã biết (CVE) hoặc mã độc.</td>
-<td style="text-align:left">- Dùng <strong>OWASP Dependency-Check</strong> hoặc <strong>MobSF</strong> quét các thư viện. {{ br }} - Kiểm tra các SDK quảng cáo, tracking xem có thu thập dữ liệu trái phép không.</td>
+<td style="text-align:left">- Dùng <strong>OWASP Dependency-Check</strong> hoặc <strong>MobSF</strong> quét các thư viện. <br> - Kiểm tra các SDK quảng cáo, tracking xem có thu thập dữ liệu trái phép không.</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>M3: Insecure Authentication / Authorization</strong></td>
@@ -210,55 +210,55 @@
 <td style="text-align:left"></td>
 <td style="text-align:left"><strong>2. Insecure Session Management</strong></td>
 <td style="text-align:left">Quản lý phiên làm việc kém an toàn trên thiết bị, như token không hết hạn, lưu trữ JWT dạng plaintext, không thu hồi token khi log out.</td>
-<td style="text-align:left">- Kiểm tra thời gian sống của token (Expiration). {{ br }} - Kiểm tra JWT có chứa dữ liệu nhạy cảm không mã hóa ở payload không. {{ br }} - Đăng xuất và dùng lại token cũ xem còn hợp lệ không.</td>
+<td style="text-align:left">- Kiểm tra thời gian sống của token (Expiration). <br> - Kiểm tra JWT có chứa dữ liệu nhạy cảm không mã hóa ở payload không. <br> - Đăng xuất và dùng lại token cũ xem còn hợp lệ không.</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>M4: Insufficient Input / Output Validation</strong></td>
 <td style="text-align:left"><strong>1. WebView Vulnerabilities</strong></td>
 <td style="text-align:left">Android <strong>WebView</strong> là thành phần cho phép ứng dụng hiển thị nội dung web ngay trong giao diện người dùng. Nó có thể chứa các lỗ hổng do lập trình không an toàn, thiếu kiểm tra dữ liệu đầu vào (<em>improper validation</em>).</td>
-<td style="text-align:left">- Kiểm tra các lỗ hổng <strong>Cross-Site Scripting (XSS)</strong>. {{ br }} - Kiểm tra các lỗ hổng <strong>Local File Inclusion (LFI)</strong>. {{ br }} - Kiểm tra xem JavaScript có được bật một cách không an toàn không. {{ br }} - Kiểm tra <em>Insecure URL Loading</em> qua hàm <code>loadUrl()</code>, cho phép kẻ tấn công <em>inject</em> các URL độc hại. {{ br }} - Kiểm tra việc sử dụng Javascript Interface: <code>setJavaScriptEnabled(true)</code> cho phép thực thực thi JavaScript, dẫn đến nguy cơ XSS.</td>
+<td style="text-align:left">- Kiểm tra các lỗ hổng <strong>Cross-Site Scripting (XSS)</strong>. <br> - Kiểm tra các lỗ hổng <strong>Local File Inclusion (LFI)</strong>. <br> - Kiểm tra xem JavaScript có được bật một cách không an toàn không. <br> - Kiểm tra <em>Insecure URL Loading</em> qua hàm <code>loadUrl()</code>, cho phép kẻ tấn công <em>inject</em> các URL độc hại. <br> - Kiểm tra việc sử dụng Javascript Interface: <code>setJavaScriptEnabled(true)</code> cho phép thực thực thi JavaScript, dẫn đến nguy cơ XSS.</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
 <td style="text-align:left"><strong>2. Insecure Coding Practices</strong></td>
 <td style="text-align:left"><strong>Insecure coding practices</strong> là việc sử dụng các kỹ thuật lập trình không bảo vệ đủ tốt cho ứng dụng (ví dụ: dùng mật khẩu yếu, không validate input), khiến hệ thống dễ bị tấn công.</td>
-<td style="text-align:left">- Kiểm tra việc sử dụng các hàm sinh số ngẫu nhiên không an toàn (<em>Insecure random number generators</em>). {{ br }} - Kiểm tra việc sử dụng các hàm (<em>functions</em>) đã bị cấm/không an toàn. {{ br }} - Kiểm tra các chuẩn mã hóa yếu (<em>weak cryptography</em>) (Ví dụ: MD5, mã hóa Base64). {{ br }} - Kiểm tra các điểm yếu về kỹ thuật lập trình khác.</td>
+<td style="text-align:left">- Kiểm tra việc sử dụng các hàm sinh số ngẫu nhiên không an toàn (<em>Insecure random number generators</em>). <br> - Kiểm tra việc sử dụng các hàm (<em>functions</em>) đã bị cấm/không an toàn. <br> - Kiểm tra các chuẩn mã hóa yếu (<em>weak cryptography</em>) (Ví dụ: MD5, mã hóa Base64). <br> - Kiểm tra các điểm yếu về kỹ thuật lập trình khác.</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
 <td style="text-align:left"><strong>3. Insecure Deeplinks</strong></td>
 <td style="text-align:left"><strong>Insecure deeplinks</strong> là các link dẫn sâu vào app không được bảo vệ. Nếu không validate và kiểm soát truy cập, kẻ tấn công có thể lợi dụng deeplinks để ép app thực hiện các hành vi nhạy cảm.</td>
-<td style="text-align:left">- Kiểm tra các <em>explicit deeplinks</em> có sử dụng <code>PendingIntent</code>. {{ br }} - Kiểm tra các *implicit deeplinks dẫn đến các khu vực nhạy cảm trong app. {{ br }} - Kiểm tra lỗ hổng <strong>Open Redirect</strong>. {{ br }} - Kiểm tra lỗ hổng lộ lọt file nội bộ (<strong>Local File Disclosure</strong>). {{ br }} - Kiểm tra khả năng khai thác các hành động nhạy cảm do ứng dụng thiếu cơ chế xác thực (<em>Authentication bypass</em>).</td>
+<td style="text-align:left">- Kiểm tra các <em>explicit deeplinks</em> có sử dụng <code>PendingIntent</code>. <br> - Kiểm tra các *implicit deeplinks dẫn đến các khu vực nhạy cảm trong app. <br> - Kiểm tra lỗ hổng <strong>Open Redirect</strong>. <br> - Kiểm tra lỗ hổng lộ lọt file nội bộ (<strong>Local File Disclosure</strong>). <br> - Kiểm tra khả năng khai thác các hành động nhạy cảm do ứng dụng thiếu cơ chế xác thực (<em>Authentication bypass</em>).</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
 <td style="text-align:left"><strong>4. Key Checks in Dynamic Analysis</strong></td>
 <td style="text-align:left">Các bước kiểm tra trọng tâm trong quá trình <strong>Dynamic Analysis</strong> (Phân tích động) khi tương tác với API và máy chủ backend của ứng dụng.</td>
-<td style="text-align:left">- Thực hiện kiểm thử bảo mật toàn diện trên API (<em>API security tests</em>). {{ br }} - Kiểm tra các lỗi kiểm soát truy cập (<em>Broken Access Controls</em> như IDOR, BOLA). {{ br }} - Test các lỗ hổng <em>Server-side injections</em> (SQLi, Command Injection&hellip;). {{ br }} - Xác định các luồng rò rỉ dữ liệu nhạy cảm từ phía server. {{ br }} - Thực hiện <em>Fuzz testing</em> để tìm lỗi crash hoặc logic sai từ các input.</td>
+<td style="text-align:left">- Thực hiện kiểm thử bảo mật toàn diện trên API (<em>API security tests</em>). <br> - Kiểm tra các lỗi kiểm soát truy cập (<em>Broken Access Controls</em> như IDOR, BOLA). <br> - Test các lỗ hổng <em>Server-side injections</em> (SQLi, Command Injection&hellip;). <br> - Xác định các luồng rò rỉ dữ liệu nhạy cảm từ phía server. <br> - Thực hiện <em>Fuzz testing</em> để tìm lỗi crash hoặc logic sai từ các input.</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
 <td style="text-align:left"><strong>5. XML External Entity (XXE) &amp; Local Data Injection</strong></td>
 <td style="text-align:left">Ứng dụng parse các file XML không an toàn dẫn đến XXE, hoặc cho phép người dùng tiêm mã độc vào các truy vấn SQLite cục bộ.</td>
-<td style="text-align:left">- Nếu app nhận file XML hoặc parse RSS feed, test các payload <strong>XXE</strong> để đọc file hệ thống. {{ br }} - Test lỗi SQL Injection ở các trường tìm kiếm/lưu trữ offline bằng SQLite.</td>
+<td style="text-align:left">- Nếu app nhận file XML hoặc parse RSS feed, test các payload <strong>XXE</strong> để đọc file hệ thống. <br> - Test lỗi SQL Injection ở các trường tìm kiếm/lưu trữ offline bằng SQLite.</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>M5: Insecure Communication</strong></td>
 <td style="text-align:left"><strong>1. SSL Pinning</strong></td>
 <td style="text-align:left">Lỗ hổng <strong>SSL Pinning</strong> xảy ra khi ứng dụng không xác minh đúng chứng chỉ SSL hoặc public key của máy chủ trong quá trình handshake SSL/TLS. Điều này cho phép kẻ tấn công thực hiện <em>man-in-the-middle</em> để chặn và giải mã giao tiếp của ứng dụng.</td>
-<td style="text-align:left">- Kiểm tra xem <strong>SSL Pinning</strong> có được triển khai không. {{ br }} - <strong>Objection:</strong> Sử dụng lệnh <code>android sslpinning disable</code>. {{ br }} - <strong>Frida:</strong> Sử dụng <code>frida-multiple-unpinning</code> -&gt; <code>frida -U --codeshare akabe1/frida-multiple-unpinning -f YOUR_BINARY</code> {{ br }} - <strong>Xposed:</strong> Cài đặt module <em>TrustMeAlready</em> hoặc <em>SSLUnpinning</em>. {{ br }} - Bypass SSL Pinning sử dụng <strong>APKLab</strong>. {{ br }} - Kiểm tra xem có thể thao túng mã (<em>code manipulation</em>) không.</td>
+<td style="text-align:left">- Kiểm tra xem <strong>SSL Pinning</strong> có được triển khai không. <br> - <strong>Objection:</strong> Sử dụng lệnh <code>android sslpinning disable</code>. <br> - <strong>Frida:</strong> Sử dụng <code>frida-multiple-unpinning</code> -&gt; <code>frida -U --codeshare akabe1/frida-multiple-unpinning -f YOUR_BINARY</code> <br> - <strong>Xposed:</strong> Cài đặt module <em>TrustMeAlready</em> hoặc <em>SSLUnpinning</em>. <br> - Bypass SSL Pinning sử dụng <strong>APKLab</strong>. <br> - Kiểm tra xem có thể thao túng mã (<em>code manipulation</em>) không.</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
 <td style="text-align:left"><strong>2. Cleartext Communication &amp; Weak TLS Suites</strong></td>
 <td style="text-align:left">Gửi dữ liệu qua HTTP hoặc sử dụng các phiên bản TLS/Cipher suites lỗi thời, dễ bị giải mã.</td>
-<td style="text-align:left">- Dùng Wireshark/Burp Suite bắt traffic xem có HTTP thuần không. {{ br }} - Kiểm tra server SSL/TLS bằng công cụ <code>testssl.sh</code> để loại bỏ TLS 1.0, 1.1 và các cipher yếu.</td>
+<td style="text-align:left">- Dùng Wireshark/Burp Suite bắt traffic xem có HTTP thuần không. <br> - Kiểm tra server SSL/TLS bằng công cụ <code>testssl.sh</code> để loại bỏ TLS 1.0, 1.1 và các cipher yếu.</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>M6: Inadequate Privacy Controls</strong></td>
 <td style="text-align:left"><strong>1. Sensitive Data in ADB Logcat Logs</strong></td>
 <td style="text-align:left">Lỗ hổng rò rỉ dữ liệu qua <strong>ADB Logcat</strong> xảy ra khi ứng dụng ghi log các dữ liệu nhạy cảm (mật khẩu, thông tin cá nhân) vào <em>system log</em>, khiến chúng có thể bị lộ cho kẻ tấn công.</td>
-<td style="text-align:left">- Quét Logcat logs tìm dữ liệu nhạy cảm bằng lệnh: {{ br }} <code>adb logcat | grep &quot;$(adb shell ps | grep &lt;package-name&gt; | awk '{print $2}')&quot;</code> {{ br }} - Kiểm tra xem logs có thể bị chỉnh  bằng Frida/Objection không. {{ br }} - Tìm các request hoặc dữ liệu dạng <em>unencrypted</em> (không mã hóa) xuất hiện trong log.</td>
+<td style="text-align:left">- Quét Logcat logs tìm dữ liệu nhạy cảm bằng lệnh: <br> <code>adb logcat | grep &quot;$(adb shell ps | grep &lt;package-name&gt; | awk '{print $2}')&quot;</code> <br> - Kiểm tra xem logs có thể bị chỉnh  bằng Frida/Objection không. <br> - Tìm các request hoặc dữ liệu dạng <em>unencrypted</em> (không mã hóa) xuất hiện trong log.</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
@@ -270,25 +270,25 @@
 <td style="text-align:left"></td>
 <td style="text-align:left"><strong>3. Clipboard &amp; Keyboard Cache Leakage</strong></td>
 <td style="text-align:left">Rò rỉ dữ liệu qua bộ nhớ tạm (Clipboard) khi copy/paste hoặc qua từ điển của bàn phím hệ thống/bên thứ ba.</td>
-<td style="text-align:left">- Kiểm tra xem có copy được dữ liệu từ các ô nhập password/OTP không. {{ br }} - Đảm bảo các trường nhạy cảm có thuộc tính <code>android:inputType=&quot;textPassword&quot;</code> hoặc <code>textNoSuggestions</code>.</td>
+<td style="text-align:left">- Kiểm tra xem có copy được dữ liệu từ các ô nhập password/OTP không. <br> - Đảm bảo các trường nhạy cảm có thuộc tính <code>android:inputType=&quot;textPassword&quot;</code> hoặc <code>textNoSuggestions</code>.</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>M7: Insufficient Binary Protections</strong></td>
 <td style="text-align:left"><strong>1. Root Detection</strong></td>
 <td style="text-align:left">Lỗ hổng <strong>Root Detection</strong> xảy ra khi ứng dụng không phát hiện và ngăn chặn đúng cách quyền truy cập từ các thiết bị đã root, cho phép người dùng có khả năng giành quyền truy cập trái phép vào dữ liệu hoặc chức năng của app.</td>
-<td style="text-align:left">- Kiểm tra xem <strong>Root Detection</strong> có được triển khai không. {{ br }} - Module <strong>MagiskHide</strong> trong ứng dụng Magisk (= &lt;v23.0). {{ br }} - <strong>Zygisk DenyList</strong> trong ứng dụng Magisk (&gt;v23.0). {{ br }} - <em>Tampering</em> (Chỉnh sửa) mã Smali. {{ br }} - <strong>Frida</strong> -&gt; Dùng script <em>fridantiroot</em>. {{ br }} - <strong>Medusa Framework</strong> -&gt; Sử dụng module <code>helpers/anti_debug</code>. {{ br }} - <strong>Objection:</strong> Dùng <code>dex2jar</code> lấy class file -&gt; Phân tích tìm library check root -&gt; Chạy <code>objection -g com.test.app explore</code> -&gt; Tìm method bằng <code>android hooking list class_methods &lt;class&gt;</code> -&gt; Set lại kết quả <code>android hooking set return_value &lt;method&gt; false</code>. Nếu app vẫn báo root, bấm Back ra ngoài (không kill app) rồi vào lại. {{ br }} - Đổi tên binaries: Đôi khi chỉ cần đổi tên binary <code>su</code> là đủ để bypass (nhưng cẩn thận hỏng môi trường). {{ br }} - Unmount <code>/proc</code> để ngăn app đọc danh sách tiến trình. {{ br }} - Dùng <strong>Frida/Xposed</strong> hook các API (Java/native) để ẩn file, tiến trình và trả về các giá trị giả (<em>bogus values</em>). {{ br }} - Hook low-level API bằng kernel modules. {{ br }} - Patch ứng dụng để xóa bỏ các hàm kiểm tra.</td>
+<td style="text-align:left">- Kiểm tra xem <strong>Root Detection</strong> có được triển khai không. <br> - Module <strong>MagiskHide</strong> trong ứng dụng Magisk (= &lt;v23.0). <br> - <strong>Zygisk DenyList</strong> trong ứng dụng Magisk (&gt;v23.0). <br> - <em>Tampering</em> (Chỉnh sửa) mã Smali. <br> - <strong>Frida</strong> -&gt; Dùng script <em>fridantiroot</em>. <br> - <strong>Medusa Framework</strong> -&gt; Sử dụng module <code>helpers/anti_debug</code>. <br> - <strong>Objection:</strong> Dùng <code>dex2jar</code> lấy class file -&gt; Phân tích tìm library check root -&gt; Chạy <code>objection -g com.test.app explore</code> -&gt; Tìm method bằng <code>android hooking list class_methods &lt;class&gt;</code> -&gt; Set lại kết quả <code>android hooking set return_value &lt;method&gt; false</code>. Nếu app vẫn báo root, bấm Back ra ngoài (không kill app) rồi vào lại. <br> - Đổi tên binaries: Đôi khi chỉ cần đổi tên binary <code>su</code> là đủ để bypass (nhưng cẩn thận hỏng môi trường). <br> - Unmount <code>/proc</code> để ngăn app đọc danh sách tiến trình. <br> - Dùng <strong>Frida/Xposed</strong> hook các API (Java/native) để ẩn file, tiến trình và trả về các giá trị giả (<em>bogus values</em>). <br> - Hook low-level API bằng kernel modules. <br> - Patch ứng dụng để xóa bỏ các hàm kiểm tra.</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
 <td style="text-align:left"><strong>2. Emulator Detection</strong></td>
 <td style="text-align:left">Lỗ hổng <strong>Emulator Detection</strong> xảy ra khi ứng dụng không phát hiện và ngăn chặn truy cập từ trình giả lập (<em>emulator</em>), cho phép người dùng bypass các kiểm soát bảo mật hoặc truy cập tính năng trái phép.</td>
-<td style="text-align:left">- Kiểm tra xem <strong>Emulator Detection</strong> có được triển khai không. {{ br }} - Chỉnh sửa các thuộc tính trong file <code>build.prop</code>. {{ br }} - Patch chức năng nhận diện: Ghi đè mã <em>bytecode</em> hoặc <em>native code</em> liên quan bằng các lệnh <strong>NOP</strong>. {{ br }} - Dùng <strong>Frida/Xposed</strong> hook các API hệ thống file (Java/native) để trả về các thông số giống máy thật thay vì thông số giả lập. Ví dụ: override hàm <code>TelephonyManager.getDeviceID</code> để trả về một mã IMEI hợp lệ.</td>
+<td style="text-align:left">- Kiểm tra xem <strong>Emulator Detection</strong> có được triển khai không. <br> - Chỉnh sửa các thuộc tính trong file <code>build.prop</code>. <br> - Patch chức năng nhận diện: Ghi đè mã <em>bytecode</em> hoặc <em>native code</em> liên quan bằng các lệnh <strong>NOP</strong>. <br> - Dùng <strong>Frida/Xposed</strong> hook các API hệ thống file (Java/native) để trả về các thông số giống máy thật thay vì thông số giả lập. Ví dụ: override hàm <code>TelephonyManager.getDeviceID</code> để trả về một mã IMEI hợp lệ.</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
 <td style="text-align:left"><strong>3. Source Code Obfuscation</strong></td>
 <td style="text-align:left"><strong>Source code obfuscation</strong> (làm rối mã nguồn) là quá trình làm cho mã nguồn khó hiểu và khó bị dịch ngược (<em>reverse engineer</em>), nhằm bảo vệ sở hữu trí tuệ và ngăn chặn chỉnh sửa trái phép.</td>
-<td style="text-align:left">- Kiểm tra xem <strong>ProGuard</strong> hoặc các công cụ <em>obfuscation</em> khác có được cấu hình không. {{ br }} - Kiểm tra xem các đoạn mã nhạy cảm có thực sự được làm rối đúng cách chưa.</td>
+<td style="text-align:left">- Kiểm tra xem <strong>ProGuard</strong> hoặc các công cụ <em>obfuscation</em> khác có được cấu hình không. <br> - Kiểm tra xem các đoạn mã nhạy cảm có thực sự được làm rối đúng cách chưa.</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
@@ -306,7 +306,7 @@
 <td style="text-align:left"><strong>M8: Security Misconfiguration</strong></td>
 <td style="text-align:left"><strong>1. Vulnerable Android Activities</strong></td>
 <td style="text-align:left"><em>Android activities</em> là các thành phần đại diện cho màn hình giao diện. Một Activity có lỗ hổng (do code kém an toàn hoặc dùng thư viện lỗi) có thể bị khai thác để chiếm quyền hoặc bypass logic ứng dụng.</td>
-<td style="text-align:left">- <strong>[Authentication Bypass]:</strong> Kiểm tra xem có thể gọi trực tiếp các protected activities thông qua ADB mà không cần đăng nhập không. {{ br }} - <strong>[Exported Sensitive Activity]:</strong> Đảm bảo các activities được đặt cờ <code>exported</code> đã được phân quyền và kiểm soát chặt chẽ. {{ br }} - <strong>[Task Hijacking]:</strong> Kiểm tra khả năng bị chiếm quyền điều khiển luồng activity (hijacking). {{ br }} - <strong>[DOS]:</strong> Gửi các payload lỗi để xem activity có gây ra hiện tượng crash app hoặc từ chối dịch vụ (Denial of Service) hay không.</td>
+<td style="text-align:left">- <strong>[Authentication Bypass]:</strong> Kiểm tra xem có thể gọi trực tiếp các protected activities thông qua ADB mà không cần đăng nhập không. <br> - <strong>[Exported Sensitive Activity]:</strong> Đảm bảo các activities được đặt cờ <code>exported</code> đã được phân quyền và kiểm soát chặt chẽ. <br> - <strong>[Task Hijacking]:</strong> Kiểm tra khả năng bị chiếm quyền điều khiển luồng activity (hijacking). <br> - <strong>[DOS]:</strong> Gửi các payload lỗi để xem activity có gây ra hiện tượng crash app hoặc từ chối dịch vụ (Denial of Service) hay không.</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
@@ -324,31 +324,31 @@
 <td style="text-align:left"></td>
 <td style="text-align:left"><strong>4. Content Provider Security</strong></td>
 <td style="text-align:left"><strong>Content Providers</strong> dùng để chia sẻ dữ liệu giữa các ứng dụng bằng các hàm <em>insert, update, delete, query</em> qua một URI đặc biệt bắt đầu bằng <code>content://</code>. Nếu không cấu hình bảo mật chuẩn, dữ liệu nội bộ có thể bị rò rỉ.</td>
-<td style="text-align:left">- Kiểm tra lỗ hổng <strong>SQL Injection</strong>. {{ br }} - Kiểm tra lỗ hổng <strong>Path Traversal</strong>. {{ br }} - Kiểm tra các lỗ hổng truy cập dữ liệu nội bộ. {{ br }} - Nếu cho phép <code>Insert</code>, hãy test khả năng làm ngập lụt (<em>Flooding</em>) Provider bằng lượng lớn dữ liệu (Infinite Data).</td>
+<td style="text-align:left">- Kiểm tra lỗ hổng <strong>SQL Injection</strong>. <br> - Kiểm tra lỗ hổng <strong>Path Traversal</strong>. <br> - Kiểm tra các lỗ hổng truy cập dữ liệu nội bộ. <br> - Nếu cho phép <code>Insert</code>, hãy test khả năng làm ngập lụt (<em>Flooding</em>) Provider bằng lượng lớn dữ liệu (Infinite Data).</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
 <td style="text-align:left"><strong>5. Insecure Services</strong></td>
 <td style="text-align:left"><strong>Service</strong> là thành phần nhận dữ liệu, xử lý và trả về phản hồi. Nếu ứng dụng <em>export</em> (mở) một số services, cần kiểm tra mã nguồn để hiểu logic và test động (<em>dynamically test</em>) để trích xuất thông tin bảo mật, bypass xác thực.</td>
-<td style="text-align:left">- Kiểm tra sự tồn tại của các <em>services</em> mà không có quyền bảo vệ hợp lý. {{ br }} - Sử dụng <strong>Drozer</strong> hoặc <strong>Activity Manager (am)</strong> để liệt kê và khai thác. {{ br }} - <strong>Lệnh Drozer:</strong> <code>run app.service.info -a &lt;package&gt;</code> (Liệt kê) và <code>run app.service.send &lt;package&gt; &lt;service_name&gt; --msg...</code> (Gửi payload). {{ br }} - <strong>Lệnh adb (am):</strong> <code>adb shell am startservice -n &lt;package&gt;/.&lt;service_name&gt; --es &quot;key&quot; &quot;malicious_data&quot;</code>.</td>
+<td style="text-align:left">- Kiểm tra sự tồn tại của các <em>services</em> mà không có quyền bảo vệ hợp lý. <br> - Sử dụng <strong>Drozer</strong> hoặc <strong>Activity Manager (am)</strong> để liệt kê và khai thác. <br> - <strong>Lệnh Drozer:</strong> <code>run app.service.info -a &lt;package&gt;</code> (Liệt kê) và <code>run app.service.send &lt;package&gt; &lt;service_name&gt; --msg...</code> (Gửi payload). <br> - <strong>Lệnh adb (am):</strong> <code>adb shell am startservice -n &lt;package&gt;/.&lt;service_name&gt; --es &quot;key&quot; &quot;malicious_data&quot;</code>.</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
 <td style="text-align:left"><strong>6. Insecure Android Permissions</strong></td>
 <td style="text-align:left">Ứng dụng Android có nhiều quyền (<em>permissions</em>) và các cờ cấu hình được set trong file <code>AndroidManifest.xml</code>. Nếu không cấu hình chặt chẽ, chúng sẽ mở ra bề mặt tấn công rất lớn.</td>
-<td style="text-align:left">- Kiểm tra xem <em>cleartext traffic</em> có được bật không (<code>cleartextTrafficPermitted=&quot;true&quot;</code>). {{ br }} - Kiểm tra xem chế độ <em>debug</em> có đang mở không (<code>android:debuggable=&quot;true&quot;</code>). {{ br }} - Kiểm tra xem luật trích xuất dữ liệu (<code>dataExtractionRules</code>) có được định nghĩa an toàn không. {{ br }} - Kiểm tra tính năng <em>backup mode</em> có bị lợi dụng được không (<code>android:allowBackup=&quot;true&quot;</code>). {{ br }} - Rà soát và đánh giá các quyền (<em>permissions</em>) không cần thiết mà app yêu cầu.</td>
+<td style="text-align:left">- Kiểm tra xem <em>cleartext traffic</em> có được bật không (<code>cleartextTrafficPermitted=&quot;true&quot;</code>). <br> - Kiểm tra xem chế độ <em>debug</em> có đang mở không (<code>android:debuggable=&quot;true&quot;</code>). <br> - Kiểm tra xem luật trích xuất dữ liệu (<code>dataExtractionRules</code>) có được định nghĩa an toàn không. <br> - Kiểm tra tính năng <em>backup mode</em> có bị lợi dụng được không (<code>android:allowBackup=&quot;true&quot;</code>). <br> - Rà soát và đánh giá các quyền (<em>permissions</em>) không cần thiết mà app yêu cầu.</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
 <td style="text-align:left"><strong>7. Insecure Firebase Database</strong></td>
 <td style="text-align:left"><strong>Firebase Database</strong> là cơ sở dữ liệu thời gian thực trên cloud. Việc developer cấu hình sai luồng phân quyền (<em>security rules</em>) là cực kỳ phổ biến.</td>
-<td style="text-align:left">- Thêm <code>.json</code> vào cuối URL của Firebase instance (VD: <code>https://&lt;project&gt;.firebaseio.com/.json</code>) để kiểm tra quyền đọc (<em>read permissions</em>). {{ br }} - Thay thế <code>firebaseio.com</code> bằng <code>appspot.com/.json</code> để kiểm tra các cấu hình sai liên quan đến CORS.</td>
+<td style="text-align:left">- Thêm <code>.json</code> vào cuối URL của Firebase instance (VD: <code>https://&lt;project&gt;.firebaseio.com/.json</code>) để kiểm tra quyền đọc (<em>read permissions</em>). <br> - Thay thế <code>firebaseio.com</code> bằng <code>appspot.com/.json</code> để kiểm tra các cấu hình sai liên quan đến CORS.</td>
 </tr>
 <tr>
 <td style="text-align:left"><strong>M9: Insecure Data Storage</strong></td>
 <td style="text-align:left"><strong>1. Sensitive Data Stored in Local Storage</strong></td>
 <td style="text-align:left">Lỗ hổng lưu trữ dữ liệu nội bộ xảy ra khi app lưu thông tin nhạy cảm ở dạng không mã hóa (<em>unencrypted</em>) hoặc không an toàn trong <strong>Local Storage</strong> của thiết bị.</td>
-<td style="text-align:left">- Kiểm tra cả <em>internal</em> và <em>external storage</em> tìm các file có dữ liệu nhạy cảm. {{ br }} - Tìm các file development, backup hoặc file cũ bị sót lại trong bản production. {{ br }} - Kiểm tra các file <strong>SQLite databases</strong> (tại <code>/data/data/&lt;package-name&gt;/databases</code>). Nếu có mã hóa, hãy xem password sinh ra thế nào và có được bảo vệ bằng <strong>Keystore</strong> hay không. {{ br }} - Kiểm tra <strong>Shared Preferences</strong> (file XML tại <code>/data/data/&lt;package-name&gt;/shared_prefs</code>). Nếu không dùng thư viện như <code>secure-preferences</code>, dữ liệu mặc định sẽ là plaintext. {{ br }} - Kiểm tra quyền (permissions) của thư mục data. Chỉ user/group của app (vd: <code>u0_a82</code>) mới được có quyền rwx. {{ br }} - <strong>Ghost Files trong Shared Preferences:</strong> Nếu bạn có quyền WRITE vào thư mục <code>shared_prefs</code> (dù không có quyền overwrite file hiện tại), bạn có thể tạo một file <code>.bak</code> chứa setting giả mạo. Ở lần chạy tới, Android sẽ tự đổi tên file <code>.bak</code> đó đè lên file gốc một cách âm thầm. {{ br }} - Kiểm tra <strong>Firebase Real-time databases</strong>: Test xem có bị misconfigured bằng cách truy cập <code>https://_firebaseProjectName_.firebaseio.com/.json</code>. {{ br }} - Kiểm tra <strong>Realm database</strong> (đuôi <code>.realm</code>, mặc định tên <code>default</code> tại thư mục <code>/files/</code>). Dùng <em>Realm Browser</em> để xem có bị lộ data unencrypted không.</td>
+<td style="text-align:left">- Kiểm tra cả <em>internal</em> và <em>external storage</em> tìm các file có dữ liệu nhạy cảm. <br> - Tìm các file development, backup hoặc file cũ bị sót lại trong bản production. <br> - Kiểm tra các file <strong>SQLite databases</strong> (tại <code>/data/data/&lt;package-name&gt;/databases</code>). Nếu có mã hóa, hãy xem password sinh ra thế nào và có được bảo vệ bằng <strong>Keystore</strong> hay không. <br> - Kiểm tra <strong>Shared Preferences</strong> (file XML tại <code>/data/data/&lt;package-name&gt;/shared_prefs</code>). Nếu không dùng thư viện như <code>secure-preferences</code>, dữ liệu mặc định sẽ là plaintext. <br> - Kiểm tra quyền (permissions) của thư mục data. Chỉ user/group của app (vd: <code>u0_a82</code>) mới được có quyền rwx. <br> - <strong>Ghost Files trong Shared Preferences:</strong> Nếu bạn có quyền WRITE vào thư mục <code>shared_prefs</code> (dù không có quyền overwrite file hiện tại), bạn có thể tạo một file <code>.bak</code> chứa setting giả mạo. Ở lần chạy tới, Android sẽ tự đổi tên file <code>.bak</code> đó đè lên file gốc một cách âm thầm. <br> - Kiểm tra <strong>Firebase Real-time databases</strong>: Test xem có bị misconfigured bằng cách truy cập <code>https://_firebaseProjectName_.firebaseio.com/.json</code>. <br> - Kiểm tra <strong>Realm database</strong> (đuôi <code>.realm</code>, mặc định tên <code>default</code> tại thư mục <code>/files/</code>). Dùng <em>Realm Browser</em> để xem có bị lộ data unencrypted không.</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
@@ -360,13 +360,13 @@
 <td style="text-align:left"><strong>M10: Insufficient Cryptography</strong></td>
 <td style="text-align:left"><strong>1. Other Security Checks</strong></td>
 <td style="text-align:left">Các cấu hình bảo mật nhỏ gọn nhưng quan trọng để tăng cường <em>hardening</em> cho phía Client (UI/UX an toàn).</td>
-<td style="text-align:left">- Kiểm tra xem các khóa mã hóa (<em>cryptographic keys</em>) có bị dùng lại không. {{ br }} - Kiểm tra bộ nhớ đệm bàn phím (<em>keyboard cache/dictionary</em>) đã bị tắt cho các trường nhạy cảm chưa. {{ br }} - Kiểm tra xem chức năng Copy/Paste đã bị chặn ở các ô nhập mật khẩu/OTP chưa. {{ br }} - Kiểm tra xem dữ liệu nhạy cảm có được che giấu (<em>masked</em>) trên UI khi chuyển app không. {{ br }} - Kiểm tra xem app có chặn bàn phím của bên thứ ba (<em>third-party keyboards</em>) khi nhập liệu quan trọng không.</td>
+<td style="text-align:left">- Kiểm tra xem các khóa mã hóa (<em>cryptographic keys</em>) có bị dùng lại không. <br> - Kiểm tra bộ nhớ đệm bàn phím (<em>keyboard cache/dictionary</em>) đã bị tắt cho các trường nhạy cảm chưa. <br> - Kiểm tra xem chức năng Copy/Paste đã bị chặn ở các ô nhập mật khẩu/OTP chưa. <br> - Kiểm tra xem dữ liệu nhạy cảm có được che giấu (<em>masked</em>) trên UI khi chuyển app không. <br> - Kiểm tra xem app có chặn bàn phím của bên thứ ba (<em>third-party keyboards</em>) khi nhập liệu quan trọng không.</td>
 </tr>
 <tr>
 <td style="text-align:left"></td>
 <td style="text-align:left"><strong>2. Weak Cryptographic Algorithms &amp; Hardcoded IVs</strong></td>
 <td style="text-align:left">Sử dụng các thuật toán mã hóa lỗi thời (MD5, RC4, DES, AES-ECB) hoặc tái sử dụng Khóa/IV (Initialization Vector), hardcode Khóa/IV trong source code.</td>
-<td style="text-align:left">- Quét source code tìm các instance của <code>Cipher.getInstance(&quot;AES/ECB/...&quot;)</code>. {{ br }} - Kiểm tra xem IV có bị hardcode cố định không (IV phải sinh ngẫu nhiên). {{ br }} - Đảm bảo Khóa mã hóa phải được sinh ra và quản lý bởi phần cứng <strong>Android Keystore</strong>.</td>
+<td style="text-align:left">- Quét source code tìm các instance của <code>Cipher.getInstance(&quot;AES/ECB/...&quot;)</code>. <br> - Kiểm tra xem IV có bị hardcode cố định không (IV phải sinh ngẫu nhiên). <br> - Đảm bảo Khóa mã hóa phải được sinh ra và quản lý bởi phần cứng <strong>Android Keystore</strong>.</td>
 </tr>
 </tbody>
 </table>
