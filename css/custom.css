@@ -41,3 +41,7 @@
     display: inline !important;
     vertical-align: baseline;
 }
+
+.content {
+    max-width: 1400px !important; /* Bạn có thể thay đổi số 1400px này cho vừa mắt, hoặc dùng tỷ lệ % như 90% */
+}
