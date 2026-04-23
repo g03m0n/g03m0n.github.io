@@ -42,18 +42,33 @@
     vertical-align: baseline;
 }
 
+/* Chỉ áp dụng giao diện 2 cột căn giữa cho màn hình máy tính (tránh lỗi trên điện thoại) */
+@media (min-width: 1024px) {
+    
+    /* 1. Gom toàn bộ (Bài viết + Mục lục) thành 1 khối và CĂN GIỮA màn hình */
+    .container {
+        max-width: 1250px !important; /* Tổng độ rộng vừa đủ đẹp */
+        margin: 0 auto !important;    /* Lệnh thần thánh để căn giữa */
+        display: flex !important;     /* Xếp bài viết và mục lục nằm ngang */
+        justify-content: center !important; 
+        align-items: flex-start !important;
+    }
 
-.page {
-    max-width: 1400px !important; /* Tăng giới hạn tối đa lên (có thể tùy chỉnh số này) */
-    width: 85% !important;        /* Tăng phần trăm chiếm dụng không gian (tùy chỉnh 80-100%) */
-}
-.container {
-    max-width: 1600px !important; /* Rộng hơn .page một chút để có chỗ cho mục lục */
-}
+    /* 2. Cố định chiều rộng bài viết (không quá to để dễ đọc) */
+    .page {
+        max-width: 850px !important; 
+        width: 100% !important;
+        margin: 0 !important;
+    }
 
-#toc-auto {
-    max-width: 280px !important; /* Đặt lại độ rộng tối đa cho mục lục (có thể chỉnh 250px - 300px) */
-    width: 280px !important;     /* Ép cứng độ rộng */
-    left: auto !important;       /* Hủy bỏ vị trí 'left' do JS tự động tính toán */
-    right: 20px !important;      /* Cố định mục lục cách lề phải màn hình 20px */
+    /* 3. Đưa mục lục sang bên phải và ghim lại khi cuộn chuột */
+    #toc-auto {
+        position: sticky !important; /* Gắn chặt vào màn hình khi cuộn */
+        top: 100px !important;       /* Cách mép trên 100px */
+        left: auto !important;       /* Xóa lỗi tính toán sai của JS */
+        right: auto !important;
+        width: 280px !important;     /* Độ rộng cố định cho mục lục */
+        max-width: 280px !important;
+        margin-left: 40px !important; /* Đẩy mục lục cách xa bài viết 40px */
+    }
 }
