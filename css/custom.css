@@ -50,3 +50,10 @@
 .container {
     max-width: 1600px !important; /* Rộng hơn .page một chút để có chỗ cho mục lục */
 }
+
+#toc-auto {
+    max-width: 280px !important; /* Đặt lại độ rộng tối đa cho mục lục (có thể chỉnh 250px - 300px) */
+    width: 280px !important;     /* Ép cứng độ rộng */
+    left: auto !important;       /* Hủy bỏ vị trí 'left' do JS tự động tính toán */
+    right: 20px !important;      /* Cố định mục lục cách lề phải màn hình 20px */
+}
