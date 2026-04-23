@@ -175,9 +175,9 @@
 <table>
 <thead>
 <tr>
-<th style="text-align:left"><strong>MASVS</strong></th>
-<th style="text-align:left"><strong>Lỗ hổng</strong></th>
-<th style="text-align:left"><strong>Mô tả</strong></th>
+<th style="text-align:left"><strong>MASVS-</strong></th>
+<th style="text-align:left"><strong>Vulnerability</strong></th>
+<th style="text-align:left"><strong>Description</strong></th>
 <th style="text-align:left"><strong>Checklist</strong></th>
 </tr>
 </thead>
