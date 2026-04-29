@@ -48,6 +48,37 @@
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>// list package
 </span></span><span style="display:flex;"><span>adb shell <span style="color:#e6db74">&#34;pm list packages | grep -i &lt;tenapp&gt;&#34;</span>
+</span></span></code></pre></div><h2 id="frida">Frida</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#75715e">// Liệt kê các thiết bị đang kết nối
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">frida</span><span style="color:#f92672">-</span><span style="color:#a6e22e">ls</span><span style="color:#f92672">-</span><span style="color:#a6e22e">devices</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Liệt kê tất cả ứng dụng đã cài đặt trên thiết bị
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">frida</span><span style="color:#f92672">-</span><span style="color:#a6e22e">ps</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">Uai</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Attach vào một ứng dụng đang chạy
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">frida</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">U</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">n</span> <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">tên_tiến_trình</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">frida</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">U</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">p</span> <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">PID</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Spawn ung dung
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">frida</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">U</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">f</span> <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">package_name</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Inject script JavaScript
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">frida</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">U</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">l</span> <span style="color:#a6e22e">my_script</span><span style="color:#f92672">.</span><span style="color:#a6e22e">js</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">f</span> <span style="color:#f92672">&lt;</span><span style="color:#a6e22e">package_name</span><span style="color:#f92672">&gt;</span>
+</span></span></code></pre></div><h2 id="objection">Objection</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#75715e">// Mo app
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">objection</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">f</span> <span style="color:#a6e22e">start</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Khoi dong lai app tu dau
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">objection</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">n</span> <span style="color:#a6e22e">com</span><span style="color:#f92672">.</span><span style="color:#a6e22e">example</span><span style="color:#f92672">.</span><span style="color:#a6e22e">vulnerableapp</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">s</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">p</span> <span style="color:#a6e22e">start</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Ket noi voi thiet bi qua IP Frida server va mo app
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">objection</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">N</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">h</span> <span style="color:#ae81ff">192.168</span><span style="color:#f92672">.</span><span style="color:#ae81ff">1.100</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">n</span> <span style="color:#a6e22e">com</span><span style="color:#f92672">.</span><span style="color:#a6e22e">example</span><span style="color:#f92672">.</span><span style="color:#a6e22e">vulnerableapp</span> <span style="color:#a6e22e">start</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Tu dong disable SSL Pinning ngay khi mo ung dung
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">objection</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">n</span> <span style="color:#a6e22e">com</span><span style="color:#f92672">.</span><span style="color:#a6e22e">example</span><span style="color:#f92672">.</span><span style="color:#a6e22e">vulnerableapp</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">s</span> <span style="color:#a6e22e">run</span> <span style="color:#e6db74">&#34;android sslpinning disable&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Patch file APK de test tren may khong root
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">objection</span> <span style="color:#a6e22e">patchapk</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">s</span> <span style="color:#a6e22e">base</span><span style="color:#f92672">.</span><span style="color:#a6e22e">apk</span>
 </span></span></code></pre></div><h2 id="decomplie-apk">Decomplie APK</h2>
 <h3 id="command-line">Command-line</h3>
 <p><code>apktool</code></p>
