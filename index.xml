@@ -3,9 +3,58 @@
         <title>g03m0n</title>
         <link>https://g03m0n.github.io/</link>
         <description>g03m0n</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 01 May 2026 08:29:01 &#43;0800</lastBuildDate>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 12 May 2026 08:31:01 &#43;0800</lastBuildDate>
             <atom:link href="https://g03m0n.github.io/index.xml" rel="self" type="application/rss+xml" />
         <item>
+    <title>Post-Auth SQL Injection in module_shops version &lt;= 4.5.03 of nukeviet</title>
+    <link>https://g03m0n.github.io/posts/nukeviet-sql-injection/</link>
+    <pubDate>Tue, 12 May 2026 08:31:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/nukeviet-sql-injection/</guid>
+    <description><![CDATA[<h1 id="post-auth-sql-injection-in-module_shops-version--4503-of-nukeviet">Post-Auth SQL Injection in module_shops version &lt;= 4.5.03 of nukeviet</h1>
+<h3 id="url--location-of-vulnerability">URL / Location of vulnerability</h3>
+<p>http://<!-- raw HTML omitted -->/nukeviet/admin/index.php?nv=shops&amp;op=order&amp;order_code=&amp;from=&amp;to=&amp;order_email=&amp;order_payment=-999%20or%20sleep(3)%20&ndash;%20a&amp;checkss=78ed08fc21971e735b01e04647bb90d8&amp;search=Search</p>
+<h3 id="description">Description</h3>
+<table>
+<thead>
+<tr>
+<th><strong>Type</strong></th>
+<th><strong>Version Affected</strong></th>
+<th><strong>Authentication required</strong></th>
+<th>?-day</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SQL Injection</td>
+<td>≤ 4.5.08, module_shop &lt;= 4.5.03</td>
+<td>Yes</td>
+<td>0-day</td>
+</tr>
+</tbody>
+</table>
+<h3 id="root-cause">Root cause</h3>
+<p><code>modules\shops\admin\order.php</code></p>
+<p><a href="/images/nukeviet-sqli1.png" rel="">image.png</a>
+</p>
+<p>The data from the <code>order_payment</code> parameter is concatenated directly into the SQL query without validation.</p>
+<p>This query is executed at:</p>
+<p><a href="/images/nukeviet-sqli2.png" rel="">image.png</a>
+</p>
+<h3 id="steps-to-reproduce">Steps to reproduce</h3>
+<p>Log in with an administrator account and navigate to the Shops module:</p>
+<p><a href="/images/nukeviet-sqli3.png" rel="">image.png</a>
+</p>
+<p>Intercept the <code>Search</code> request and inject the following payload into the <code>order_payment</code> parameter: <code>-999%20or%20sleep(3)%20--%20a</code></p>
+<p>This payload causes the application to sleep for a total of 18 seconds (3 seconds for each of the 6 columns).</p>
+<p><a href="/images/nukeviet-sqli4.png" rel="">image.png</a>
+</p>
+<h3 id="commit">Commit</h3>
+<p><a href="https://github.com/nukeviet/module-shops/commit/1b6d2ab792dd525ff660ecfbb848b1295cc28b19" target="_blank" rel="noopener noreffer">https://github.com/nukeviet/module-shops/commit/1b6d2ab792dd525ff660ecfbb848b1295cc28b19</a>
+</p>
+]]></description>
+</item>
+<item>
     <title>Hackthebox - Prompt Injection Attacks</title>
     <link>https://g03m0n.github.io/posts/prompt-injection-attacks/</link>
     <pubDate>Fri, 01 May 2026 08:29:01 &#43;0800</pubDate>
@@ -968,85 +1017,6 @@ Access <strong><code>Receive Shipments</code></strong> to create a new Invoice:<
      <iframe src="https://www.youtube.com/embed/4rmbBW8QHOk" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
    </div>
 
-]]></description>
-</item>
-<item>
-    <title>CVE-2022-4566</title>
-    <link>https://g03m0n.github.io/posts/cve-2022-4566/</link>
-    <pubDate>Sun, 25 Aug 2024 08:29:01 &#43;0800</pubDate>
-    <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cve-2022-4566/</guid>
-    <description><![CDATA[<h1 id="sql-injection-at-rouyi-framework-cve-2022-4566">SQL Injection at Rouyi framework (CVE-2022-4566)</h1>
-<h2 id="1-description-and-impact">1. <strong>Description and Impact</strong></h2>
-<p>CVE-2022-4566 is a critical vulnerability identified in the RuoYi Framework. This vulnerability occurs in the file com/ruoyi/generator/controller/GenController and is related to SQL injection attacks. Manipulating this file allows an attacker to execute arbitrary SQL commands, potentially compromising the security, integrity, and availability of the system.</p>
-<table>
-<thead>
-<tr>
-<th><strong>Type</strong></th>
-<th><strong>Required Authentication</strong></th>
-<th><strong>?-day</strong></th>
-<th><strong>CVSS</strong></th>
-<th><strong>Version Affected</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>SQL Injection</td>
-<td>Yes</td>
-<td>n-day</td>
-<td>9.8 (NIST)</td>
-<td>≤ 4.7.5</td>
-</tr>
-</tbody>
-</table>
-<h2 id="2-root-cause-analysis">2. Root cause analysis</h2>
-<p>First, the application allows users to create tables by sending a POST packet containing SQL statements to the endpoint <code>/tool/gen/createTables</code></p>
-<p></p>
-<p>Success create table:</p>
-<p></p>
-<p>The vulnerability occurs here when an attacker can inject arbitrary SQL commands into the user input.</p>
-<p><strong>Debug:</strong></p>
-<p></p>
-<p>Initially, the <code>filterKeyword()</code> method receives the <code>sql</code> value of String type, which is the user&rsquo;s input.</p>
-<p>Inside the <code>filterKeyword()</code> function, the application checks if there is input using the <code>isEmpty()</code> function. If there is, it moves to the next statement.</p>
-<p>Here, the application uses the <code>StringUtils.split()</code> method to split the <code>SQL_REGEX</code> string into an array of SQL statements based on the pipe (<code>|</code>) delimiter, then assigns it to the <code>sqlKeywords</code> array.</p>
-<p></p>
-<p></p>
-<p>Next, the application iterates through all elements of the <code>sqlKeywords</code> array, with <code>sqlKeyword</code> successively taking the value of each SQL statement in the <code>sqlKeywords</code> array.</p>
-<p></p>
-<p>The application uses the <code>indexOfIgnoreCase()</code> method to find the first occurrence of the sqlKeyword array in the value string, case-insensitive. If <code>indexOfIgnoreCase()</code> returns a value <code>&gt; -1</code>, it means <code>sqlKeyword</code> has been found in value. This condition checks if the value string contains any SQL statement matching the blacklist.</p>
-<p>If an SQL statement is found in value, this code snippet will throw an Exception: <code>UtilException.&quot;参数存在SQL注入风险&quot;</code> which means <code>Parameter has risk of SQL Injection attack</code>.</p>
-<p>After validating the input, the application will continue to run.</p>
-<p></p>
-<p>Since the application allows multiple statements to be executed simultaneously, it uses the <code>SQLUtils.parseStatements()</code> method to split the input SQL string into a list of SQL statements and then assigns it to the <code>sqlStatements</code></p>
-<p><code>List&lt;String&gt;tableNames = new ArrayList&lt;&gt;();</code> : Creates a list to store the names of created tables.</p>
-<p></p>
-<p>Next, the application iterates through each SQL statement in <code>sqlStatements</code> with the element <code>sqlStatement</code>.</p>
-<p></p>
-<p>Here, the application checks if the statement is <code>CREATE TABLE</code> by using <code>instanceof</code>. If true, it converts that statement to a <code>MySqlCreateTableStatement</code> object.</p>
-<p>Next, the application will call the <code>genTableService.createTable</code> method to execute the SQL statement.</p>
-<p></p>
-<p>If successful, it retrieves the table name and adds it to the <code>tableNames</code> list.</p>
-<p>If an error occurs, the application will jump to the catch block and output an error message along with <code>e.getMessage()</code> containing the result of the newly passed SQL statement.</p>
-<p>→ This is the <strong>Sink</strong> of the vulnerability</p>
-<p></p>
-<p>→ This is an <strong>Error-Based</strong> SQL Injection vulnerability.</p>
-<h2 id="3-steps-to-reproduce">3. Steps to reproduce</h2>
-<p>Send a POST request to the endpoint <code>/tool/gen/createTable</code> with the Payload:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-jsx" data-lang="jsx"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">sql</span><span style="color:#f92672">=</span><span style="color:#a6e22e">CREATE</span> <span style="color:#a6e22e">table</span> <span style="color:#a6e22e">keke</span> <span style="color:#a6e22e">as</span> <span style="color:#a6e22e">SELECT</span><span style="color:#75715e">/**/</span><span style="color:#f92672">*</span> <span style="color:#a6e22e">FROM</span> <span style="color:#a6e22e">sys_job</span> <span style="color:#a6e22e">WHERE</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> 
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">AND</span><span style="color:#75715e">/**/</span><span style="color:#a6e22e">extractvalue</span>(<span style="color:#ae81ff">1</span>,<span style="color:#a6e22e">concat</span>(<span style="color:#ae81ff">0x7e</span>,(<span style="color:#a6e22e">select</span><span style="color:#75715e">/**/</span><span style="color:#a6e22e">version</span>()),<span style="color:#ae81ff">0x7e</span>));
-</span></span></code></pre></div><p></p>
-<h2 id="4-recomendation">4. Recomendation</h2>
-<p>In version 4.7.6, RuoYi added a commit with the code <a href="https://gitee.com/y_project/RuoYi/commit/167970e5c4da7bb46217f576dc50622b83f32b40" target="_blank" rel="noopener noreffer">167970e5c4da7bb46217f576dc50622b83f32b40</a>
- to add some statements to the blacklist and not directly return <code>e.getMessage()</code> to summarize error information to avoid SQL injection.</p>
-<h2 id="references">References</h2>
-<p><a href="https://gitee.com/y_project/RuoYi/issues/I65V2B" target="_blank" rel="noopener noreffer">https://gitee.com/y_project/RuoYi/issues/I65V2B</a>
-</p>
-<p><a href="https://www.cvedetails.com/cve/CVE-2022-4566/?q=cve-2022-4566" target="_blank" rel="noopener noreffer">CVE-2022-4566 Details</a>
-</p>
-<p><a href="https://www.cvedetails.com/cve/CVE-2022-48114/?q=cve-2022-48114" target="_blank" rel="noopener noreffer">https://www.cvedetails.com/cve/CVE-2022-48114/?q=cve-2022-48114</a>
-</p>
 ]]></description>
 </item>
 </channel>
