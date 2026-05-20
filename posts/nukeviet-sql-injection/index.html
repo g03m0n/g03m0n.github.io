@@ -5,11 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noodp" />
         <title>Post-Auth SQL Injection in module_shops version &lt;= 4.5.03 of nukeviet - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:title" content="Post-Auth SQL Injection in module_shops version &lt;= 4.5.03 of nukeviet" />
-<meta property="og:description" content="Post-Auth SQL Injection in module_shops version &lt;= 4.5.03 of nukeviet URL / Location of vulnerability http:///nukeviet/admin/index.php?nv=shops&amp;op=order&amp;order_code=&amp;from=&amp;to=&amp;order_email=&amp;order_payment=-999%20or%20sleep(3)%20&ndash;%20a&amp;checkss=78ed08fc21971e735b01e04647bb90d8&amp;search=Search
-Description Type Version Affected Authentication required ?-day SQL Injection ≤ 4.5.08, module_shop &lt;= 4.5.03 Yes 0-day Root cause modules\shops\admin\order.php
-image.pngThe data from the order_payment parameter is concatenated directly into the SQL query without validation.
+<meta property="og:description" content="Post-Auth SQL Injection in module_shops version &lt;= 4.5.03 of nukeviet URL / Location of vulnerability http://&lt;domain&gt;/nukeviet/admin/index.php?nv=shops&amp;op=order&amp;order_code=&amp;from=&amp;to=&amp;order_email=&amp;order_payment=-999%20or%20sleep(3)%20--%20a&amp;checkss=78ed08fc21971e735b01e04647bb90d8&amp;search=Search Description Type Version Affected Authentication required ?-day SQL Injection ≤ 4.5.08, module_shop &lt;= 4.5.03 Yes 0-day Root cause modules\shops\admin\order.php
+The data from the order_payment parameter is concatenated directly into the SQL query without validation.
 This query is executed at:
-image.pngSteps to reproduce Log in with an administrator account and navigate to the Shops module:" />
+Steps to reproduce Log in with an administrator account and navigate to the Shops module:" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://g03m0n.github.io/posts/nukeviet-sql-injection/" /><meta property="og:image" content="https://g03m0n.github.io/logo.png" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2026-05-12T08:31:01+08:00" />
@@ -17,11 +16,10 @@ image.pngSteps to reproduce Log in with an administrator account and navigate t
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="https://g03m0n.github.io/logo.png" /><meta name="twitter:title" content="Post-Auth SQL Injection in module_shops version &lt;= 4.5.03 of nukeviet"/>
-<meta name="twitter:description" content="Post-Auth SQL Injection in module_shops version &lt;= 4.5.03 of nukeviet URL / Location of vulnerability http:///nukeviet/admin/index.php?nv=shops&amp;op=order&amp;order_code=&amp;from=&amp;to=&amp;order_email=&amp;order_payment=-999%20or%20sleep(3)%20&ndash;%20a&amp;checkss=78ed08fc21971e735b01e04647bb90d8&amp;search=Search
-Description Type Version Affected Authentication required ?-day SQL Injection ≤ 4.5.08, module_shop &lt;= 4.5.03 Yes 0-day Root cause modules\shops\admin\order.php
-image.pngThe data from the order_payment parameter is concatenated directly into the SQL query without validation.
+<meta name="twitter:description" content="Post-Auth SQL Injection in module_shops version &lt;= 4.5.03 of nukeviet URL / Location of vulnerability http://&lt;domain&gt;/nukeviet/admin/index.php?nv=shops&amp;op=order&amp;order_code=&amp;from=&amp;to=&amp;order_email=&amp;order_payment=-999%20or%20sleep(3)%20--%20a&amp;checkss=78ed08fc21971e735b01e04647bb90d8&amp;search=Search Description Type Version Affected Authentication required ?-day SQL Injection ≤ 4.5.08, module_shop &lt;= 4.5.03 Yes 0-day Root cause modules\shops\admin\order.php
+The data from the order_payment parameter is concatenated directly into the SQL query without validation.
 This query is executed at:
-image.pngSteps to reproduce Log in with an administrator account and navigate to the Shops module:"/>
+Steps to reproduce Log in with an administrator account and navigate to the Shops module:"/>
 <meta name="application-name" content="g03m0n">
 <meta name="apple-mobile-web-app-title" content="g03m0n"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -39,7 +37,7 @@ image.pngSteps to reproduce Log in with an administrator account and navigate t
                             "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
                             "width":  3200 ,
                             "height":  2048 
-                        }],"genre": "posts","keywords": "cve, nukeviet","wordcount":  111 ,
+                        }],"genre": "posts","keywords": "cve, nukeviet","wordcount":  107 ,
         "url": "https:\/\/g03m0n.github.io\/posts\/nukeviet-sql-injection\/","datePublished": "2026-05-12T08:31:01+08:00","dateModified": "2026-05-12T08:31:01+08:00","publisher": {
             "@type": "Organization",
             "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
@@ -129,7 +127,7 @@ image.pngSteps to reproduce Log in with an administrator account and navigate t
         </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Post-Auth SQL Injection in module_shops version &lt;= 4.5.03 of nukeviet</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2026-05-12">2026-05-12</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;111 words&nbsp;
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2026-05-12">2026-05-12</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;107 words&nbsp;
                 <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;One minute&nbsp;</div>
         </div><div class="details toc" id="toc-static"  data-kept="">
                 <div class="details-summary toc-title">
@@ -151,8 +149,8 @@ image.pngSteps to reproduce Log in with an administrator account and navigate t
 </nav></div>
             </div><div class="content" id="content"><h1 id="post-auth-sql-injection-in-module_shops-version--4503-of-nukeviet">Post-Auth SQL Injection in module_shops version &lt;= 4.5.03 of nukeviet</h1>
 <h3 id="url--location-of-vulnerability">URL / Location of vulnerability</h3>
-<p>http://<!-- raw HTML omitted -->/nukeviet/admin/index.php?nv=shops&amp;op=order&amp;order_code=&amp;from=&amp;to=&amp;order_email=&amp;order_payment=-999%20or%20sleep(3)%20&ndash;%20a&amp;checkss=78ed08fc21971e735b01e04647bb90d8&amp;search=Search</p>
-<h3 id="description">Description</h3>
+<pre tabindex="0"><code>http://&lt;domain&gt;/nukeviet/admin/index.php?nv=shops&amp;op=order&amp;order_code=&amp;from=&amp;to=&amp;order_email=&amp;order_payment=-999%20or%20sleep(3)%20--%20a&amp;checkss=78ed08fc21971e735b01e04647bb90d8&amp;search=Search
+</code></pre><h3 id="description">Description</h3>
 <table>
 <thead>
 <tr>
@@ -173,20 +171,44 @@ image.pngSteps to reproduce Log in with an administrator account and navigate t
 </table>
 <h3 id="root-cause">Root cause</h3>
 <p><code>modules\shops\admin\order.php</code></p>
-<p><a href="/images/nukeviet-sqli1.png" rel="">image.png</a>
-</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/images/nukeviet-sqli1.png"
+        data-srcset="/images/nukeviet-sqli1.png, /images/nukeviet-sqli1.png 1.5x, /images/nukeviet-sqli1.png 2x"
+        data-sizes="auto"
+        alt="/images/nukeviet-sqli1.png"
+        title="image.png" /></p>
 <p>The data from the <code>order_payment</code> parameter is concatenated directly into the SQL query without validation.</p>
 <p>This query is executed at:</p>
-<p><a href="/images/nukeviet-sqli2.png" rel="">image.png</a>
-</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/images/nukeviet-sqli2.png"
+        data-srcset="/images/nukeviet-sqli2.png, /images/nukeviet-sqli2.png 1.5x, /images/nukeviet-sqli2.png 2x"
+        data-sizes="auto"
+        alt="/images/nukeviet-sqli2.png"
+        title="image.png" /></p>
 <h3 id="steps-to-reproduce">Steps to reproduce</h3>
 <p>Log in with an administrator account and navigate to the Shops module:</p>
-<p><a href="/images/nukeviet-sqli3.png" rel="">image.png</a>
-</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/images/nukeviet-sqli3.png"
+        data-srcset="/images/nukeviet-sqli3.png, /images/nukeviet-sqli3.png 1.5x, /images/nukeviet-sqli3.png 2x"
+        data-sizes="auto"
+        alt="/images/nukeviet-sqli3.png"
+        title="image.png" /></p>
 <p>Intercept the <code>Search</code> request and inject the following payload into the <code>order_payment</code> parameter: <code>-999%20or%20sleep(3)%20--%20a</code></p>
 <p>This payload causes the application to sleep for a total of 18 seconds (3 seconds for each of the 6 columns).</p>
-<p><a href="/images/nukeviet-sqli4.png" rel="">image.png</a>
-</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/images/nukeviet-sqli4.png"
+        data-srcset="/images/nukeviet-sqli4.png, /images/nukeviet-sqli4.png 1.5x, /images/nukeviet-sqli4.png 2x"
+        data-sizes="auto"
+        alt="/images/nukeviet-sqli4.png"
+        title="image.png" /></p>
 <h3 id="commit">Commit</h3>
 <p><a href="https://github.com/nukeviet/module-shops/commit/1b6d2ab792dd525ff660ecfbb848b1295cc28b19" target="_blank" rel="noopener noreffer">https://github.com/nukeviet/module-shops/commit/1b6d2ab792dd525ff660ecfbb848b1295cc28b19</a>
 </p>

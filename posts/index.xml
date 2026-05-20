@@ -11,8 +11,8 @@
     <guid>https://g03m0n.github.io/posts/nukeviet-sql-injection/</guid>
     <description><![CDATA[<h1 id="post-auth-sql-injection-in-module_shops-version--4503-of-nukeviet">Post-Auth SQL Injection in module_shops version &lt;= 4.5.03 of nukeviet</h1>
 <h3 id="url--location-of-vulnerability">URL / Location of vulnerability</h3>
-<p>http://<!-- raw HTML omitted -->/nukeviet/admin/index.php?nv=shops&amp;op=order&amp;order_code=&amp;from=&amp;to=&amp;order_email=&amp;order_payment=-999%20or%20sleep(3)%20&ndash;%20a&amp;checkss=78ed08fc21971e735b01e04647bb90d8&amp;search=Search</p>
-<h3 id="description">Description</h3>
+<pre tabindex="0"><code>http://&lt;domain&gt;/nukeviet/admin/index.php?nv=shops&amp;op=order&amp;order_code=&amp;from=&amp;to=&amp;order_email=&amp;order_payment=-999%20or%20sleep(3)%20--%20a&amp;checkss=78ed08fc21971e735b01e04647bb90d8&amp;search=Search
+</code></pre><h3 id="description">Description</h3>
 <table>
 <thead>
 <tr>
@@ -33,20 +33,16 @@
 </table>
 <h3 id="root-cause">Root cause</h3>
 <p><code>modules\shops\admin\order.php</code></p>
-<p><a href="/images/nukeviet-sqli1.png" rel="">image.png</a>
-</p>
+<p></p>
 <p>The data from the <code>order_payment</code> parameter is concatenated directly into the SQL query without validation.</p>
 <p>This query is executed at:</p>
-<p><a href="/images/nukeviet-sqli2.png" rel="">image.png</a>
-</p>
+<p></p>
 <h3 id="steps-to-reproduce">Steps to reproduce</h3>
 <p>Log in with an administrator account and navigate to the Shops module:</p>
-<p><a href="/images/nukeviet-sqli3.png" rel="">image.png</a>
-</p>
+<p></p>
 <p>Intercept the <code>Search</code> request and inject the following payload into the <code>order_payment</code> parameter: <code>-999%20or%20sleep(3)%20--%20a</code></p>
 <p>This payload causes the application to sleep for a total of 18 seconds (3 seconds for each of the 6 columns).</p>
-<p><a href="/images/nukeviet-sqli4.png" rel="">image.png</a>
-</p>
+<p></p>
 <h3 id="commit">Commit</h3>
 <p><a href="https://github.com/nukeviet/module-shops/commit/1b6d2ab792dd525ff660ecfbb848b1295cc28b19" target="_blank" rel="noopener noreffer">https://github.com/nukeviet/module-shops/commit/1b6d2ab792dd525ff660ecfbb848b1295cc28b19</a>
 </p>
