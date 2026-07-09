@@ -155,7 +155,7 @@ X-Forwarded-Host: 127.0.0.1:8081/</strong></p>
 </tr>
 </tbody>
 </table>
-<h3 id="root-cause-2"><strong>Root Cause</strong></h3>
+<h3 id="root-cause-2">Root Cause</h3>
 <p><code>modules/comment/admin/edit.php</code></p>
 <p></p>
 <p>Dòng 48, ứng dụng nhận giá trị  <code>attach</code> qua HTTP POST.</p>
