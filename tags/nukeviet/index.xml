@@ -31,12 +31,12 @@
 </tbody>
 </table>
 <h3 id="root-cause">Root cause</h3>
-<h4 id="source">Source</h4>
+<p><strong>Source</strong></p>
 <p><code>admin\seotools\robots.php</code></p>
 <p></p>
 <p>Hàm <code>$nv_Request-&gt;get_array('filename', 'post')</code> ở dòng 19 lấy dữ liệu từ array <code>$_POST['filename']</code> với body có dạng <code>filename[&lt;key&gt;] = &lt;value&gt;</code>.</p>
 <p>Tại dòng 32, input đi qua hàm <code>serialize()</code> và gắn vào biến <code>$content_config</code></p>
-<h4 id="sink"><strong>Sink</strong></h4>
+<p><strong>Sink</strong></p>
 <p>Tại dòng 35, data đã được serialize được đưa vào vào hàm <code>file_put_content()</code> để ghi vào file <code>/data/config/robots.php</code></p>
 <p></p>
 <p>Cuối cùng, tại dòng 86, file cache vừa được tạo được <code>include</code> để đọc lại cấu hình, code PHP bị nhúng bên trong sẽ lập tức được thực thi.</p>

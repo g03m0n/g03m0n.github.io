@@ -5,10 +5,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noodp" />
         <title>Nukeviet 0-days research - g03m0n</title><meta name="Description" content="g03m0n"><meta property="og:title" content="Nukeviet 0-days research" />
-<meta property="og:description" content="Nukeviet 0-days research Code Injection lead to RCE at SEO Tool function in nukeviet Description Type Version Affected Authentication required ?-day Code Injection ≤ 4.5.08 Yes (admin) 0-day Root cause Source admin\seotools\robots.php
+<meta property="og:description" content="Nukeviet 0-days research Code Injection lead to RCE at SEO Tool function in nukeviet Description Type Version Affected Authentication required ?-day Code Injection ≤ 4.5.08 Yes (admin) 0-day Root cause Source
+admin\seotools\robots.php
 Hàm $nv_Request-&gt;get_array(&#39;filename&#39;, &#39;post&#39;) ở dòng 19 lấy dữ liệu từ array $_POST[&#39;filename&#39;] với body có dạng filename[&lt;key&gt;] = &lt;value&gt;.
 Tại dòng 32, input đi qua hàm serialize() và gắn vào biến $content_config
-Sink Tại dòng 35, data đã được serialize được đưa vào vào hàm file_put_content() để ghi vào file /data/config/robots." />
+Sink
+Tại dòng 35, data đã được serialize được đưa vào vào hàm file_put_content() để ghi vào file /data/config/robots." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://g03m0n.github.io/posts/nukeviet-0-days-research/" /><meta property="og:image" content="https://g03m0n.github.io/logo.png" /><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2026-07-08T08:31:01+08:00" />
@@ -16,10 +18,12 @@ Sink Tại dòng 35, data đã được serialize được đưa vào vào hàm 
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:image" content="https://g03m0n.github.io/logo.png" /><meta name="twitter:title" content="Nukeviet 0-days research"/>
-<meta name="twitter:description" content="Nukeviet 0-days research Code Injection lead to RCE at SEO Tool function in nukeviet Description Type Version Affected Authentication required ?-day Code Injection ≤ 4.5.08 Yes (admin) 0-day Root cause Source admin\seotools\robots.php
+<meta name="twitter:description" content="Nukeviet 0-days research Code Injection lead to RCE at SEO Tool function in nukeviet Description Type Version Affected Authentication required ?-day Code Injection ≤ 4.5.08 Yes (admin) 0-day Root cause Source
+admin\seotools\robots.php
 Hàm $nv_Request-&gt;get_array(&#39;filename&#39;, &#39;post&#39;) ở dòng 19 lấy dữ liệu từ array $_POST[&#39;filename&#39;] với body có dạng filename[&lt;key&gt;] = &lt;value&gt;.
 Tại dòng 32, input đi qua hàm serialize() và gắn vào biến $content_config
-Sink Tại dòng 35, data đã được serialize được đưa vào vào hàm file_put_content() để ghi vào file /data/config/robots."/>
+Sink
+Tại dòng 35, data đã được serialize được đưa vào vào hàm file_put_content() để ghi vào file /data/config/robots."/>
 <meta name="application-name" content="g03m0n">
 <meta name="apple-mobile-web-app-title" content="g03m0n"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -195,7 +199,7 @@ Sink Tại dòng 35, data đã được serialize được đưa vào vào hàm 
 </tbody>
 </table>
 <h3 id="root-cause">Root cause</h3>
-<h4 id="source">Source</h4>
+<p><strong>Source</strong></p>
 <p><code>admin\seotools\robots.php</code></p>
 <p><img
         class="lazyload"
@@ -207,7 +211,7 @@ Sink Tại dòng 35, data đã được serialize được đưa vào vào hàm 
         title="image.png" /></p>
 <p>Hàm <code>$nv_Request-&gt;get_array('filename', 'post')</code> ở dòng 19 lấy dữ liệu từ array <code>$_POST['filename']</code> với body có dạng <code>filename[&lt;key&gt;] = &lt;value&gt;</code>.</p>
 <p>Tại dòng 32, input đi qua hàm <code>serialize()</code> và gắn vào biến <code>$content_config</code></p>
-<h4 id="sink"><strong>Sink</strong></h4>
+<p><strong>Sink</strong></p>
 <p>Tại dòng 35, data đã được serialize được đưa vào vào hàm <code>file_put_content()</code> để ghi vào file <code>/data/config/robots.php</code></p>
 <p><img
         class="lazyload"
