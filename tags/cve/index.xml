@@ -11,7 +11,7 @@
     <guid>https://g03m0n.github.io/posts/nukeviet-0-days-research/</guid>
     <description><![CDATA[<h1 id="nukeviet-0-days-research">Nukeviet 0-days research</h1>
 <h2 id="code-injection-lead-to-rce-at-seo-tool-function-in-nukeviet"><strong>Code Injection lead to RCE at SEO Tool function in nukeviet</strong></h2>
-<h3 id="description"><strong>Description</strong></h3>
+<h3 id="description">Description</h3>
 <table>
 <thead>
 <tr>
