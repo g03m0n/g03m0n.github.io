@@ -6,12 +6,12 @@
         <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 09 Jul 2026 08:29:01 &#43;0800</lastBuildDate>
             <atom:link href="https://g03m0n.github.io/index.xml" rel="self" type="application/rss+xml" />
         <item>
-    <title>1-days Roundcube Research</title>
+    <title>Roundcube 1-day Research</title>
     <link>https://g03m0n.github.io/posts/cve-2026-54433/</link>
     <pubDate>Thu, 09 Jul 2026 08:29:01 &#43;0800</pubDate>
     <author>g03m0n</author>
     <guid>https://g03m0n.github.io/posts/cve-2026-54433/</guid>
-    <description><![CDATA[<h1 id="1-days-roundcube-research">1-days Roundcube Research</h1>
+    <description><![CDATA[<h1 id="roundcube-1-day-research">Roundcube 1-day Research</h1>
 <h2 id="zero-click-stored-xss-in-roundcube-cve-2026-54433">Zero-click Stored XSS in Roundcube (CVE-2026-54433)</h2>
 <h3 id="description">Description</h3>
 <table>
@@ -225,12 +225,12 @@ VD:</p>
 ]]></description>
 </item>
 <item>
-    <title>Nukeviet 0-days Research</title>
+    <title>Nukeviet 0-day Research</title>
     <link>https://g03m0n.github.io/posts/nukeviet-0-days-research/</link>
     <pubDate>Wed, 08 Jul 2026 08:31:01 &#43;0800</pubDate>
     <author>g03m0n</author>
     <guid>https://g03m0n.github.io/posts/nukeviet-0-days-research/</guid>
-    <description><![CDATA[<h1 id="nukeviet-0-days-research"><strong>Nukeviet 0-days Research</strong></h1>
+    <description><![CDATA[<h1 id="nukeviet-0-day-research"><strong>Nukeviet 0-day Research</strong></h1>
 <h2 id="code-injection-lead-to-rce-at-seo-tool-function-in-nukeviet"><strong>Code Injection lead to RCE at SEO Tool function in nukeviet</strong></h2>
 <h3 id="description">Description</h3>
 <table>
