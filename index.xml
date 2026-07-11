@@ -3,9 +3,78 @@
         <title>g03m0n</title>
         <link>https://g03m0n.github.io/</link>
         <description>g03m0n</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 08 Jul 2026 08:31:01 &#43;0800</lastBuildDate>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 09 Jul 2026 08:29:01 &#43;0800</lastBuildDate>
             <atom:link href="https://g03m0n.github.io/index.xml" rel="self" type="application/rss+xml" />
         <item>
+    <title>Zero-click Stored XSS in Roundcube (CVE-2026-54433)</title>
+    <link>https://g03m0n.github.io/posts/cve-2026-54433/</link>
+    <pubDate>Thu, 09 Jul 2026 08:29:01 &#43;0800</pubDate>
+    <author>g03m0n</author>
+    <guid>https://g03m0n.github.io/posts/cve-2026-54433/</guid>
+    <description><![CDATA[<h1 id="zero-click-stored-xss-in-roundcube-cve-2026-54433">Zero-click Stored XSS in Roundcube (CVE-2026-54433)</h1>
+<h3 id="description">Description</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Verison Affected</th>
+<th>Required Authentication</th>
+<th>?-day</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stored XSS</td>
+<td>1.7.0, 1.7.1</td>
+<td>Yes (User)</td>
+<td>1-day</td>
+</tr>
+</tbody>
+</table>
+<h3 id="root-cause">Root cause</h3>
+<p><code>program\lib\Roundcube\rcube_string_replacer.php</code></p>
+<p></p>
+<p>Lỗi Regex dùng để trích xuất địa chỉ email nằm ở việc sử dụng <code>\S+</code> - Non-whitespace character.</p>
+<ul>
+<li><code>\?</code> : Chuỗi bắt buộc bắt đầu bằng dấu <code>?</code>.</li>
+<li><code>\S+</code> : Khớp với toàn bộ các ký tự miễn là không phải khoảng trắng như: dấu cách, dấu tab, xuống dòng. Dấu <code>+</code> nghĩa là kéo dài đến khi nào gặp khoảng trắng mới dừng lại.</li>
+</ul>
+<p>Có nghĩa là nó có thể bao gồm tất cả ký tự như <code>&lt;&gt; ' &quot; ()</code>. Bypass khoảng trắng bằng dấu <code>/</code>.</p>
+<p>→ Payload: <code>a@a.co?&lt;img/src=&quot;x&quot;/onerror=alert(123)&gt;</code></p>
+<p>Nơi sử dụng regex này là hàm <code>replace()</code> tại dòng 216:</p>
+<p></p>
+<p>Hàm <code>preg_replace_callback</code> quét chuỗi  <code>$str</code> bằng Regex <code>$this-&gt;mailto_pattern</code> và truyền các chuỗi  khớp được vào hàm <code>mailto_callback</code> để xử lý.
+Đi vào hàm <code>mailto_callback()</code>:</p>
+<p></p>
+<p>Tại dòng 191, payload trên được gán vào biến $href và bị đưa vào hàm <code>rcube::Q()</code> để xử lý.</p>
+<p>Hàm này thực chất gọi <code>htmlspecialchars</code>:</p>
+<p></p>
+<p>Đi vào hàm <code>parse_url_brackets()</code> tại dòng 190:</p>
+<p></p>
+<p></p>
+<p>Hàm này có tác dụng tìm dấu <code>[ ]</code> bị thừa trong url → cắt nó ra khỏi <code>$url</code> và trả về phần thừa nằm sau dấu <code>]</code> rồi gán vào biến <code>$suffix</code> để in ra bên ngoài thẻ link thay vì dính vào trong URL.
+VD:</p>
+<p><code>$href = &quot;http://google.com?q=hello&quot;</code> → <code>$suffix</code> = <code>&quot;&quot;</code></p>
+<p><code>$href = &quot;http://example.com]abc</code> →  <code>$suffix</code> = <code>&quot;]abc&quot;</code></p>
+<p>→ Có thể bypass bằng cách chèn dấu <code>]</code> đằng sau dấu <code>?</code> trong payload để khi payload đi qua hàm này:</p>
+<ul>
+<li>Phần trước dấu <code>]</code> giữ lại trong <code>$href</code>: <code>a@a.co?</code></li>
+<li>Phần sau dấu <code>]</code> sẽ được gán vào biến <code>$suffix</code>: <code>]&lt;img/src=&quot;x&quot;/onerror=alert(1)&gt;</code>.</li>
+</ul>
+<p>Phần <code>$suffix</code> sẽ không bị đi qua hàm <code>rcube::Q()</code>  mà sẽ được nối trực tiếp vào thẻ <code>a</code> tại dong 191:</p>
+<p></p>
+<p>→ Payload cuối: <code>a@a.co?]&lt;img/src=&quot;x&quot;/onerror=alert(123)&gt;</code></p>
+<h3 id="steps-to-reproduce">Steps to reproduce</h3>
+<p>Gửi email kèm payload: <code>a@a.co?]&lt;img/src=&quot;x&quot;/onerror=alert(123)&gt;</code> vào phần body của mail:</p>
+<p></p>
+<p>Click xem email → Triggered</p>
+<p></p>
+<h3 id="patch">Patch</h3>
+<p></p>
+<p>Ứng dụng lọc ký tự <code>&lt;&gt;</code></p>
+]]></description>
+</item>
+<item>
     <title>Nukeviet 0-days Research</title>
     <link>https://g03m0n.github.io/posts/nukeviet-0-days-research/</link>
     <pubDate>Wed, 08 Jul 2026 08:31:01 &#43;0800</pubDate>
@@ -1164,80 +1233,6 @@ Access <strong><code>Receive Shipments</code></strong> to create a new Invoice:<
 <p></p>
 <p>Additionally, when returning to the <strong>Mainpage</strong>, XSS is also <strong>Triggered</strong> because there are no measures to control the content before rendering it to the screen.</p>
 <p></p>
-]]></description>
-</item>
-<item>
-    <title>Stored-XSS via animate tag in Roundcube (CVE-2025-68461)</title>
-    <link>https://g03m0n.github.io/posts/cve-2025-68461/</link>
-    <pubDate>Wed, 31 Dec 2025 08:29:01 &#43;0800</pubDate>
-    <author>g03m0n</author>
-    <guid>https://g03m0n.github.io/posts/cve-2025-68461/</guid>
-    <description><![CDATA[<h1 id="stored-xss-via-animate-tag-in-roundcube-cve-2025-68461">Stored-XSS via animate tag in Roundcube (CVE-2025-68461)</h1>
-<h2 id="description-and-impact">Description and Impact</h2>
-<table>
-<thead>
-<tr>
-<th>Type</th>
-<th>Version Affected</th>
-<th>Authentication Required</th>
-<th>?-day</th>
-<th>CVSS</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Stored-XSS</td>
-<td>&lt;1.5.12, &lt;1.6.12</td>
-<td>Yes</td>
-<td>1-day</td>
-<td>7.2</td>
-</tr>
-</tbody>
-</table>
-<p>Roundcube Webmail before 1.5.12 and 1.6 before 1.6.12 is prone to a Cross-Site-Scripting (XSS) vulnerability via the animate tag in an SVG document.</p>
-<h2 id="root-cause-analysis">Root cause analysis</h2>
-<p><code>program\lib\Roundcube\rcube_washtml.php:dumpHtml()</code></p>
-<p></p>
-<p>Ứng dụng kiểm tra xem thẻ hiện tại (<code>$tagName</code>) có phải là một trong các thẻ hoạt ảnh (<code>animate</code>, <code>animatecolor</code>, …) hay không. Nếu đúng, nó gọi tiếp hàm <code>self::attribute_value</code> để kiểm tra xem thẻ này có chứa thuộc tính tên là <code>attributename</code> và giá trị của nó có đang được đặt là <code>href</code> hay không. Nếu cả 2 điều kiện đúng, nó sẽ chặn thẻ này.</p>
-<p></p>
-<p>Hàm <code>attribute_value</code> đi tìm trong thẻ đó xem có thuộc tính nào khớp tên (<code>$attr_name</code>) và khớp giá trị (<code>$attr_value</code>) hay không. Ở đây là nó <strong>so sánh chuỗi chính xác</strong> (chỉ bỏ qua chữ hoa/chữ thường và khoảng trắng thừa).</p>
-<p>Bypass bằng cách thay href bằng xlink:href:  <code>&lt;animate attributeName=&quot;xlink:href&quot; ...&gt;</code> khi đó:</p>
-<ul>
-<li>Biến <code>$attr_value</code> mà hàm ở Ảnh 1 đang tìm kiếm là chuỗi <strong><code>'href'</code></strong>.</li>
-<li>Nhưng giá trị thực tế truyền vào là chuỗi <strong><code>xlink:href</code></strong>.</li>
-<li>Khi hàm <code>attribute_value()</code>  thực hiện so sánh: <code>'href' === 'xlink:href'</code>, kết quả trả về là <strong>False</strong>.</li>
-</ul>
-<p>→ Ứng dũng sẽ bỏ qua <code>if</code> và không bị block.</p>
-<h3 id="limitation">Limitation</h3>
-<p>Để hiển thị email đồng nhất, ứng dụng bọc nội dung vào một cấu trúc HTML. Điều này ép lớp <code>DOMDocument</code> của PHP phải sử dụng trình phân tích cú pháp HTML (<code>loadHTML()</code>) thay vì XML (<code>loadXML()</code>)</p>
-<p></p>
-<p></p>
-<p></p>
-<p>Trình phân tích HTML không hỗ trợ các tiêu chuẩn của XML namespace. Do đó, trong quá trình xử lý, nó đã âm thầm loại bỏ khai báo bắt buộc <code>xmlns:xlink</code> và tự động chuyển không gian tên của SVG (<code>http://www.w3.org/2000/svg</code>) sang chuẩn HTML (<code>http://www.w3.org/1999/xhtml</code>).</p>
-<p>Từ phiên bản 1.5.8, Roundcube đã thêm CSP header khi người dùng xem ảnh trực tiếp trên trình duyệt:</p>
-<p></p>
-<h2 id="steps-to-reproduce">Steps to Reproduce</h2>
-<p>Gửi mail kèm file svg với nội dung như sau:
-<code>xss.svg</code></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>&lt;svg xmlns:xlink<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;http://www.w3.org/1999/xlink&#34;</span>
-</span></span><span style="display:flex;"><span>     xmlns<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;http://www.w3.org/2000/svg&#34;</span>&gt;
-</span></span><span style="display:flex;"><span>  &lt;a&gt;
-</span></span><span style="display:flex;"><span>    &lt;animate attributeName<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;xlink:href&#34;</span> dur<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;0.1s&#34;</span> fill<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;freeze&#34;</span>
-</span></span><span style="display:flex;"><span>             values<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;javascript:alert(1)&#34;</span>/&gt;
-</span></span><span style="display:flex;"><span>    &lt;text x<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;100&#34;</span> y<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;100&#34;</span>
-</span></span><span style="display:flex;"><span>          font-weight<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;bold&#34;</span>&gt;Click me!!!&lt;/text&gt;
-</span></span><span style="display:flex;"><span>  &lt;/a&gt;
-</span></span><span style="display:flex;"><span>&lt;/svg&gt;
-</span></span></code></pre></div><p></p>
-<p>Open image in new tab:</p>
-<p></p>
-<p>Click → XSS:</p>
-<p></p>
-<h2 id="patch">Patch</h2>
-<p></p>
-<p>Hàm Regex này sẽ tìm và xóa mọi thứ từ đầu chuỗi cho đến dấu hai chấm <code>:</code>.</p>
-<p>Nếu truyền vào giá trị <code>xlink:href</code> (hoặc bất kỳ tên ảo nào như <code>abc:href</code>), hàm này sẽ cắt bỏ phần đầu, chỉ giữ lại chữ <code>href</code>.</p>
-<p>Khi đó, phép so sánh cuối cùng sẽ là <code>'href' === 'href'</code> (trả về True).</p>
 ]]></description>
 </item>
 </channel>
