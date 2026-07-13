@@ -150,7 +150,7 @@ VD:</p>
 <p>Sau patch, payload được render thành text:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&amp;lt;img src=x onerror=alert(1)&amp;gt;
 </span></span></code></pre></div><hr>
-<h2 id="bypass-url-filter-leading-to-ssrf">Bypass url filter leading to SSRF</h2>
+<h2 id="bypass-url-filter-leading-to-ssrf-cve-2026-48843">Bypass url filter leading to SSRF (CVE-2026-48843)</h2>
 <h3 id="description-2">Description</h3>
 <table>
 <thead>
